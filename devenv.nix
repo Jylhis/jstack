@@ -14,6 +14,7 @@
     pkgs.git
     pkgs.gh
     pkgs.playwright-driver
+    pkgs.supabase-cli
   ];
 
   # Bun runtime + auto-install deps on shell entry
@@ -51,6 +52,10 @@
         env = {
           DEVENV_ROOT = config.devenv.root;
         };
+      };
+      supabase = {
+        type = "http";
+        url = "https://mcp.supabase.com/mcp?project_ref=dgoyvrnzxpiailzearqg&read_only=true";
       };
     };
   };
