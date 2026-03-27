@@ -36,6 +36,7 @@
     enable = true;
     config.programs = {
       nixfmt.enable = true;
+      actionlint.enable = true;
     };
   };
 
