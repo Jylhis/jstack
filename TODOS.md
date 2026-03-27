@@ -632,6 +632,95 @@ Shipped in v0.6.5. TemplateContext in gen-skill-docs.ts bakes skill name into pr
 **Priority:** P3
 **Depends on:** Telemetry data showing freeze hook fires in real /investigate sessions
 
+## Skill Landscape Research
+
+### Review and evaluate external skill repositories
+
+**What:** Systematically read, review, and evaluate skills from community and vendor repositories. Identify patterns worth adopting, skills worth integrating or adapting, and gaps in gstack's current skill set. Produce a structured evaluation for each repository.
+
+**Why:** The Claude Code / agent skill ecosystem is growing fast. Understanding what others have built reveals: (1) patterns we should adopt, (2) skills we could integrate or adapt, (3) anti-patterns to avoid, (4) positioning gaps where gstack is behind or ahead.
+
+**Repositories to evaluate:**
+
+General / official:
+- https://github.com/anthropics/skills
+- https://github.com/anthropics/claude-plugins-official
+- https://github.com/openai/skills
+- https://github.com/microsoft/skills
+- https://github.com/google-gemini/gemini-skills
+- https://github.com/github/copilot-plugins
+- https://github.com/hashicorp/agent-skills
+
+Developer tooling:
+- https://github.com/callstackincubator/agent-skills
+- https://github.com/samber/cc-skills-golang
+- https://github.com/getsentry/skills
+- https://gitlab.com/gitlab-org/ai/skills
+- https://github.com/trailofbits/skills
+- https://github.com/actionbook/rust-skills
+- https://github.com/duckdb/duckdb-skills
+- https://github.com/antonbabenko/terraform-skill
+- https://github.com/coderabbitai/skills
+- https://github.com/mattpocock/skills
+- https://github.com/mcollina/skills/tree/main/skills
+- https://github.com/fvadicamo/dev-agent-skills
+- https://github.com/obra/superpowers
+- https://github.com/googleworkspace/cli
+
+Context engineering / methodology:
+- https://github.com/NeoLabHQ/context-engineering-kit/tree/master/plugins/code-review
+- https://github.com/NeoLabHQ/context-engineering-kit/tree/master/plugins/ddd
+- https://github.com/NeoLabHQ/context-engineering-kit/tree/master/plugins/sdd
+- https://github.com/NeoLabHQ/context-engineering-kit/tree/master/plugins/sadd
+- https://github.com/NeoLabHQ/context-engineering-kit/tree/master/plugins/kaizen
+- https://github.com/NeoLabHQ/context-engineering-kit/tree/master/plugins/docs/skills/write-concisely
+- https://github.com/NeoLabHQ/context-engineering-kit/tree/master/plugins/customaize-agent/skills/prompt-engineering
+- https://github.com/muratcankoylan/Agent-Skills-for-Context-Engineering
+
+Security:
+- https://github.com/prompt-security/clawsec
+- https://github.com/BehiSecc/VibeSec-Skill
+- https://github.com/mukul975/Anthropic-Cybersecurity-Skills
+- https://github.com/jthack/ffuf_claude_skill
+- https://github.com/wrsmith108/varlock-claude-skill
+
+Research / specialized:
+- https://github.com/sanjay3290/ai-skills/tree/main/skills/deep-research
+- https://github.com/Orchestra-Research/AI-Research-SKILLs
+- https://github.com/ShunsukeHayashi/agent-skill-bus
+- https://github.com/hanfang/claude-memory-skill
+- https://github.com/kreuzberg-dev/kreuzberg/tree/main/skills/kreuzberg
+
+Product / design / non-engineering:
+- https://github.com/deanpeters/Product-Manager-Skills
+- https://github.com/phuryn/pm-skills
+- https://github.com/coreyhaines31/marketingskills
+- https://github.com/Paramchoudhary/ResumeSkills
+- https://github.com/yusufkaraaslan/Skill_Seekers
+- https://github.com/kepano/obsidian-skills
+
+UI / creative:
+- https://github.com/ibelick/ui-skills
+- https://github.com/bitwize-music-studio/claude-ai-music-skills
+- https://github.com/meodai/skill.color-expert
+- https://paulo.com.br/skills/genealogy-research/SKILL.md
+
+Curated collections:
+- https://github.com/Shpigford/skills/tree/main/readme
+
+**Evaluation criteria per repo:**
+1. **Quality:** Is the skill well-structured? Does it follow good prompt engineering patterns?
+2. **Relevance:** Does it cover a gap in gstack's current skill set?
+3. **Adoptability:** Could we integrate, adapt, or learn from it? What's the effort?
+4. **Patterns:** Any novel patterns (tool use, context management, multi-step workflows) worth adopting?
+5. **Anti-patterns:** Anything we should explicitly avoid?
+
+**Output:** Structured evaluation doc at `~/.gstack-dev/plans/skill-landscape-eval.md` with per-repo notes and a summary of actionable takeaways.
+
+**Effort:** L (human: ~2 weeks / CC: ~4 hours)
+**Priority:** P2
+**Depends on:** None
+
 ## Completed
 
 ### CI eval pipeline (v0.9.9.0)
