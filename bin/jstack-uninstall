@@ -1,31 +1,31 @@
 #!/usr/bin/env bash
-# gstack-uninstall — remove gstack skills, state, and browse daemons
+# jstack-uninstall — remove jstack skills, state, and browse daemons
 #
 # Usage:
-#   gstack-uninstall              — interactive uninstall (prompts before removing)
-#   gstack-uninstall --force      — remove everything without prompting
-#   gstack-uninstall --keep-state — remove skills but keep ~/.gstack/ data
+#   jstack-uninstall              — interactive uninstall (prompts before removing)
+#   jstack-uninstall --force      — remove everything without prompting
+#   jstack-uninstall --keep-state — remove skills but keep ~/.jstack/ data
 #
 # What gets REMOVED:
-#   ~/.claude/skills/gstack       — global Claude skill install (git clone or vendored)
+#   ~/.claude/skills/jstack       — global Claude skill install (git clone or vendored)
 #   ~/.claude/skills/{skill}      — per-skill symlinks created by setup
-#   ~/.codex/skills/gstack*       — Codex skill install + per-skill symlinks
-#   ~/.kiro/skills/gstack*        — Kiro skill install + per-skill symlinks
-#   ~/.gstack/                    — global state (config, analytics, sessions, projects,
+#   ~/.codex/skills/jstack*       — Codex skill install + per-skill symlinks
+#   ~/.kiro/skills/jstack*        — Kiro skill install + per-skill symlinks
+#   ~/.jstack/                    — global state (config, analytics, sessions, projects,
 #                                   repos, installation-id, browse error logs)
-#   .claude/skills/gstack*        — project-local skill install (--local installs)
-#   .gstack/                      — per-project browse state (in current git repo)
-#   .gstack-worktrees/            — per-project test worktrees (in current git repo)
-#   .agents/skills/gstack*        — Codex/Gemini/Cursor sidecar (in current git repo)
+#   .claude/skills/jstack*        — project-local skill install (--local installs)
+#   .jstack/                      — per-project browse state (in current git repo)
+#   .jstack-worktrees/            — per-project test worktrees (in current git repo)
+#   .agents/skills/jstack*        — Codex/Gemini/Cursor sidecar (in current git repo)
 #   Running browse daemons        — stopped via SIGTERM before cleanup
 #
 # What is NOT REMOVED:
 #   ~/Library/Caches/ms-playwright/  — Playwright Chromium (shared, may be used by other tools)
-#   ~/.gstack-dev/                   — developer eval artifacts (only present in gstack contributors)
+#   ~/.jstack-dev/                   — developer eval artifacts (only present in jstack contributors)
 #
 # Env overrides (for testing):
-#   GSTACK_DIR        — override auto-detected gstack root
-#   GSTACK_STATE_DIR  — override ~/.gstack state directory
+#   JSTACK_DIR        — override auto-detected jstack root
+#   JSTACK_STATE_DIR  — override ~/.jstack state directory
 #
 # NOTE: Uses set -uo pipefail (no -e) — uninstall must never abort partway.
 set -uo pipefail
@@ -35,8 +35,8 @@ if [ -z "${HOME:-}" ]; then
   exit 1
 fi
 
-GSTACK_DIR="${GSTACK_DIR:-$(cd "$(dirname "$0")/.." && pwd)}"
-STATE_DIR="${GSTACK_STATE_DIR:-$HOME/.gstack}"
+JSTACK_DIR="${JSTACK_DIR:-$(cd "$(dirname "$0")/.." && pwd)}"
+STATE_DIR="${JSTACK_STATE_DIR:-$HOME/.jstack}"
 _GIT_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || true)"
 
 # ─── Parse flags ─────────────────────────────────────────────
@@ -52,7 +52,7 @@ while [ $# -gt 0 ]; do
       ;;
     *)
       echo "Unknown option: $1" >&2
-      echo "Usage: gstack-uninstall [--force] [--keep-state]" >&2
+      echo "Usage: jstack-uninstall [--force] [--keep-state]" >&2
       exit 1
       ;;
   esac
@@ -60,22 +60,22 @@ done
 
 # ─── Confirmation ────────────────────────────────────────────
 if [ "$FORCE" -eq 0 ]; then
-  echo "This will remove gstack from your system:"
-  { [ -d "$HOME/.claude/skills/gstack" ] || [ -L "$HOME/.claude/skills/gstack" ]; } && echo "  ~/.claude/skills/gstack (+ per-skill symlinks)"
-  [ -d "$HOME/.codex/skills" ] && echo "  ~/.codex/skills/gstack*"
-  [ -d "$HOME/.kiro/skills" ] && echo "  ~/.kiro/skills/gstack*"
+  echo "This will remove jstack from your system:"
+  { [ -d "$HOME/.claude/skills/jstack" ] || [ -L "$HOME/.claude/skills/jstack" ]; } && echo "  ~/.claude/skills/jstack (+ per-skill symlinks)"
+  [ -d "$HOME/.codex/skills" ] && echo "  ~/.codex/skills/jstack*"
+  [ -d "$HOME/.kiro/skills" ] && echo "  ~/.kiro/skills/jstack*"
   [ "$KEEP_STATE" -eq 0 ] && [ -d "$STATE_DIR" ] && echo "  $STATE_DIR"
 
   if [ -n "$_GIT_ROOT" ]; then
-    [ -d "$_GIT_ROOT/.claude/skills/gstack" ] && echo "  $_GIT_ROOT/.claude/skills/gstack (project-local)"
-    [ -d "$_GIT_ROOT/.gstack" ] && echo "  $_GIT_ROOT/.gstack/ (browse state + reports)"
-    [ -d "$_GIT_ROOT/.gstack-worktrees" ] && echo "  $_GIT_ROOT/.gstack-worktrees/"
-    [ -d "$_GIT_ROOT/.agents/skills" ] && echo "  $_GIT_ROOT/.agents/skills/gstack*"
+    [ -d "$_GIT_ROOT/.claude/skills/jstack" ] && echo "  $_GIT_ROOT/.claude/skills/jstack (project-local)"
+    [ -d "$_GIT_ROOT/.jstack" ] && echo "  $_GIT_ROOT/.jstack/ (browse state + reports)"
+    [ -d "$_GIT_ROOT/.jstack-worktrees" ] && echo "  $_GIT_ROOT/.jstack-worktrees/"
+    [ -d "$_GIT_ROOT/.agents/skills" ] && echo "  $_GIT_ROOT/.agents/skills/jstack*"
   fi
 
   # Preview running daemons
-  if [ -n "$_GIT_ROOT" ] && [ -f "$_GIT_ROOT/.gstack/browse.json" ]; then
-    _PREVIEW_PID="$(awk -F'[:,]' '/"pid"/ { for(i=1;i<=NF;i++) if($i ~ /"pid"/) { gsub(/[^0-9]/, "", $(i+1)); print $(i+1); exit } }' "$_GIT_ROOT/.gstack/browse.json" 2>/dev/null || true)"
+  if [ -n "$_GIT_ROOT" ] && [ -f "$_GIT_ROOT/.jstack/browse.json" ]; then
+    _PREVIEW_PID="$(awk -F'[:,]' '/"pid"/ { for(i=1;i<=NF;i++) if($i ~ /"pid"/) { gsub(/[^0-9]/, "", $(i+1)); print $(i+1); exit } }' "$_GIT_ROOT/.jstack/browse.json" 2>/dev/null || true)"
     [ -n "$_PREVIEW_PID" ] && kill -0 "$_PREVIEW_PID" 2>/dev/null && echo "  browse daemon (PID $_PREVIEW_PID) will be stopped"
   fi
 
@@ -90,7 +90,7 @@ fi
 REMOVED=()
 
 # ─── Stop running browse daemons ─────────────────────────────
-# Browse servers write PID to {project}/.gstack/browse.json.
+# Browse servers write PID to {project}/.jstack/browse.json.
 # Stop any we can find before removing state directories.
 stop_browse_daemon() {
   local state_file="$1"
@@ -115,33 +115,33 @@ stop_browse_daemon() {
 }
 
 # Stop daemon in current project
-if [ -n "$_GIT_ROOT" ] && [ -f "$_GIT_ROOT/.gstack/browse.json" ]; then
-  stop_browse_daemon "$_GIT_ROOT/.gstack/browse.json"
+if [ -n "$_GIT_ROOT" ] && [ -f "$_GIT_ROOT/.jstack/browse.json" ]; then
+  stop_browse_daemon "$_GIT_ROOT/.jstack/browse.json"
 fi
 
 # Stop daemons tracked in global projects directory
 if [ -d "$STATE_DIR/projects" ]; then
   while IFS= read -r _BJ; do
     stop_browse_daemon "$_BJ"
-  done < <(find "$STATE_DIR/projects" -name browse.json -path '*/.gstack/*' 2>/dev/null || true)
+  done < <(find "$STATE_DIR/projects" -name browse.json -path '*/.jstack/*' 2>/dev/null || true)
 fi
 
 # ─── Remove global Claude skills ────────────────────────────
 CLAUDE_SKILLS="$HOME/.claude/skills"
-if [ -d "$CLAUDE_SKILLS/gstack" ] || [ -L "$CLAUDE_SKILLS/gstack" ]; then
-  # Remove per-skill symlinks that point into gstack/
+if [ -d "$CLAUDE_SKILLS/jstack" ] || [ -L "$CLAUDE_SKILLS/jstack" ]; then
+  # Remove per-skill symlinks that point into jstack/
   for _LINK in "$CLAUDE_SKILLS"/*; do
     [ -L "$_LINK" ] || continue
     _NAME="$(basename "$_LINK")"
-    [ "$_NAME" = "gstack" ] && continue
+    [ "$_NAME" = "jstack" ] && continue
     _TARGET="$(readlink "$_LINK" 2>/dev/null || true)"
     case "$_TARGET" in
-      gstack/*|*/gstack/*) rm -f "$_LINK"; REMOVED+=("claude/$_NAME") ;;
+      jstack/*|*/jstack/*) rm -f "$_LINK"; REMOVED+=("claude/$_NAME") ;;
     esac
   done
 
-  rm -rf "$CLAUDE_SKILLS/gstack"
-  REMOVED+=("~/.claude/skills/gstack")
+  rm -rf "$CLAUDE_SKILLS/jstack"
+  REMOVED+=("~/.claude/skills/jstack")
 fi
 
 # ─── Remove project-local Claude skills (--local installs) ──
@@ -150,19 +150,19 @@ if [ -n "$_GIT_ROOT" ] && [ -d "$_GIT_ROOT/.claude/skills" ]; then
     [ -L "$_LINK" ] || continue
     _TARGET="$(readlink "$_LINK" 2>/dev/null || true)"
     case "$_TARGET" in
-      gstack/*|*/gstack/*) rm -f "$_LINK"; REMOVED+=("local claude/$(basename "$_LINK")") ;;
+      jstack/*|*/jstack/*) rm -f "$_LINK"; REMOVED+=("local claude/$(basename "$_LINK")") ;;
     esac
   done
-  if [ -d "$_GIT_ROOT/.claude/skills/gstack" ] || [ -L "$_GIT_ROOT/.claude/skills/gstack" ]; then
-    rm -rf "$_GIT_ROOT/.claude/skills/gstack"
-    REMOVED+=("$_GIT_ROOT/.claude/skills/gstack")
+  if [ -d "$_GIT_ROOT/.claude/skills/jstack" ] || [ -L "$_GIT_ROOT/.claude/skills/jstack" ]; then
+    rm -rf "$_GIT_ROOT/.claude/skills/jstack"
+    REMOVED+=("$_GIT_ROOT/.claude/skills/jstack")
   fi
 fi
 
 # ─── Remove Codex skills ────────────────────────────────────
 CODEX_SKILLS="$HOME/.codex/skills"
 if [ -d "$CODEX_SKILLS" ]; then
-  for _ITEM in "$CODEX_SKILLS"/gstack*; do
+  for _ITEM in "$CODEX_SKILLS"/jstack*; do
     [ -e "$_ITEM" ] || [ -L "$_ITEM" ] || continue
     rm -rf "$_ITEM"
     REMOVED+=("codex/$(basename "$_ITEM")")
@@ -172,7 +172,7 @@ fi
 # ─── Remove Kiro skills ─────────────────────────────────────
 KIRO_SKILLS="$HOME/.kiro/skills"
 if [ -d "$KIRO_SKILLS" ]; then
-  for _ITEM in "$KIRO_SKILLS"/gstack*; do
+  for _ITEM in "$KIRO_SKILLS"/jstack*; do
     [ -e "$_ITEM" ] || [ -L "$_ITEM" ] || continue
     rm -rf "$_ITEM"
     REMOVED+=("kiro/$(basename "$_ITEM")")
@@ -181,7 +181,7 @@ fi
 
 # ─── Remove per-project .agents/ sidecar ─────────────────────
 if [ -n "$_GIT_ROOT" ] && [ -d "$_GIT_ROOT/.agents/skills" ]; then
-  for _ITEM in "$_GIT_ROOT/.agents/skills"/gstack*; do
+  for _ITEM in "$_GIT_ROOT/.agents/skills"/jstack*; do
     [ -e "$_ITEM" ] || [ -L "$_ITEM" ] || continue
     rm -rf "$_ITEM"
     REMOVED+=("agents/$(basename "$_ITEM")")
@@ -193,13 +193,13 @@ fi
 
 # ─── Remove per-project state ───────────────────────────────
 if [ -n "$_GIT_ROOT" ]; then
-  if [ -d "$_GIT_ROOT/.gstack" ]; then
-    rm -rf "$_GIT_ROOT/.gstack"
-    REMOVED+=("$_GIT_ROOT/.gstack/")
+  if [ -d "$_GIT_ROOT/.jstack" ]; then
+    rm -rf "$_GIT_ROOT/.jstack"
+    REMOVED+=("$_GIT_ROOT/.jstack/")
   fi
-  if [ -d "$_GIT_ROOT/.gstack-worktrees" ]; then
-    rm -rf "$_GIT_ROOT/.gstack-worktrees"
-    REMOVED+=("$_GIT_ROOT/.gstack-worktrees/")
+  if [ -d "$_GIT_ROOT/.jstack-worktrees" ]; then
+    rm -rf "$_GIT_ROOT/.jstack-worktrees"
+    REMOVED+=("$_GIT_ROOT/.jstack-worktrees/")
   fi
 fi
 
@@ -210,7 +210,7 @@ if [ "$KEEP_STATE" -eq 0 ] && [ -d "$STATE_DIR" ]; then
 fi
 
 # ─── Clean up temp files ────────────────────────────────────
-for _TMP in /tmp/gstack-latest-version /tmp/gstack-sketch-*.html /tmp/gstack-sketch.png /tmp/gstack-sync-*; do
+for _TMP in /tmp/jstack-latest-version /tmp/jstack-sketch-*.html /tmp/jstack-sketch.png /tmp/jstack-sync-*; do
   if [ -e "$_TMP" ]; then
     rm -f "$_TMP"
     REMOVED+=("$(basename "$_TMP")")
@@ -220,9 +220,9 @@ done
 # ─── Summary ────────────────────────────────────────────────
 if [ ${#REMOVED[@]} -gt 0 ]; then
   echo "Removed: ${REMOVED[*]}"
-  echo "gstack uninstalled."
+  echo "jstack uninstalled."
 else
-  echo "Nothing to remove — gstack is not installed."
+  echo "Nothing to remove — jstack is not installed."
 fi
 
 exit 0

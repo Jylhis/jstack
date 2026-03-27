@@ -1,12 +1,12 @@
 #!/usr/bin/env bun
 /**
- * gstack-global-discover — Discover AI coding sessions across Claude Code, Codex CLI, and Gemini CLI.
+ * jstack-global-discover — Discover AI coding sessions across Claude Code, Codex CLI, and Gemini CLI.
  * Resolves each session's working directory to a git repo, deduplicates by normalized remote URL,
  * and outputs structured JSON to stdout.
  *
  * Usage:
- *   gstack-global-discover --since 7d [--format json|summary]
- *   gstack-global-discover --help
+ *   jstack-global-discover --since 7d [--format json|summary]
+ *   jstack-global-discover --help
  */
 
 import { existsSync, readdirSync, statSync, readFileSync, openSync, readSync, closeSync } from "fs";
@@ -44,15 +44,15 @@ interface DiscoveryResult {
 // ── CLI parsing ────────────────────────────────────────────────────────────
 
 function printUsage(): void {
-  console.error(`Usage: gstack-global-discover --since <window> [--format json|summary]
+  console.error(`Usage: jstack-global-discover --since <window> [--format json|summary]
 
   --since <window>   Time window: e.g. 7d, 14d, 30d, 24h
   --format <fmt>     Output format: json (default) or summary
   --help             Show this help
 
 Examples:
-  gstack-global-discover --since 7d
-  gstack-global-discover --since 14d --format summary`);
+  jstack-global-discover --since 7d
+  jstack-global-discover --since 14d --format summary`);
 }
 
 function parseArgs(): { since: string; format: "json" | "summary" } {
@@ -241,7 +241,7 @@ function resolveClaudeCodeCwd(
   jsonlFiles: string[]
 ): string | null {
   // Fast-path: decode directory name
-  // e.g., -Users-garrytan-git-repo → /Users/garrytan/git/repo
+  // e.g., -Users-Jylhis-git-repo → /Users/Jylhis/git/repo
   const decoded = dirName.replace(/^-/, "/").replace(/-/g, "/");
   if (existsSync(decoded)) return decoded;
 

@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
-# gstack-analytics — personal usage dashboard from local JSONL
+# jstack-analytics — personal usage dashboard from local JSONL
 #
 # Usage:
-#   gstack-analytics          # default: last 7 days
-#   gstack-analytics 7d       # last 7 days
-#   gstack-analytics 30d      # last 30 days
-#   gstack-analytics all      # all time
+#   jstack-analytics          # default: last 7 days
+#   jstack-analytics 7d       # last 7 days
+#   jstack-analytics 30d      # last 30 days
+#   jstack-analytics all      # all time
 #
 # Env overrides (for testing):
-#   GSTACK_STATE_DIR  — override ~/.gstack state directory
+#   JSTACK_STATE_DIR  — override ~/.jstack state directory
 set -uo pipefail
 
-STATE_DIR="${GSTACK_STATE_DIR:-$HOME/.gstack}"
+STATE_DIR="${JSTACK_STATE_DIR:-$HOME/.jstack}"
 JSONL_FILE="$STATE_DIR/analytics/skill-usage.jsonl"
 
 # ─── Parse time window ───────────────────────────────────────
@@ -25,16 +25,16 @@ esac
 
 # ─── Check for data ──────────────────────────────────────────
 if [ ! -f "$JSONL_FILE" ]; then
-  echo "gstack usage — no data yet"
+  echo "jstack usage — no data yet"
   echo ""
-  echo "Usage data will appear here after you use gstack skills"
-  echo "with telemetry enabled (gstack-config set telemetry anonymous)."
+  echo "Usage data will appear here after you use jstack skills"
+  echo "with telemetry enabled (jstack-config set telemetry anonymous)."
   exit 0
 fi
 
 TOTAL_LINES="$(wc -l < "$JSONL_FILE" | tr -d ' ')"
 if [ "$TOTAL_LINES" = "0" ]; then
-  echo "gstack usage — no data yet"
+  echo "jstack usage — no data yet"
   exit 0
 fi
 
@@ -71,7 +71,7 @@ else
 fi
 
 if [ -z "$FILTERED" ]; then
-  echo "gstack usage ($LABEL) — no skill runs found"
+  echo "jstack usage ($LABEL) — no skill runs found"
   exit 0
 fi
 
@@ -138,7 +138,7 @@ else
 fi
 
 # ─── Render output ───────────────────────────────────────────
-echo "gstack usage ($LABEL)"
+echo "jstack usage ($LABEL)"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
 # Find max count for bar scaling
