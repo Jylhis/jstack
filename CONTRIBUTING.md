@@ -10,14 +10,13 @@ That's what dev mode does. It symlinks your repo into the local `.claude/skills/
 
 ```bash
 git clone <repo> && cd gstack
-bun install                    # install dependencies
-bin/dev-setup                  # activate dev mode
+devenv shell                   # enter dev shell (auto-installs deps, activates dev mode)
 ```
 
 Now edit any `SKILL.md`, invoke it in Claude Code (e.g. `/review`), and see your changes live. When you're done developing:
 
 ```bash
-bin/dev-teardown               # deactivate — back to your global install
+dev-teardown                   # deactivate — back to your global install
 ```
 
 ## Contributor mode
@@ -63,13 +62,13 @@ When you have 3+ gstack sessions open simultaneously, every question tells you w
 ## Working on gstack inside the gstack repo
 
 When you're editing gstack skills and want to test them by actually using gstack
-in the same repo, `bin/dev-setup` wires this up. It creates `.claude/skills/`
+in the same repo, `devenv shell` wires this up. It creates `.claude/skills/`
 symlinks (gitignored) pointing back to your working tree, so Claude Code uses
 your local edits instead of the global install.
 
 ```
 gstack/                          <- your working tree
-├── .claude/skills/              <- created by dev-setup (gitignored)
+├── .claude/skills/              <- created by devenv shell (gitignored)
 │   ├── gstack -> ../../         <- symlink back to repo root
 │   ├── review -> gstack/review  <- short names (default)
 │   ├── ship -> gstack/ship      <- or gstack-review, gstack-ship if --prefix
@@ -92,7 +91,7 @@ prefer namespaced names (`/gstack-review`, `/gstack-ship`).
 
 ```bash
 # 1. Enter dev mode
-bin/dev-setup
+devenv shell
 
 # 2. Edit a skill
 vim review/SKILL.md
@@ -104,7 +103,7 @@ vim review/SKILL.md
 bun run build
 
 # 5. Done for the day? Tear down
-bin/dev-teardown
+dev-teardown
 ```
 
 ## Testing & evals
@@ -278,7 +277,7 @@ bun run skill:check
 
 ### Dev setup for .agents/
 
-When you run `bin/dev-setup`, it creates symlinks in both `.claude/skills/` and `.agents/skills/` (if applicable), so Codex-compatible agents can discover your dev skills too. The `.agents/` directory is generated at setup time from `.tmpl` templates — it is gitignored and not committed.
+When you enter `devenv shell`, it creates symlinks in both `.claude/skills/` and `.agents/skills/` (if applicable), so Codex-compatible agents can discover your dev skills too. The `.agents/` directory is generated at setup time from `.tmpl` templates — it is gitignored and not committed.
 
 ### Adding a new skill
 
@@ -294,10 +293,10 @@ If you're using [Conductor](https://conductor.build) to run multiple Claude Code
 
 | Hook | Script | What it does |
 |------|--------|-------------|
-| `setup` | `bin/dev-setup` | Copies `.env` from main worktree, installs deps, symlinks skills |
-| `archive` | `bin/dev-teardown` | Removes skill symlinks, cleans up `.claude/` directory |
+| `setup` | `devenv shell` | Copies `.env` from main worktree, installs deps, symlinks skills |
+| `archive` | `devenv shell -- dev-teardown` | Removes skill symlinks, cleans up `.claude/` directory |
 
-When Conductor creates a new workspace, `bin/dev-setup` runs automatically. It detects the main worktree (via `git worktree list`), copies your `.env` so API keys carry over, and sets up dev mode — no manual steps needed.
+When Conductor creates a new workspace, `devenv shell` runs automatically. It detects the main worktree (via `git worktree list`), copies your `.env` so API keys carry over, and sets up dev mode — no manual steps needed.
 
 **First-time setup:** Put your `ANTHROPIC_API_KEY` in `.env` in the main repo (see `.env.example`). Every Conductor workspace inherits it automatically.
 
@@ -306,8 +305,8 @@ When Conductor creates a new workspace, `bin/dev-setup` runs automatically. It d
 - **SKILL.md files are generated.** Edit the `.tmpl` template, not the `.md`. Run `bun run gen:skill-docs` to regenerate.
 - **TODOS.md is the unified backlog.** Organized by skill/component with P0-P4 priorities. `/ship` auto-detects completed items. All planning/review/retro skills read it for context.
 - **Browse source changes need a rebuild.** If you touch `browse/src/*.ts`, run `bun run build`.
-- **Dev mode shadows your global install.** Project-local skills take priority over `~/.claude/skills/gstack`. `bin/dev-teardown` restores the global one.
-- **Conductor workspaces are independent.** Each workspace is its own git worktree. `bin/dev-setup` runs automatically via `conductor.json`.
+- **Dev mode shadows your global install.** Project-local skills take priority over `~/.claude/skills/gstack`. `dev-teardown` restores the global one.
+- **Conductor workspaces are independent.** Each workspace is its own git worktree. `devenv shell` runs automatically via `conductor.json`.
 - **`.env` propagates across worktrees.** Set it once in the main repo, all Conductor workspaces get it.
 - **`.claude/skills/` is gitignored.** The symlinks never get committed.
 

@@ -54,7 +54,106 @@
     };
   };
 
+  # dev-teardown: remove dev skill symlinks, restore global gstack install
+  scripts.dev-teardown = {
+    description = "Remove dev skill symlinks and restore global gstack install";
+    exec = ''
+      _REPO_ROOT="$(git rev-parse --show-toplevel)"
+      _removed=()
+
+      # Clean up .claude/skills/
+      _CLAUDE_SKILLS="$_REPO_ROOT/.claude/skills"
+      if [ -d "$_CLAUDE_SKILLS" ]; then
+        for link in "$_CLAUDE_SKILLS"/*/; do
+          name="$(basename "$link")"
+          [ "$name" = "gstack" ] && continue
+          if [ -L "''${link%/}" ]; then
+            rm "''${link%/}"
+            _removed+=("claude/$name")
+          fi
+        done
+        if [ -L "$_CLAUDE_SKILLS/gstack" ]; then
+          rm "$_CLAUDE_SKILLS/gstack"
+          _removed+=("claude/gstack")
+        fi
+        rmdir "$_CLAUDE_SKILLS" 2>/dev/null || true
+        rmdir "$_REPO_ROOT/.claude" 2>/dev/null || true
+      fi
+
+      # Clean up .agents/skills/
+      _AGENTS_SKILLS="$_REPO_ROOT/.agents/skills"
+      if [ -d "$_AGENTS_SKILLS" ]; then
+        for link in "$_AGENTS_SKILLS"/*/; do
+          name="$(basename "$link")"
+          [ "$name" = "gstack" ] && continue
+          if [ -L "''${link%/}" ]; then
+            rm "''${link%/}"
+            _removed+=("agents/$name")
+          fi
+        done
+        if [ -L "$_AGENTS_SKILLS/gstack" ]; then
+          rm "$_AGENTS_SKILLS/gstack"
+          _removed+=("agents/gstack")
+        fi
+        rmdir "$_AGENTS_SKILLS" 2>/dev/null || true
+        rmdir "$_REPO_ROOT/.agents" 2>/dev/null || true
+      fi
+
+      if [ ''${#_removed[@]} -gt 0 ]; then
+        echo "Removed: ''${_removed[*]}"
+      else
+        echo "No symlinks found."
+      fi
+      echo "Dev mode deactivated. Global gstack (~/.claude/skills/gstack) is now active."
+    '';
+  };
+
   enterShell = ''
+    _REPO_ROOT="$(pwd)"
+
+    # 1. Copy .env from main worktree if this is a worktree and .env is missing
+    if [ ! -f "$_REPO_ROOT/.env" ]; then
+      _MAIN_WORKTREE="$(git worktree list --porcelain 2>/dev/null | head -1 | sed 's/^worktree //')"
+      if [ -n "$_MAIN_WORKTREE" ] && [ "$_MAIN_WORKTREE" != "$_REPO_ROOT" ] && [ -f "$_MAIN_WORKTREE/.env" ]; then
+        cp "$_MAIN_WORKTREE/.env" "$_REPO_ROOT/.env"
+        echo "Copied .env from main worktree ($_MAIN_WORKTREE)"
+      fi
+    fi
+
+    # 3-5. Create skill symlinks (idempotent — skip if gstack symlink already correct)
+    _GSTACK_LINK="$_REPO_ROOT/.claude/skills/gstack"
+    _AGENTS_LINK="$_REPO_ROOT/.agents/skills/gstack"
+    _NEEDS_SETUP=0
+
+    if [ -L "$_GSTACK_LINK" ] && [ "$(readlink "$_GSTACK_LINK")" = "$_REPO_ROOT" ]; then
+      : # symlink exists and points to the right place
+    else
+      mkdir -p "$_REPO_ROOT/.claude/skills"
+      if [ -d "$_GSTACK_LINK" ] && [ ! -L "$_GSTACK_LINK" ]; then
+        echo "Warning: .claude/skills/gstack is a real directory, not a symlink." >&2
+        echo "Remove it manually if you want to use dev mode." >&2
+      else
+        [ -L "$_GSTACK_LINK" ] && rm "$_GSTACK_LINK"
+        ln -s "$_REPO_ROOT" "$_GSTACK_LINK"
+        _NEEDS_SETUP=1
+      fi
+    fi
+
+    mkdir -p "$_REPO_ROOT/.agents/skills"
+    if [ -L "$_AGENTS_LINK" ] && [ "$(readlink "$_AGENTS_LINK")" = "$_REPO_ROOT" ]; then
+      : # already correct
+    elif [ -d "$_AGENTS_LINK" ] && [ ! -L "$_AGENTS_LINK" ]; then
+      echo "Warning: .agents/skills/gstack is a real directory, skipping." >&2
+    else
+      [ -L "$_AGENTS_LINK" ] && rm "$_AGENTS_LINK"
+      ln -s "$_REPO_ROOT" "$_AGENTS_LINK"
+    fi
+
+    # 6. Run setup through the symlink (only if symlinks were just created or per-skill symlinks missing)
+    if [ "$_NEEDS_SETUP" -eq 1 ] || [ ! -L "$_REPO_ROOT/.claude/skills/review" ]; then
+      "$_GSTACK_LINK/setup"
+    fi
+
     echo "gstack dev shell ready — bun $(bun --version), playwright ${pkgs.playwright-driver.version}"
   '';
 
