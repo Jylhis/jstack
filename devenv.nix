@@ -1,4 +1,9 @@
-{ pkgs, lib, config, ... }:
+{
+  pkgs,
+  lib,
+  config,
+  ...
+}:
 
 {
   # Playwright browsers from nix
@@ -12,8 +17,21 @@
   ];
 
   # Bun runtime + auto-install deps on shell entry
-  languages.javascript.bun.enable = true;
-  languages.javascript.bun.install.enable = true;
+  languages = {
+    javascript = {
+      enable = true;
+      package = pkgs.nodejs;
+      bun = {
+        enable = true;
+        install.enable = true;
+      };
+    };
+    nix = {
+      enable = true;
+      lsp.enable = true;
+    };
+  };
+
   treefmt = {
     enable = true;
     config.programs = {
