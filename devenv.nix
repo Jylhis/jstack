@@ -14,6 +14,12 @@
   # Bun runtime + auto-install deps on shell entry
   languages.javascript.bun.enable = true;
   languages.javascript.bun.install.enable = true;
+  treefmt = {
+    enable = true;
+    config.programs = {
+      nixfmt.enable = true;
+    };
+  };
 
   # Claude Code with devenv MCP server
   claude.code = {
