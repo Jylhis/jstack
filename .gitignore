@@ -25,6 +25,7 @@ supabase/.temp/
 .devenv*
 devenv.local.nix
 devenv.local.yaml
+.mcp.json
 
 # direnv
 .direnv
