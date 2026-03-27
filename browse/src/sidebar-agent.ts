@@ -13,11 +13,11 @@ import { spawn } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
 
-const QUEUE = process.env.SIDEBAR_QUEUE_PATH || path.join(process.env.HOME || '/tmp', '.gstack', 'sidebar-agent-queue.jsonl');
+const QUEUE = process.env.SIDEBAR_QUEUE_PATH || path.join(process.env.HOME || '/tmp', '.jstack', 'sidebar-agent-queue.jsonl');
 const SERVER_PORT = parseInt(process.env.BROWSE_SERVER_PORT || '34567', 10);
 const SERVER_URL = `http://127.0.0.1:${SERVER_PORT}`;
 const POLL_MS = 500;  // Fast polling — server already did the user-facing response
-const B = process.env.BROWSE_BIN || path.resolve(__dirname, '../../.claude/skills/gstack/browse/dist/browse');
+const B = process.env.BROWSE_BIN || path.resolve(__dirname, '../../.claude/skills/jstack/browse/dist/browse');
 
 let lastLine = 0;
 let authToken: string | null = null;
@@ -104,7 +104,7 @@ function shorten(str: string): string {
     .replace(new RegExp(B.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), '$B')
     .replace(/\/Users\/[^/]+/g, '~')
     .replace(/\/conductor\/workspaces\/[^/]+\/[^/]+/g, '')
-    .replace(/\.claude\/skills\/gstack\//g, '')
+    .replace(/\.claude\/skills\/jstack\//g, '')
     .replace(/browse\/dist\/browse/g, '$B');
 }
 

@@ -1,5 +1,5 @@
 /**
- * gstack browse — Side Panel
+ * jstack browse — Side Panel
  *
  * Chat tab: two-way messaging with Claude Code via file queue.
  * Debug tabs: activity feed (SSE) + refs (REST).

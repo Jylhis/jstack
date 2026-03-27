@@ -1,0 +1,6 @@
+interface:
+  display_name: "jstack-office-hours"
+  short_description: "YC Office Hours — two modes. Startup mode: six forcing questions that expose demand reality, status quo, desperate..."
+  default_prompt: "Use jstack-office-hours for this task."
+policy:
+  allow_implicit_invocation: true

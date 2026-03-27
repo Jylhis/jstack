@@ -1,0 +1,6 @@
+interface:
+  display_name: "jstack-retro"
+  short_description: "Weekly engineering retrospective. Analyzes commit history, work patterns, and code quality metrics with persistent..."
+  default_prompt: "Use jstack-retro for this task."
+policy:
+  allow_implicit_invocation: true

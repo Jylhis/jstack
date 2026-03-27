@@ -22,7 +22,7 @@
 
 **Why:** Right now, headed mode launches a fresh Chromium profile. Users must log in manually or import cookies. Chrome DevTools MCP connects to the user's actual Chrome ... instant access to every authenticated site. This is the future of browser automation for AI agents.
 
-**Context:** Google shipped Chrome DevTools MCP in Chrome 146+ (June 2025). It provides screenshots, console messages, performance traces, Lighthouse audits, and full page interaction through the user's real browser. gstack should use it for real-session access while keeping Playwright for headless CI/testing workflows.
+**Context:** Google shipped Chrome DevTools MCP in Chrome 146+ (June 2025). It provides screenshots, console messages, performance traces, Lighthouse audits, and full page interaction through the user's real browser. jstack should use it for real-session access while keeping Playwright for headless CI/testing workflows.
 
 Potential new skills:
 - `/debug-browser`: JS error tracing with source-mapped stack traces
@@ -84,7 +84,7 @@ May replace `/setup-browser-cookies` for most use cases since the user's real co
 
 ~~**What:** Save/load cookies + localStorage to JSON files for reproducible test sessions.~~
 
-`$B state save/load` ships in v0.12.1.0. V1 saves cookies + URLs only (not localStorage, which breaks on load-before-navigate). Files at `.gstack/browse-states/{name}.json` with 0o600 permissions. Load replaces session (closes all pages first). Name sanitized to `[a-zA-Z0-9_-]`.
+`$B state save/load` ships in v0.12.1.0. V1 saves cookies + URLs only (not localStorage, which breaks on load-before-navigate). Files at `.jstack/browse-states/{name}.json` with 0o600 permissions. Load replaces session (closes all pages first). Name sanitized to `[a-zA-Z0-9_-]`.
 
 **Remaining:** V2 localStorage support (needs pre-navigation injection strategy).
 **Completed:** v0.12.1.0 (2026-03-26)
@@ -163,7 +163,7 @@ May replace `/setup-browser-cookies` for most use cases since the user's real co
 
 ### Headed mode with Chrome extension — SHIPPED
 
-`$B connect` launches Playwright's bundled Chromium in headed mode with the gstack Chrome extension auto-loaded. `$B handoff` now produces the same result (extension + side panel). Sidebar chat gated behind `--chat` flag.
+`$B connect` launches Playwright's bundled Chromium in headed mode with the jstack Chrome extension auto-loaded. `$B handoff` now produces the same result (extension + side panel). Sidebar chat gated behind `--chat` flag.
 
 ### `$B watch` — SHIPPED
 
@@ -199,7 +199,7 @@ Sidebar agent writes structured messages to `.context/sidebar-inbox/`. Workspace
 
 ### Chrome Web Store publishing
 
-**What:** Publish the gstack browse Chrome extension to Chrome Web Store for easier install.
+**What:** Publish the jstack browse Chrome extension to Chrome Web Store for easier install.
 
 **Why:** Currently sideloaded via chrome://extensions. Web Store makes install one-click.
 
@@ -237,7 +237,7 @@ Linux cookie import shipped in v0.11.11.0 (Wave 3). Supports Chrome, Chromium, B
 
 **What:** Add a periodic E2E eval that creates a branch with 5+ commits spanning 3+ themes (features, cleanup, infra), runs /ship's Step 5 CHANGELOG generation, and verifies the CHANGELOG mentions all themes.
 
-**Why:** The bug fixed in v0.11.22 (garrytan/ship-full-commit-coverage) showed that /ship's CHANGELOG generation biased toward recent commits on long branches. The prompt fix adds a cross-check, but no test exercises the multi-commit failure mode. The existing `ship-local-workflow` E2E only uses a single-commit branch.
+**Why:** The bug fixed in v0.11.22 (Jylhis/ship-full-commit-coverage) showed that /ship's CHANGELOG generation biased toward recent commits on long branches. The prompt fix adds a cross-check, but no test exercises the multi-commit failure mode. The existing `ship-local-workflow` E2E only uses a single-commit branch.
 
 **Context:** Would be a `periodic` tier test (~$4/run, non-deterministic since it tests LLM instruction-following). Setup: create bare remote, clone, add 5+ commits across different themes on a feature branch, run Step 5 via `claude -p`, verify CHANGELOG output covers all themes. Pattern: `ship-local-workflow` in `test/skill-e2e-workflow.test.ts`.
 
@@ -247,7 +247,7 @@ Linux cookie import shipped in v0.11.11.0 (Wave 3). Supports Chrome, Chromium, B
 
 ### Ship log — persistent record of /ship runs
 
-**What:** Append structured JSON entry to `.gstack/ship-log.json` at end of every /ship run (version, date, branch, PR URL, review findings, Greptile stats, todos completed, test results).
+**What:** Append structured JSON entry to `.jstack/ship-log.json` at end of every /ship run (version, date, branch, PR URL, review findings, Greptile stats, todos completed, test results).
 
 **Why:** /retro has no structured data about shipping velocity. Ship log enables: PRs-per-week trending, review finding rates, Greptile signal over time, test suite growth.
 
@@ -268,7 +268,7 @@ Linux cookie import shipped in v0.11.11.0 (Wave 3). Supports Chrome, Chromium, B
 
 **Effort:** M
 **Priority:** P2
-**Depends on:** /setup-gstack-upload
+**Depends on:** /setup-jstack-upload
 
 ## Review
 
@@ -306,7 +306,7 @@ Linux cookie import shipped in v0.11.11.0 (Wave 3). Supports Chrome, Chromium, B
 
 **Effort:** M
 **Priority:** P2
-**Depends on:** /setup-gstack-upload
+**Depends on:** /setup-jstack-upload
 
 ## QA
 
@@ -388,7 +388,7 @@ Linux cookie import shipped in v0.11.11.0 (Wave 3). Supports Chrome, Chromium, B
 
 ## Infrastructure
 
-### /setup-gstack-upload skill (S3 bucket)
+### /setup-jstack-upload skill (S3 bucket)
 
 **What:** Configure S3 bucket for image hosting. One-time setup for visual PR annotations.
 
@@ -397,15 +397,15 @@ Linux cookie import shipped in v0.11.11.0 (Wave 3). Supports Chrome, Chromium, B
 **Effort:** M
 **Priority:** P2
 
-### gstack-upload helper
+### jstack-upload helper
 
-**What:** `browse/bin/gstack-upload` — upload file to S3, return public URL.
+**What:** `browse/bin/jstack-upload` — upload file to S3, return public URL.
 
 **Why:** Shared utility for all skills that need to embed images in PRs.
 
 **Effort:** S
 **Priority:** P2
-**Depends on:** /setup-gstack-upload
+**Depends on:** /setup-jstack-upload
 
 ### WebM to GIF conversion
 
@@ -443,7 +443,7 @@ Shipped: Default model changed to Sonnet for structure tests (~30), Opus retaine
 
 **Why:** Visual charts better for spotting trends than CLI tools.
 
-**Context:** Reads `~/.gstack-dev/evals/*.json`. ~200 lines HTML + chart.js via Bun HTTP server.
+**Context:** Reads `~/.jstack-dev/evals/*.json`. ~200 lines HTML + chart.js via Bun HTTP server.
 
 **Effort:** M
 **Priority:** P3
@@ -463,9 +463,9 @@ Shipped: Default model changed to Sonnet for structure tests (~30), Opus retaine
 
 ### Cross-platform URL open helper
 
-**What:** `gstack-open-url` helper script — detect platform, use `open` (macOS) or `xdg-open` (Linux).
+**What:** `jstack-open-url` helper script — detect platform, use `open` (macOS) or `xdg-open` (Linux).
 
-**Why:** The first-time Completeness Principle intro uses macOS `open` to launch the essay. If gstack ever supports Linux, this silently fails.
+**Why:** The first-time Completeness Principle intro uses macOS `open` to launch the essay. If jstack ever supports Linux, this silently fails.
 
 **Effort:** S (human: ~30 min / CC: ~2 min)
 **Priority:** P4
@@ -489,13 +489,13 @@ Shipped: Default model changed to Sonnet for structure tests (~30), Opus retaine
 
 **What:** Add design docs (`*-design-*.md`) to the Supabase sync pipeline alongside test plans, retro snapshots, and QA reports.
 
-**Why:** Cross-team design discovery at scale. Local `~/.gstack/projects/$SLUG/` keyword-grep discovery works for same-machine users now, but Supabase sync makes it work across the whole team. Duplicate ideas surface, everyone sees what's been explored.
+**Why:** Cross-team design discovery at scale. Local `~/.jstack/projects/$SLUG/` keyword-grep discovery works for same-machine users now, but Supabase sync makes it work across the whole team. Duplicate ideas surface, everyone sees what's been explored.
 
-**Context:** /office-hours writes design docs to `~/.gstack/projects/$SLUG/`. The team store already syncs test plans, retro snapshots, QA reports. Design docs follow the same pattern — just add a sync adapter.
+**Context:** /office-hours writes design docs to `~/.jstack/projects/$SLUG/`. The team store already syncs test plans, retro snapshots, QA reports. Design docs follow the same pattern — just add a sync adapter.
 
 **Effort:** S
 **Priority:** P2
-**Depends on:** `garrytan/team-supabase-store` branch landing on main
+**Depends on:** `Jylhis/team-supabase-store` branch landing on main
 
 ### /yc-prep skill
 
@@ -545,7 +545,7 @@ Shipped in v0.8.3. Step 8.5 added to `/ship` — after creating the PR, `/ship` 
 
 ### `{{DOC_VOICE}}` shared resolver
 
-**What:** Create a placeholder resolver in gen-skill-docs.ts encoding the gstack voice guide (friendly, user-forward, lead with benefits). Inject into /ship Step 5, /document-release Step 5, and reference from CLAUDE.md.
+**What:** Create a placeholder resolver in gen-skill-docs.ts encoding the jstack voice guide (friendly, user-forward, lead with benefits). Inject into /ship Step 5, /document-release Step 5, and reference from CLAUDE.md.
 
 **Why:** DRY — voice rules currently live inline in 3 places (CLAUDE.md CHANGELOG style section, /ship Step 5, /document-release Step 5). When the voice evolves, all three drift.
 
@@ -561,24 +561,24 @@ Shipped in v0.8.3. Step 8.5 added to `/ship` — after creating the PR, `/ship` 
 
 ~~**What:** Auto-detect which of the 4 reviews are relevant based on branch changes (skip Design Review if no CSS/view changes, skip Code Review if plan-only).~~
 
-`bin/gstack-diff-scope` shipped — categorizes diff into SCOPE_FRONTEND, SCOPE_BACKEND, SCOPE_PROMPTS, SCOPE_TESTS, SCOPE_DOCS, SCOPE_CONFIG. Used by design-review-lite to skip when no frontend files changed. Dashboard integration for conditional row display is a follow-up.
+`bin/jstack-diff-scope` shipped — categorizes diff into SCOPE_FRONTEND, SCOPE_BACKEND, SCOPE_PROMPTS, SCOPE_TESTS, SCOPE_DOCS, SCOPE_CONFIG. Used by design-review-lite to skip when no frontend files changed. Dashboard integration for conditional row display is a follow-up.
 
 **Remaining:** Dashboard conditional row display (hide "Design Review: NOT YET RUN" when SCOPE_FRONTEND=false). Extend to Eng Review (skip for docs-only) and CEO Review (skip for config-only).
 
 **Effort:** S
 **Priority:** P3
-**Depends on:** gstack-diff-scope (shipped)
+**Depends on:** jstack-diff-scope (shipped)
 
 
 ## Codex
 
 ### Codex→Claude reverse buddy check skill
 
-**What:** A Codex-native skill (`.agents/skills/gstack-claude/SKILL.md`) that runs `claude -p` to get an independent second opinion from Claude — the reverse of what `/codex` does today from Claude Code.
+**What:** A Codex-native skill (`.agents/skills/jstack-claude/SKILL.md`) that runs `claude -p` to get an independent second opinion from Claude — the reverse of what `/codex` does today from Claude Code.
 
 **Why:** Codex users deserve the same cross-model challenge that Claude users get via `/codex`. Currently the flow is one-way (Claude→Codex). Codex users have no way to get a Claude second opinion.
 
-**Context:** The `/codex` skill template (`codex/SKILL.md.tmpl`) shows the pattern — it wraps `codex exec` with JSONL parsing, timeout handling, and structured output. The reverse skill would wrap `claude -p` with similar infrastructure. Would be generated into `.agents/skills/gstack-claude/` by `gen-skill-docs --host codex`.
+**Context:** The `/codex` skill template (`codex/SKILL.md.tmpl`) shows the pattern — it wraps `codex exec` with JSONL parsing, timeout handling, and structured output. The reverse skill would wrap `claude -p` with similar infrastructure. Would be generated into `.agents/skills/jstack-claude/` by `gen-skill-docs --host codex`.
 
 **Effort:** M (human: ~2 weeks / CC: ~30 min)
 **Priority:** P1
@@ -588,7 +588,7 @@ Shipped in v0.8.3. Step 8.5 added to `/ship` — after creating the PR, `/ship` 
 
 ### Completeness metrics dashboard
 
-**What:** Track how often Claude chooses the complete option vs shortcut across gstack sessions. Aggregate into a dashboard showing completeness trend over time.
+**What:** Track how often Claude chooses the complete option vs shortcut across jstack sessions. Aggregate into a dashboard showing completeness trend over time.
 
 **Why:** Without measurement, we can't know if the Completeness Principle is working. Could surface patterns (e.g., certain skills still bias toward shortcuts).
 
@@ -625,7 +625,7 @@ Shipped in v0.6.5. TemplateContext in gen-skill-docs.ts bakes skill name into pr
 2. Freeze boundary widening (ask to widen instead of hard-block when hitting boundary)
 3. Post-fix auto-unfreeze + full test suite run
 4. Debug instrumentation cleanup (tag with DEBUG-TEMP, remove before commit)
-5. Debug session persistence (~/.gstack/investigate-sessions/ — save investigation for reuse)
+5. Debug session persistence (~/.jstack/investigate-sessions/ — save investigation for reuse)
 6. Investigation timeline in debug report (hypothesis log with timing)
 
 **Effort:** M (all 6 combined)
@@ -636,9 +636,9 @@ Shipped in v0.6.5. TemplateContext in gen-skill-docs.ts bakes skill name into pr
 
 ### Review and evaluate external skill repositories
 
-**What:** Systematically read, review, and evaluate skills from community and vendor repositories. Identify patterns worth adopting, skills worth integrating or adapting, and gaps in gstack's current skill set. Produce a structured evaluation for each repository.
+**What:** Systematically read, review, and evaluate skills from community and vendor repositories. Identify patterns worth adopting, skills worth integrating or adapting, and gaps in jstack's current skill set. Produce a structured evaluation for each repository.
 
-**Why:** The Claude Code / agent skill ecosystem is growing fast. Understanding what others have built reveals: (1) patterns we should adopt, (2) skills we could integrate or adapt, (3) anti-patterns to avoid, (4) positioning gaps where gstack is behind or ahead.
+**Why:** The Claude Code / agent skill ecosystem is growing fast. Understanding what others have built reveals: (1) patterns we should adopt, (2) skills we could integrate or adapt, (3) anti-patterns to avoid, (4) positioning gaps where jstack is behind or ahead.
 
 **Repositories to evaluate:**
 
@@ -710,12 +710,12 @@ Curated collections:
 
 **Evaluation criteria per repo:**
 1. **Quality:** Is the skill well-structured? Does it follow good prompt engineering patterns?
-2. **Relevance:** Does it cover a gap in gstack's current skill set?
+2. **Relevance:** Does it cover a gap in jstack's current skill set?
 3. **Adoptability:** Could we integrate, adapt, or learn from it? What's the effort?
 4. **Patterns:** Any novel patterns (tool use, context management, multi-step workflows) worth adopting?
 5. **Anti-patterns:** Anything we should explicitly avoid?
 
-**Output:** Structured evaluation doc at `~/.gstack-dev/plans/skill-landscape-eval.md` with per-repo notes and a summary of actionable takeaways.
+**Output:** Structured evaluation doc at `~/.jstack-dev/plans/skill-landscape-eval.md` with per-repo notes and a summary of actionable takeaways.
 
 **Effort:** L (human: ~2 weeks / CC: ~4 hours)
 **Priority:** P2
@@ -743,7 +743,7 @@ Curated collections:
 **Completed:** v0.9.8.0
 
 ### Phase 1: Foundations (v0.2.0)
-- Rename to gstack
+- Rename to jstack
 - Restructure to monorepo layout
 - Setup script for skill symlinks
 - Snapshot command with ref-based element selection
@@ -776,5 +776,5 @@ Curated collections:
 **Completed:** v0.3.6
 
 ### Auto-upgrade mode + smart update check
-- Config CLI (`bin/gstack-config`), auto-upgrade via `~/.gstack/config.yaml`, 12h cache TTL, exponential snooze backoff (24h→48h→1wk), "never ask again" option, vendored copy sync on upgrade
+- Config CLI (`bin/jstack-config`), auto-upgrade via `~/.jstack/config.yaml`, 12h cache TTL, exponential snooze backoff (24h→48h→1wk), "never ask again" option, vendored copy sync on upgrade
 **Completed:** v0.3.8

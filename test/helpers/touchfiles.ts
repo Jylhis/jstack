@@ -77,7 +77,7 @@ export const E2E_TOUCHFILES: Record<string, string[]> = {
   'codex-offered-eng-review':    ['plan-eng-review/**', 'scripts/gen-skill-docs.ts'],
 
   // Ship
-  'ship-base-branch': ['ship/**', 'bin/gstack-repo-mode'],
+  'ship-base-branch': ['ship/**', 'bin/jstack-repo-mode'],
   'ship-local-workflow': ['ship/**', 'scripts/gen-skill-docs.ts'],
   'review-dashboard-via': ['ship/**', 'scripts/resolvers/review.ts', 'codex/**', 'autoplan/**', 'land-and-deploy/**'],
   'ship-plan-completion': ['ship/**', 'scripts/gen-skill-docs.ts'],
@@ -88,7 +88,7 @@ export const E2E_TOUCHFILES: Record<string, string[]> = {
   'retro-base-branch': ['retro/**'],
 
   // Global discover
-  'global-discover':   ['bin/gstack-global-discover.ts', 'test/global-discover.test.ts'],
+  'global-discover':   ['bin/jstack-global-discover.ts', 'test/global-discover.test.ts'],
 
   // CSO
   'cso-full-audit':   ['cso/**'],
@@ -103,18 +103,18 @@ export const E2E_TOUCHFILES: Record<string, string[]> = {
 
   // Codex E2E (tests skills via Codex CLI + worktree)
   'codex-discover-skill':  ['codex/**', '.agents/skills/**', 'test/helpers/codex-session-runner.ts', 'lib/worktree.ts'],
-  'codex-review-findings': ['review/**', '.agents/skills/gstack-review/**', 'codex/**', 'test/helpers/codex-session-runner.ts', 'lib/worktree.ts'],
+  'codex-review-findings': ['review/**', '.agents/skills/jstack-review/**', 'codex/**', 'test/helpers/codex-session-runner.ts', 'lib/worktree.ts'],
 
   // Gemini E2E (tests skills via Gemini CLI + worktree)
   'gemini-discover-skill':  ['.agents/skills/**', 'test/helpers/gemini-session-runner.ts', 'lib/worktree.ts'],
-  'gemini-review-findings': ['review/**', '.agents/skills/gstack-review/**', 'test/helpers/gemini-session-runner.ts', 'lib/worktree.ts'],
+  'gemini-review-findings': ['review/**', '.agents/skills/jstack-review/**', 'test/helpers/gemini-session-runner.ts', 'lib/worktree.ts'],
 
 
   // Coverage audit (shared fixture) + triage + gates
-  'ship-coverage-audit': ['ship/**', 'test/fixtures/coverage-audit-fixture.ts', 'bin/gstack-repo-mode'],
+  'ship-coverage-audit': ['ship/**', 'test/fixtures/coverage-audit-fixture.ts', 'bin/jstack-repo-mode'],
   'review-coverage-audit': ['review/**', 'test/fixtures/coverage-audit-fixture.ts'],
   'plan-eng-coverage-audit': ['plan-eng-review/**', 'test/fixtures/coverage-audit-fixture.ts'],
-  'ship-triage': ['ship/**', 'bin/gstack-repo-mode'],
+  'ship-triage': ['ship/**', 'bin/jstack-repo-mode'],
 
   // Plan completion audit + verification
   'ship-plan-completion': ['ship/**', 'scripts/gen-skill-docs.ts'],
@@ -130,13 +130,13 @@ export const E2E_TOUCHFILES: Record<string, string[]> = {
   'plan-design-review-no-ui-scope': ['plan-design-review/**', 'scripts/gen-skill-docs.ts'],
   'design-review-fix':              ['design-review/**', 'browse/src/**', 'scripts/gen-skill-docs.ts'],
 
-  // gstack-upgrade
-  'gstack-upgrade-happy-path': ['gstack-upgrade/**'],
+  // jstack-upgrade
+  'jstack-upgrade-happy-path': ['jstack-upgrade/**'],
 
   // Deploy skills
   'land-and-deploy-workflow':      ['land-and-deploy/**', 'scripts/gen-skill-docs.ts'],
-  'land-and-deploy-first-run':     ['land-and-deploy/**', 'scripts/gen-skill-docs.ts', 'bin/gstack-slug'],
-  'land-and-deploy-review-gate':   ['land-and-deploy/**', 'bin/gstack-review-read'],
+  'land-and-deploy-first-run':     ['land-and-deploy/**', 'scripts/gen-skill-docs.ts', 'bin/jstack-slug'],
+  'land-and-deploy-review-gate':   ['land-and-deploy/**', 'bin/jstack-review-read'],
   'canary-workflow':               ['canary/**', 'browse/src/**'],
   'benchmark-workflow':            ['benchmark/**', 'browse/src/**'],
   'setup-deploy-workflow':         ['setup-deploy/**', 'scripts/gen-skill-docs.ts'],
@@ -254,8 +254,8 @@ export const E2E_TIERS: Record<string, 'gate' | 'periodic'> = {
   'plan-design-review-no-ui-scope': 'gate',
   'design-review-fix': 'periodic',
 
-  // gstack-upgrade
-  'gstack-upgrade-happy-path': 'gate',
+  // jstack-upgrade
+  'jstack-upgrade-happy-path': 'gate',
 
   // Deploy skills
   'land-and-deploy-workflow': 'gate',
@@ -326,7 +326,7 @@ export const LLM_JUDGE_TOUCHFILES: Record<string, string[]> = {
   // Other skills
   'retro/SKILL.md instructions':          ['retro/SKILL.md', 'retro/SKILL.md.tmpl'],
   'qa-only/SKILL.md workflow':            ['qa-only/SKILL.md', 'qa-only/SKILL.md.tmpl'],
-  'gstack-upgrade/SKILL.md upgrade flow': ['gstack-upgrade/SKILL.md', 'gstack-upgrade/SKILL.md.tmpl'],
+  'jstack-upgrade/SKILL.md upgrade flow': ['jstack-upgrade/SKILL.md', 'jstack-upgrade/SKILL.md.tmpl'],
 
   // Voice directive
   'voice directive tone':                 ['scripts/resolvers/preamble.ts', 'review/SKILL.md', 'review/SKILL.md.tmpl', 'scripts/gen-skill-docs.ts'],

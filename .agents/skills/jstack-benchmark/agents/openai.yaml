@@ -1,0 +1,6 @@
+interface:
+  display_name: "jstack-benchmark"
+  short_description: "Performance regression detection using the browse daemon. Establishes baselines for page load times, Core Web..."
+  default_prompt: "Use jstack-benchmark for this task."
+policy:
+  allow_implicit_invocation: true

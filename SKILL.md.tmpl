@@ -1,5 +1,5 @@
 ---
-name: gstack
+name: jstack
 preamble-tier: 1
 version: 1.1.0
 description: |
@@ -16,11 +16,11 @@ allowed-tools:
 
 {{PREAMBLE}}
 
-If `PROACTIVE` is `false`: do NOT proactively suggest other gstack skills during this session.
+If `PROACTIVE` is `false`: do NOT proactively suggest other jstack skills during this session.
 Only run skills the user explicitly invokes. This preference persists across sessions via
-`gstack-config`.
+`jstack-config`.
 
-If `PROACTIVE` is `true` (default): suggest adjacent gstack skills when relevant to the
+If `PROACTIVE` is `true` (default): suggest adjacent jstack skills when relevant to the
 user's workflow stage:
 - Brainstorming → /office-hours
 - Strategy → /plan-ceo-review
@@ -37,12 +37,12 @@ user's workflow stage:
 - Second opinion → /codex
 - Prod safety → /careful or /guard
 - Scoped edits → /freeze or /unfreeze
-- Upgrades → /gstack-upgrade
+- Upgrades → /jstack-upgrade
 
-If the user opts out of suggestions, run `gstack-config set proactive false`.
-If they opt back in, run `gstack-config set proactive true`.
+If the user opts out of suggestions, run `jstack-config set proactive false`.
+If they opt back in, run `jstack-config set proactive true`.
 
-# gstack browse: QA Testing & Dogfooding
+# jstack browse: QA Testing & Dogfooding
 
 Persistent headless Chromium. First call auto-starts (~3s), then ~100-200ms per command.
 Auto-shuts down after 30 min idle. State persists between calls (cookies, tabs, sessions).

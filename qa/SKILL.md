@@ -27,59 +27,59 @@ allowed-tools:
 ## Preamble (run first)
 
 ```bash
-_UPD=$(~/.claude/skills/gstack/bin/gstack-update-check 2>/dev/null || .claude/skills/gstack/bin/gstack-update-check 2>/dev/null || true)
+_UPD=$(~/.claude/skills/jstack/bin/jstack-update-check 2>/dev/null || .claude/skills/jstack/bin/jstack-update-check 2>/dev/null || true)
 [ -n "$_UPD" ] && echo "$_UPD" || true
-mkdir -p ~/.gstack/sessions
-touch ~/.gstack/sessions/"$PPID"
-_SESSIONS=$(find ~/.gstack/sessions -mmin -120 -type f 2>/dev/null | wc -l | tr -d ' ')
-find ~/.gstack/sessions -mmin +120 -type f -delete 2>/dev/null || true
-_CONTRIB=$(~/.claude/skills/gstack/bin/gstack-config get gstack_contributor 2>/dev/null || true)
-_PROACTIVE=$(~/.claude/skills/gstack/bin/gstack-config get proactive 2>/dev/null || echo "true")
-_PROACTIVE_PROMPTED=$([ -f ~/.gstack/.proactive-prompted ] && echo "yes" || echo "no")
+mkdir -p ~/.jstack/sessions
+touch ~/.jstack/sessions/"$PPID"
+_SESSIONS=$(find ~/.jstack/sessions -mmin -120 -type f 2>/dev/null | wc -l | tr -d ' ')
+find ~/.jstack/sessions -mmin +120 -type f -delete 2>/dev/null || true
+_CONTRIB=$(~/.claude/skills/jstack/bin/jstack-config get jstack_contributor 2>/dev/null || true)
+_PROACTIVE=$(~/.claude/skills/jstack/bin/jstack-config get proactive 2>/dev/null || echo "true")
+_PROACTIVE_PROMPTED=$([ -f ~/.jstack/.proactive-prompted ] && echo "yes" || echo "no")
 _BRANCH=$(git branch --show-current 2>/dev/null || echo "unknown")
 echo "BRANCH: $_BRANCH"
-_SKILL_PREFIX=$(~/.claude/skills/gstack/bin/gstack-config get skill_prefix 2>/dev/null || echo "false")
+_SKILL_PREFIX=$(~/.claude/skills/jstack/bin/jstack-config get skill_prefix 2>/dev/null || echo "false")
 echo "PROACTIVE: $_PROACTIVE"
 echo "PROACTIVE_PROMPTED: $_PROACTIVE_PROMPTED"
 echo "SKILL_PREFIX: $_SKILL_PREFIX"
-source <(~/.claude/skills/gstack/bin/gstack-repo-mode 2>/dev/null) || true
+source <(~/.claude/skills/jstack/bin/jstack-repo-mode 2>/dev/null) || true
 REPO_MODE=${REPO_MODE:-unknown}
 echo "REPO_MODE: $REPO_MODE"
-_LAKE_SEEN=$([ -f ~/.gstack/.completeness-intro-seen ] && echo "yes" || echo "no")
+_LAKE_SEEN=$([ -f ~/.jstack/.completeness-intro-seen ] && echo "yes" || echo "no")
 echo "LAKE_INTRO: $_LAKE_SEEN"
-_TEL=$(~/.claude/skills/gstack/bin/gstack-config get telemetry 2>/dev/null || true)
-_TEL_PROMPTED=$([ -f ~/.gstack/.telemetry-prompted ] && echo "yes" || echo "no")
+_TEL=$(~/.claude/skills/jstack/bin/jstack-config get telemetry 2>/dev/null || true)
+_TEL_PROMPTED=$([ -f ~/.jstack/.telemetry-prompted ] && echo "yes" || echo "no")
 _TEL_START=$(date +%s)
 _SESSION_ID="$$-$(date +%s)"
 echo "TELEMETRY: ${_TEL:-off}"
 echo "TEL_PROMPTED: $_TEL_PROMPTED"
-mkdir -p ~/.gstack/analytics
-echo '{"skill":"qa","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.gstack/analytics/skill-usage.jsonl 2>/dev/null || true
+mkdir -p ~/.jstack/analytics
+echo '{"skill":"qa","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.jstack/analytics/skill-usage.jsonl 2>/dev/null || true
 # zsh-compatible: use find instead of glob to avoid NOMATCH error
-for _PF in $(find ~/.gstack/analytics -maxdepth 1 -name '.pending-*' 2>/dev/null); do [ -f "$_PF" ] && ~/.claude/skills/gstack/bin/gstack-telemetry-log --event-type skill_run --skill _pending_finalize --outcome unknown --session-id "$_SESSION_ID" 2>/dev/null || true; break; done
+for _PF in $(find ~/.jstack/analytics -maxdepth 1 -name '.pending-*' 2>/dev/null); do [ -f "$_PF" ] && ~/.claude/skills/jstack/bin/jstack-telemetry-log --event-type skill_run --skill _pending_finalize --outcome unknown --session-id "$_SESSION_ID" 2>/dev/null || true; break; done
 ```
 
-If `PROACTIVE` is `"false"`, do not proactively suggest gstack skills AND do not
+If `PROACTIVE` is `"false"`, do not proactively suggest jstack skills AND do not
 auto-invoke skills based on conversation context. Only run skills the user explicitly
 types (e.g., /qa, /ship). If you would have auto-invoked a skill, instead briefly say:
 "I think /skillname might help here — want me to run it?" and wait for confirmation.
 The user opted out of proactive behavior.
 
 If `SKILL_PREFIX` is `"true"`, the user has namespaced skill names. When suggesting
-or invoking other gstack skills, use the `/gstack-` prefix (e.g., `/gstack-qa` instead
-of `/qa`, `/gstack-ship` instead of `/ship`). Disk paths are unaffected — always use
-`~/.claude/skills/gstack/[skill-name]/SKILL.md` for reading skill files.
+or invoking other jstack skills, use the `/jstack-` prefix (e.g., `/jstack-qa` instead
+of `/qa`, `/jstack-ship` instead of `/ship`). Disk paths are unaffected — always use
+`~/.claude/skills/jstack/[skill-name]/SKILL.md` for reading skill files.
 
-If output shows `UPGRADE_AVAILABLE <old> <new>`: read `~/.claude/skills/gstack/gstack-upgrade/SKILL.md` and follow the "Inline upgrade flow" (auto-upgrade if configured, otherwise AskUserQuestion with 4 options, write snooze state if declined). If `JUST_UPGRADED <from> <to>`: tell user "Running gstack v{to} (just updated!)" and continue.
+If output shows `UPGRADE_AVAILABLE <old> <new>`: read `~/.claude/skills/jstack/jstack-upgrade/SKILL.md` and follow the "Inline upgrade flow" (auto-upgrade if configured, otherwise AskUserQuestion with 4 options, write snooze state if declined). If `JUST_UPGRADED <from> <to>`: tell user "Running jstack v{to} (just updated!)" and continue.
 
 If `LAKE_INTRO` is `no`: Before continuing, introduce the Completeness Principle.
-Tell the user: "gstack follows the **Boil the Lake** principle — always do the complete
+Tell the user: "jstack follows the **Boil the Lake** principle — always do the complete
 thing when AI makes the marginal cost near-zero. Read more: https://garryslist.org/posts/boil-the-ocean"
 Then offer to open the essay in their default browser:
 
 ```bash
 open https://garryslist.org/posts/boil-the-ocean
-touch ~/.gstack/.completeness-intro-seen
+touch ~/.jstack/.completeness-intro-seen
 ```
 
 Only run `open` if the user says yes. Always run `touch` to mark as seen. This only happens once.
@@ -87,32 +87,32 @@ Only run `open` if the user says yes. Always run `touch` to mark as seen. This o
 If `TEL_PROMPTED` is `no` AND `LAKE_INTRO` is `yes`: After the lake intro is handled,
 ask the user about telemetry. Use AskUserQuestion:
 
-> Help gstack get better! Community mode shares usage data (which skills you use, how long
+> Help jstack get better! Community mode shares usage data (which skills you use, how long
 > they take, crash info) with a stable device ID so we can track trends and fix bugs faster.
 > No code, file paths, or repo names are ever sent.
-> Change anytime with `gstack-config set telemetry off`.
+> Change anytime with `jstack-config set telemetry off`.
 
 Options:
-- A) Help gstack get better! (recommended)
+- A) Help jstack get better! (recommended)
 - B) No thanks
 
-If A: run `~/.claude/skills/gstack/bin/gstack-config set telemetry community`
+If A: run `~/.claude/skills/jstack/bin/jstack-config set telemetry community`
 
 If B: ask a follow-up AskUserQuestion:
 
-> How about anonymous mode? We just learn that *someone* used gstack — no unique ID,
+> How about anonymous mode? We just learn that *someone* used jstack — no unique ID,
 > no way to connect sessions. Just a counter that helps us know if anyone's out there.
 
 Options:
 - A) Sure, anonymous is fine
 - B) No thanks, fully off
 
-If B→A: run `~/.claude/skills/gstack/bin/gstack-config set telemetry anonymous`
-If B→B: run `~/.claude/skills/gstack/bin/gstack-config set telemetry off`
+If B→A: run `~/.claude/skills/jstack/bin/jstack-config set telemetry anonymous`
+If B→B: run `~/.claude/skills/jstack/bin/jstack-config set telemetry off`
 
 Always run:
 ```bash
-touch ~/.gstack/.telemetry-prompted
+touch ~/.jstack/.telemetry-prompted
 ```
 
 This only happens once. If `TEL_PROMPTED` is `yes`, skip this entirely.
@@ -120,7 +120,7 @@ This only happens once. If `TEL_PROMPTED` is `yes`, skip this entirely.
 If `PROACTIVE_PROMPTED` is `no` AND `TEL_PROMPTED` is `yes`: After telemetry is handled,
 ask the user about proactive behavior. Use AskUserQuestion:
 
-> gstack can proactively figure out when you might need a skill while you work —
+> jstack can proactively figure out when you might need a skill while you work —
 > like suggesting /qa when you say "does this work?" or /investigate when you hit
 > a bug. We recommend keeping this on — it speeds up every part of your workflow.
 
@@ -128,12 +128,12 @@ Options:
 - A) Keep it on (recommended)
 - B) Turn it off — I'll type /commands myself
 
-If A: run `~/.claude/skills/gstack/bin/gstack-config set proactive true`
-If B: run `~/.claude/skills/gstack/bin/gstack-config set proactive false`
+If A: run `~/.claude/skills/jstack/bin/jstack-config set proactive true`
+If B: run `~/.claude/skills/jstack/bin/jstack-config set proactive false`
 
 Always run:
 ```bash
-touch ~/.gstack/.proactive-prompted
+touch ~/.jstack/.proactive-prompted
 ```
 
 This only happens once. If `PROACTIVE_PROMPTED` is `yes`, skip this entirely.
@@ -196,11 +196,11 @@ Per-skill instructions may add additional formatting rules on top of this baseli
 
 ## Completeness Principle — Boil the Lake
 
-AI makes completeness near-free. Always recommend the complete option over shortcuts — the delta is minutes with CC+gstack. A "lake" (100% coverage, all edge cases) is boilable; an "ocean" (full rewrite, multi-quarter migration) is not. Boil lakes, flag oceans.
+AI makes completeness near-free. Always recommend the complete option over shortcuts — the delta is minutes with CC+jstack. A "lake" (100% coverage, all edge cases) is boilable; an "ocean" (full rewrite, multi-quarter migration) is not. Boil lakes, flag oceans.
 
 **Effort reference** — always show both scales:
 
-| Task type | Human team | CC+gstack | Compression |
+| Task type | Human team | CC+jstack | Compression |
 |-----------|-----------|-----------|-------------|
 | Boilerplate | 2 days | 15 min | ~100x |
 | Tests | 1 day | 15 min | ~50x |
@@ -219,21 +219,21 @@ Always flag anything that looks wrong — one sentence, what you noticed and its
 
 ## Search Before Building
 
-Before building anything unfamiliar, **search first.** See `~/.claude/skills/gstack/ETHOS.md`.
+Before building anything unfamiliar, **search first.** See `~/.claude/skills/jstack/ETHOS.md`.
 - **Layer 1** (tried and true) — don't reinvent. **Layer 2** (new and popular) — scrutinize. **Layer 3** (first principles) — prize above all.
 
 **Eureka:** When first-principles reasoning contradicts conventional wisdom, name it and log:
 ```bash
-jq -n --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" --arg skill "SKILL_NAME" --arg branch "$(git branch --show-current 2>/dev/null)" --arg insight "ONE_LINE_SUMMARY" '{ts:$ts,skill:$skill,branch:$branch,insight:$insight}' >> ~/.gstack/analytics/eureka.jsonl 2>/dev/null || true
+jq -n --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" --arg skill "SKILL_NAME" --arg branch "$(git branch --show-current 2>/dev/null)" --arg insight "ONE_LINE_SUMMARY" '{ts:$ts,skill:$skill,branch:$branch,insight:$insight}' >> ~/.jstack/analytics/eureka.jsonl 2>/dev/null || true
 ```
 
 ## Contributor Mode
 
-If `_CONTRIB` is `true`: you are in **contributor mode**. At the end of each major workflow step, rate your gstack experience 0-10. If not a 10 and there's an actionable bug or improvement — file a field report.
+If `_CONTRIB` is `true`: you are in **contributor mode**. At the end of each major workflow step, rate your jstack experience 0-10. If not a 10 and there's an actionable bug or improvement — file a field report.
 
-**File only:** gstack tooling bugs where the input was reasonable but gstack failed. **Skip:** user app bugs, network errors, auth failures on user's site.
+**File only:** jstack tooling bugs where the input was reasonable but jstack failed. **Skip:** user app bugs, network errors, auth failures on user's site.
 
-**To file:** write `~/.gstack/contributor-logs/{slug}.md`:
+**To file:** write `~/.jstack/contributor-logs/{slug}.md`:
 ```
 # {Title}
 **What I tried:** {action} | **What happened:** {result} | **Rating:** {0-10}
@@ -278,7 +278,7 @@ Determine the outcome from the workflow result (success if completed normally, e
 if it failed, abort if the user interrupted).
 
 **PLAN MODE EXCEPTION — ALWAYS RUN:** This command writes telemetry to
-`~/.gstack/analytics/` (user config directory, not project files). The skill
+`~/.jstack/analytics/` (user config directory, not project files). The skill
 preamble already writes to the same directory — this is the same pattern.
 Skipping this command loses session duration and outcome data.
 
@@ -287,8 +287,8 @@ Run this bash:
 ```bash
 _TEL_END=$(date +%s)
 _TEL_DUR=$(( _TEL_END - _TEL_START ))
-rm -f ~/.gstack/analytics/.pending-"$_SESSION_ID" 2>/dev/null || true
-~/.claude/skills/gstack/bin/gstack-telemetry-log \
+rm -f ~/.jstack/analytics/.pending-"$_SESSION_ID" 2>/dev/null || true
+~/.claude/skills/jstack/bin/jstack-telemetry-log \
   --skill "SKILL_NAME" --duration "$_TEL_DUR" --outcome "OUTCOME" \
   --used-browse "USED_BROWSE" --session-id "$_SESSION_ID" 2>/dev/null &
 ```
@@ -302,15 +302,15 @@ never blocks the user.
 
 When you are in plan mode and about to call ExitPlanMode:
 
-1. Check if the plan file already has a `## GSTACK REVIEW REPORT` section.
+1. Check if the plan file already has a `## JSTACK REVIEW REPORT` section.
 2. If it DOES — skip (a review skill already wrote a richer report).
 3. If it does NOT — run this command:
 
 \`\`\`bash
-~/.claude/skills/gstack/bin/gstack-review-read
+~/.claude/skills/jstack/bin/jstack-review-read
 \`\`\`
 
-Then write a `## GSTACK REVIEW REPORT` section to the end of the plan file:
+Then write a `## JSTACK REVIEW REPORT` section to the end of the plan file:
 
 - If the output contains review entries (JSONL lines before `---CONFIG---`): format the
   standard report table with runs/status/findings per skill, same format as the review
@@ -318,7 +318,7 @@ Then write a `## GSTACK REVIEW REPORT` section to the end of the plan file:
 - If the output is `NO_REVIEWS` or empty: write this placeholder table:
 
 \`\`\`markdown
-## GSTACK REVIEW REPORT
+## JSTACK REVIEW REPORT
 
 | Review | Trigger | Why | Runs | Status | Findings |
 |--------|---------|-----|------|--------|----------|
@@ -385,8 +385,8 @@ You are a QA engineer AND a bug-fix engineer. Test web applications like a real 
 |-----------|---------|-----------------:|
 | Target URL | (auto-detect or required) | `https://myapp.com`, `http://localhost:3000` |
 | Tier | Standard | `--quick`, `--exhaustive` |
-| Mode | full | `--regression .gstack/qa-reports/baseline.json` |
-| Output dir | `.gstack/qa-reports/` | `Output to /tmp/qa` |
+| Mode | full | `--regression .jstack/qa-reports/baseline.json` |
+| Output dir | `.jstack/qa-reports/` | `Output to /tmp/qa` |
 | Scope | Full app (or diff-scoped) | `Focus on the billing page` |
 | Auth | None | `Sign in to user@example.com`, `Import cookies from cookies.json` |
 
@@ -428,8 +428,8 @@ After the user chooses, execute their choice (commit or stash), then continue wi
 ```bash
 _ROOT=$(git rev-parse --show-toplevel 2>/dev/null)
 B=""
-[ -n "$_ROOT" ] && [ -x "$_ROOT/.claude/skills/gstack/browse/dist/browse" ] && B="$_ROOT/.claude/skills/gstack/browse/dist/browse"
-[ -z "$B" ] && B=~/.claude/skills/gstack/browse/dist/browse
+[ -n "$_ROOT" ] && [ -x "$_ROOT/.claude/skills/jstack/browse/dist/browse" ] && B="$_ROOT/.claude/skills/jstack/browse/dist/browse"
+[ -z "$B" ] && B=~/.claude/skills/jstack/browse/dist/browse
 if [ -x "$B" ]; then
   echo "READY: $B"
 else
@@ -438,7 +438,7 @@ fi
 ```
 
 If `NEEDS_SETUP`:
-1. Tell the user: "gstack browse needs a one-time build (~10 seconds). OK to proceed?" Then STOP and wait.
+1. Tell the user: "jstack browse needs a one-time build (~10 seconds). OK to proceed?" Then STOP and wait.
 2. Run: `cd <SKILL_DIR> && ./setup`
 3. If `bun` is not installed: `curl -fsSL https://bun.sh/install | bash`
 
@@ -465,7 +465,7 @@ setopt +o nomatch 2>/dev/null || true  # zsh compat
 ls jest.config.* vitest.config.* playwright.config.* .rspec pytest.ini pyproject.toml phpunit.xml 2>/dev/null
 ls -d test/ tests/ spec/ __tests__/ cypress/ e2e/ 2>/dev/null
 # Check opt-out marker
-[ -f .gstack/no-test-bootstrap ] && echo "BOOTSTRAP_DECLINED"
+[ -f .jstack/no-test-bootstrap ] && echo "BOOTSTRAP_DECLINED"
 ```
 
 **If test framework detected** (config files or test directories found):
@@ -478,7 +478,7 @@ Store conventions as prose context for use in Phase 8e.5 or Step 3.4. **Skip the
 **If NO runtime detected** (no config files found): Use AskUserQuestion:
 "I couldn't detect your project's language. What runtime are you using?"
 Options: A) Node.js/TypeScript B) Ruby/Rails C) Python D) Go E) Rust F) PHP G) Elixir H) This project doesn't need tests.
-If user picks H → write `.gstack/no-test-bootstrap` and continue without tests.
+If user picks H → write `.jstack/no-test-bootstrap` and continue without tests.
 
 **If runtime detected but no test framework — bootstrap:**
 
@@ -510,7 +510,7 @@ B) [Alternative] — [rationale]. Includes: [packages]
 C) Skip — don't set up testing right now
 RECOMMENDATION: Choose A because [reason based on project context]"
 
-If user picks C → write `.gstack/no-test-bootstrap`. Tell user: "If you change your mind later, delete `.gstack/no-test-bootstrap` and re-run." Continue without tests.
+If user picks C → write `.jstack/no-test-bootstrap`. Tell user: "If you change your mind later, delete `.jstack/no-test-bootstrap` and re-run." Continue without tests.
 
 If multiple runtimes detected (monorepo) → ask which runtime to set up first, with option to do both sequentially.
 
@@ -601,7 +601,7 @@ Only commit if there are changes. Stage all bootstrap files (config, test direct
 **Create output directories:**
 
 ```bash
-mkdir -p .gstack/qa-reports/screenshots
+mkdir -p .jstack/qa-reports/screenshots
 ```
 
 ---
@@ -610,11 +610,11 @@ mkdir -p .gstack/qa-reports/screenshots
 
 Before falling back to git diff heuristics, check for richer test plan sources:
 
-1. **Project-scoped test plans:** Check `~/.gstack/projects/` for recent `*-test-plan-*.md` files for this repo
+1. **Project-scoped test plans:** Check `~/.jstack/projects/` for recent `*-test-plan-*.md` files for this repo
    ```bash
    setopt +o nomatch 2>/dev/null || true  # zsh compat
-   eval "$(~/.claude/skills/gstack/bin/gstack-slug 2>/dev/null)"
-   ls -t ~/.gstack/projects/$SLUG/*-test-plan-*.md 2>/dev/null | head -1
+   eval "$(~/.claude/skills/jstack/bin/jstack-slug 2>/dev/null)"
+   ls -t ~/.jstack/projects/$SLUG/*-test-plan-*.md 2>/dev/null | head -1
    ```
 2. **Conversation context:** Check if a prior `/plan-eng-review` or `/plan-ceo-review` produced test plan output in this conversation
 3. **Use whichever source is richer.** Fall back to git diff analysis only if neither is available.
@@ -908,7 +908,7 @@ Record baseline health score at end of Phase 6.
 ## Output Structure
 
 ```
-.gstack/qa-reports/
+.jstack/qa-reports/
 ├── qa-report-{domain}-{YYYY-MM-DD}.md    # Structured report
 ├── screenshots/
 │   ├── initial.png                        # Landing page annotated screenshot
@@ -1013,7 +1013,7 @@ The test MUST:
   ```
   // Regression: ISSUE-NNN — {what broke}
   // Found by /qa on {YYYY-MM-DD}
-  // Report: .gstack/qa-reports/qa-report-{domain}-{date}.md
+  // Report: .jstack/qa-reports/qa-report-{domain}-{date}.md
   ```
 
 Test type decision:
@@ -1073,13 +1073,13 @@ After all fixes are applied:
 
 Write the report to both local and project-scoped locations:
 
-**Local:** `.gstack/qa-reports/qa-report-{domain}-{YYYY-MM-DD}.md`
+**Local:** `.jstack/qa-reports/qa-report-{domain}-{YYYY-MM-DD}.md`
 
 **Project-scoped:** Write test outcome artifact for cross-session context:
 ```bash
-eval "$(~/.claude/skills/gstack/bin/gstack-slug 2>/dev/null)" && mkdir -p ~/.gstack/projects/$SLUG
+eval "$(~/.claude/skills/jstack/bin/jstack-slug 2>/dev/null)" && mkdir -p ~/.jstack/projects/$SLUG
 ```
-Write to `~/.gstack/projects/{slug}/{user}-{branch}-test-outcome-{datetime}.md`
+Write to `~/.jstack/projects/{slug}/{user}-{branch}-test-outcome-{datetime}.md`
 
 **Per-issue additions** (beyond standard report template):
 - Fix Status: verified / best-effort / reverted / deferred

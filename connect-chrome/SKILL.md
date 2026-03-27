@@ -2,7 +2,7 @@
 name: connect-chrome
 version: 0.1.0
 description: |
-  Launch real Chrome controlled by gstack with the Side Panel extension auto-loaded.
+  Launch real Chrome controlled by jstack with the Side Panel extension auto-loaded.
   One command: connects Claude to a visible Chrome window where you can watch every
   action in real time. The extension shows a live activity feed in the Side Panel.
   Use when asked to "connect chrome", "open chrome", "real browser", "launch chrome",
@@ -19,59 +19,59 @@ allowed-tools:
 ## Preamble (run first)
 
 ```bash
-_UPD=$(~/.claude/skills/gstack/bin/gstack-update-check 2>/dev/null || .claude/skills/gstack/bin/gstack-update-check 2>/dev/null || true)
+_UPD=$(~/.claude/skills/jstack/bin/jstack-update-check 2>/dev/null || .claude/skills/jstack/bin/jstack-update-check 2>/dev/null || true)
 [ -n "$_UPD" ] && echo "$_UPD" || true
-mkdir -p ~/.gstack/sessions
-touch ~/.gstack/sessions/"$PPID"
-_SESSIONS=$(find ~/.gstack/sessions -mmin -120 -type f 2>/dev/null | wc -l | tr -d ' ')
-find ~/.gstack/sessions -mmin +120 -type f -delete 2>/dev/null || true
-_CONTRIB=$(~/.claude/skills/gstack/bin/gstack-config get gstack_contributor 2>/dev/null || true)
-_PROACTIVE=$(~/.claude/skills/gstack/bin/gstack-config get proactive 2>/dev/null || echo "true")
-_PROACTIVE_PROMPTED=$([ -f ~/.gstack/.proactive-prompted ] && echo "yes" || echo "no")
+mkdir -p ~/.jstack/sessions
+touch ~/.jstack/sessions/"$PPID"
+_SESSIONS=$(find ~/.jstack/sessions -mmin -120 -type f 2>/dev/null | wc -l | tr -d ' ')
+find ~/.jstack/sessions -mmin +120 -type f -delete 2>/dev/null || true
+_CONTRIB=$(~/.claude/skills/jstack/bin/jstack-config get jstack_contributor 2>/dev/null || true)
+_PROACTIVE=$(~/.claude/skills/jstack/bin/jstack-config get proactive 2>/dev/null || echo "true")
+_PROACTIVE_PROMPTED=$([ -f ~/.jstack/.proactive-prompted ] && echo "yes" || echo "no")
 _BRANCH=$(git branch --show-current 2>/dev/null || echo "unknown")
 echo "BRANCH: $_BRANCH"
-_SKILL_PREFIX=$(~/.claude/skills/gstack/bin/gstack-config get skill_prefix 2>/dev/null || echo "false")
+_SKILL_PREFIX=$(~/.claude/skills/jstack/bin/jstack-config get skill_prefix 2>/dev/null || echo "false")
 echo "PROACTIVE: $_PROACTIVE"
 echo "PROACTIVE_PROMPTED: $_PROACTIVE_PROMPTED"
 echo "SKILL_PREFIX: $_SKILL_PREFIX"
-source <(~/.claude/skills/gstack/bin/gstack-repo-mode 2>/dev/null) || true
+source <(~/.claude/skills/jstack/bin/jstack-repo-mode 2>/dev/null) || true
 REPO_MODE=${REPO_MODE:-unknown}
 echo "REPO_MODE: $REPO_MODE"
-_LAKE_SEEN=$([ -f ~/.gstack/.completeness-intro-seen ] && echo "yes" || echo "no")
+_LAKE_SEEN=$([ -f ~/.jstack/.completeness-intro-seen ] && echo "yes" || echo "no")
 echo "LAKE_INTRO: $_LAKE_SEEN"
-_TEL=$(~/.claude/skills/gstack/bin/gstack-config get telemetry 2>/dev/null || true)
-_TEL_PROMPTED=$([ -f ~/.gstack/.telemetry-prompted ] && echo "yes" || echo "no")
+_TEL=$(~/.claude/skills/jstack/bin/jstack-config get telemetry 2>/dev/null || true)
+_TEL_PROMPTED=$([ -f ~/.jstack/.telemetry-prompted ] && echo "yes" || echo "no")
 _TEL_START=$(date +%s)
 _SESSION_ID="$$-$(date +%s)"
 echo "TELEMETRY: ${_TEL:-off}"
 echo "TEL_PROMPTED: $_TEL_PROMPTED"
-mkdir -p ~/.gstack/analytics
-echo '{"skill":"connect-chrome","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.gstack/analytics/skill-usage.jsonl 2>/dev/null || true
+mkdir -p ~/.jstack/analytics
+echo '{"skill":"connect-chrome","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.jstack/analytics/skill-usage.jsonl 2>/dev/null || true
 # zsh-compatible: use find instead of glob to avoid NOMATCH error
-for _PF in $(find ~/.gstack/analytics -maxdepth 1 -name '.pending-*' 2>/dev/null); do [ -f "$_PF" ] && ~/.claude/skills/gstack/bin/gstack-telemetry-log --event-type skill_run --skill _pending_finalize --outcome unknown --session-id "$_SESSION_ID" 2>/dev/null || true; break; done
+for _PF in $(find ~/.jstack/analytics -maxdepth 1 -name '.pending-*' 2>/dev/null); do [ -f "$_PF" ] && ~/.claude/skills/jstack/bin/jstack-telemetry-log --event-type skill_run --skill _pending_finalize --outcome unknown --session-id "$_SESSION_ID" 2>/dev/null || true; break; done
 ```
 
-If `PROACTIVE` is `"false"`, do not proactively suggest gstack skills AND do not
+If `PROACTIVE` is `"false"`, do not proactively suggest jstack skills AND do not
 auto-invoke skills based on conversation context. Only run skills the user explicitly
 types (e.g., /qa, /ship). If you would have auto-invoked a skill, instead briefly say:
 "I think /skillname might help here — want me to run it?" and wait for confirmation.
 The user opted out of proactive behavior.
 
 If `SKILL_PREFIX` is `"true"`, the user has namespaced skill names. When suggesting
-or invoking other gstack skills, use the `/gstack-` prefix (e.g., `/gstack-qa` instead
-of `/qa`, `/gstack-ship` instead of `/ship`). Disk paths are unaffected — always use
-`~/.claude/skills/gstack/[skill-name]/SKILL.md` for reading skill files.
+or invoking other jstack skills, use the `/jstack-` prefix (e.g., `/jstack-qa` instead
+of `/qa`, `/jstack-ship` instead of `/ship`). Disk paths are unaffected — always use
+`~/.claude/skills/jstack/[skill-name]/SKILL.md` for reading skill files.
 
-If output shows `UPGRADE_AVAILABLE <old> <new>`: read `~/.claude/skills/gstack/gstack-upgrade/SKILL.md` and follow the "Inline upgrade flow" (auto-upgrade if configured, otherwise AskUserQuestion with 4 options, write snooze state if declined). If `JUST_UPGRADED <from> <to>`: tell user "Running gstack v{to} (just updated!)" and continue.
+If output shows `UPGRADE_AVAILABLE <old> <new>`: read `~/.claude/skills/jstack/jstack-upgrade/SKILL.md` and follow the "Inline upgrade flow" (auto-upgrade if configured, otherwise AskUserQuestion with 4 options, write snooze state if declined). If `JUST_UPGRADED <from> <to>`: tell user "Running jstack v{to} (just updated!)" and continue.
 
 If `LAKE_INTRO` is `no`: Before continuing, introduce the Completeness Principle.
-Tell the user: "gstack follows the **Boil the Lake** principle — always do the complete
+Tell the user: "jstack follows the **Boil the Lake** principle — always do the complete
 thing when AI makes the marginal cost near-zero. Read more: https://garryslist.org/posts/boil-the-ocean"
 Then offer to open the essay in their default browser:
 
 ```bash
 open https://garryslist.org/posts/boil-the-ocean
-touch ~/.gstack/.completeness-intro-seen
+touch ~/.jstack/.completeness-intro-seen
 ```
 
 Only run `open` if the user says yes. Always run `touch` to mark as seen. This only happens once.
@@ -79,32 +79,32 @@ Only run `open` if the user says yes. Always run `touch` to mark as seen. This o
 If `TEL_PROMPTED` is `no` AND `LAKE_INTRO` is `yes`: After the lake intro is handled,
 ask the user about telemetry. Use AskUserQuestion:
 
-> Help gstack get better! Community mode shares usage data (which skills you use, how long
+> Help jstack get better! Community mode shares usage data (which skills you use, how long
 > they take, crash info) with a stable device ID so we can track trends and fix bugs faster.
 > No code, file paths, or repo names are ever sent.
-> Change anytime with `gstack-config set telemetry off`.
+> Change anytime with `jstack-config set telemetry off`.
 
 Options:
-- A) Help gstack get better! (recommended)
+- A) Help jstack get better! (recommended)
 - B) No thanks
 
-If A: run `~/.claude/skills/gstack/bin/gstack-config set telemetry community`
+If A: run `~/.claude/skills/jstack/bin/jstack-config set telemetry community`
 
 If B: ask a follow-up AskUserQuestion:
 
-> How about anonymous mode? We just learn that *someone* used gstack — no unique ID,
+> How about anonymous mode? We just learn that *someone* used jstack — no unique ID,
 > no way to connect sessions. Just a counter that helps us know if anyone's out there.
 
 Options:
 - A) Sure, anonymous is fine
 - B) No thanks, fully off
 
-If B→A: run `~/.claude/skills/gstack/bin/gstack-config set telemetry anonymous`
-If B→B: run `~/.claude/skills/gstack/bin/gstack-config set telemetry off`
+If B→A: run `~/.claude/skills/jstack/bin/jstack-config set telemetry anonymous`
+If B→B: run `~/.claude/skills/jstack/bin/jstack-config set telemetry off`
 
 Always run:
 ```bash
-touch ~/.gstack/.telemetry-prompted
+touch ~/.jstack/.telemetry-prompted
 ```
 
 This only happens once. If `TEL_PROMPTED` is `yes`, skip this entirely.
@@ -112,7 +112,7 @@ This only happens once. If `TEL_PROMPTED` is `yes`, skip this entirely.
 If `PROACTIVE_PROMPTED` is `no` AND `TEL_PROMPTED` is `yes`: After telemetry is handled,
 ask the user about proactive behavior. Use AskUserQuestion:
 
-> gstack can proactively figure out when you might need a skill while you work —
+> jstack can proactively figure out when you might need a skill while you work —
 > like suggesting /qa when you say "does this work?" or /investigate when you hit
 > a bug. We recommend keeping this on — it speeds up every part of your workflow.
 
@@ -120,12 +120,12 @@ Options:
 - A) Keep it on (recommended)
 - B) Turn it off — I'll type /commands myself
 
-If A: run `~/.claude/skills/gstack/bin/gstack-config set proactive true`
-If B: run `~/.claude/skills/gstack/bin/gstack-config set proactive false`
+If A: run `~/.claude/skills/jstack/bin/jstack-config set proactive true`
+If B: run `~/.claude/skills/jstack/bin/jstack-config set proactive false`
 
 Always run:
 ```bash
-touch ~/.gstack/.proactive-prompted
+touch ~/.jstack/.proactive-prompted
 ```
 
 This only happens once. If `PROACTIVE_PROMPTED` is `yes`, skip this entirely.
@@ -188,11 +188,11 @@ Per-skill instructions may add additional formatting rules on top of this baseli
 
 ## Completeness Principle — Boil the Lake
 
-AI makes completeness near-free. Always recommend the complete option over shortcuts — the delta is minutes with CC+gstack. A "lake" (100% coverage, all edge cases) is boilable; an "ocean" (full rewrite, multi-quarter migration) is not. Boil lakes, flag oceans.
+AI makes completeness near-free. Always recommend the complete option over shortcuts — the delta is minutes with CC+jstack. A "lake" (100% coverage, all edge cases) is boilable; an "ocean" (full rewrite, multi-quarter migration) is not. Boil lakes, flag oceans.
 
 **Effort reference** — always show both scales:
 
-| Task type | Human team | CC+gstack | Compression |
+| Task type | Human team | CC+jstack | Compression |
 |-----------|-----------|-----------|-------------|
 | Boilerplate | 2 days | 15 min | ~100x |
 | Tests | 1 day | 15 min | ~50x |
@@ -211,21 +211,21 @@ Always flag anything that looks wrong — one sentence, what you noticed and its
 
 ## Search Before Building
 
-Before building anything unfamiliar, **search first.** See `~/.claude/skills/gstack/ETHOS.md`.
+Before building anything unfamiliar, **search first.** See `~/.claude/skills/jstack/ETHOS.md`.
 - **Layer 1** (tried and true) — don't reinvent. **Layer 2** (new and popular) — scrutinize. **Layer 3** (first principles) — prize above all.
 
 **Eureka:** When first-principles reasoning contradicts conventional wisdom, name it and log:
 ```bash
-jq -n --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" --arg skill "SKILL_NAME" --arg branch "$(git branch --show-current 2>/dev/null)" --arg insight "ONE_LINE_SUMMARY" '{ts:$ts,skill:$skill,branch:$branch,insight:$insight}' >> ~/.gstack/analytics/eureka.jsonl 2>/dev/null || true
+jq -n --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" --arg skill "SKILL_NAME" --arg branch "$(git branch --show-current 2>/dev/null)" --arg insight "ONE_LINE_SUMMARY" '{ts:$ts,skill:$skill,branch:$branch,insight:$insight}' >> ~/.jstack/analytics/eureka.jsonl 2>/dev/null || true
 ```
 
 ## Contributor Mode
 
-If `_CONTRIB` is `true`: you are in **contributor mode**. At the end of each major workflow step, rate your gstack experience 0-10. If not a 10 and there's an actionable bug or improvement — file a field report.
+If `_CONTRIB` is `true`: you are in **contributor mode**. At the end of each major workflow step, rate your jstack experience 0-10. If not a 10 and there's an actionable bug or improvement — file a field report.
 
-**File only:** gstack tooling bugs where the input was reasonable but gstack failed. **Skip:** user app bugs, network errors, auth failures on user's site.
+**File only:** jstack tooling bugs where the input was reasonable but jstack failed. **Skip:** user app bugs, network errors, auth failures on user's site.
 
-**To file:** write `~/.gstack/contributor-logs/{slug}.md`:
+**To file:** write `~/.jstack/contributor-logs/{slug}.md`:
 ```
 # {Title}
 **What I tried:** {action} | **What happened:** {result} | **Rating:** {0-10}
@@ -270,7 +270,7 @@ Determine the outcome from the workflow result (success if completed normally, e
 if it failed, abort if the user interrupted).
 
 **PLAN MODE EXCEPTION — ALWAYS RUN:** This command writes telemetry to
-`~/.gstack/analytics/` (user config directory, not project files). The skill
+`~/.jstack/analytics/` (user config directory, not project files). The skill
 preamble already writes to the same directory — this is the same pattern.
 Skipping this command loses session duration and outcome data.
 
@@ -279,8 +279,8 @@ Run this bash:
 ```bash
 _TEL_END=$(date +%s)
 _TEL_DUR=$(( _TEL_END - _TEL_START ))
-rm -f ~/.gstack/analytics/.pending-"$_SESSION_ID" 2>/dev/null || true
-~/.claude/skills/gstack/bin/gstack-telemetry-log \
+rm -f ~/.jstack/analytics/.pending-"$_SESSION_ID" 2>/dev/null || true
+~/.claude/skills/jstack/bin/jstack-telemetry-log \
   --skill "SKILL_NAME" --duration "$_TEL_DUR" --outcome "OUTCOME" \
   --used-browse "USED_BROWSE" --session-id "$_SESSION_ID" 2>/dev/null &
 ```
@@ -294,15 +294,15 @@ never blocks the user.
 
 When you are in plan mode and about to call ExitPlanMode:
 
-1. Check if the plan file already has a `## GSTACK REVIEW REPORT` section.
+1. Check if the plan file already has a `## JSTACK REVIEW REPORT` section.
 2. If it DOES — skip (a review skill already wrote a richer report).
 3. If it does NOT — run this command:
 
 \`\`\`bash
-~/.claude/skills/gstack/bin/gstack-review-read
+~/.claude/skills/jstack/bin/jstack-review-read
 \`\`\`
 
-Then write a `## GSTACK REVIEW REPORT` section to the end of the plan file:
+Then write a `## JSTACK REVIEW REPORT` section to the end of the plan file:
 
 - If the output contains review entries (JSONL lines before `---CONFIG---`): format the
   standard report table with runs/status/findings per skill, same format as the review
@@ -310,7 +310,7 @@ Then write a `## GSTACK REVIEW REPORT` section to the end of the plan file:
 - If the output is `NO_REVIEWS` or empty: write this placeholder table:
 
 \`\`\`markdown
-## GSTACK REVIEW REPORT
+## JSTACK REVIEW REPORT
 
 | Review | Trigger | Why | Runs | Status | Findings |
 |--------|---------|-----|------|--------|----------|
@@ -328,7 +328,7 @@ plan's living status.
 
 # /connect-chrome — Launch Real Chrome with Side Panel
 
-Connect Claude to a visible Chrome window with the gstack extension auto-loaded.
+Connect Claude to a visible Chrome window with the jstack extension auto-loaded.
 You see every click, every navigation, every action in real time.
 
 ## SETUP (run this check BEFORE any browse command)
@@ -336,8 +336,8 @@ You see every click, every navigation, every action in real time.
 ```bash
 _ROOT=$(git rev-parse --show-toplevel 2>/dev/null)
 B=""
-[ -n "$_ROOT" ] && [ -x "$_ROOT/.claude/skills/gstack/browse/dist/browse" ] && B="$_ROOT/.claude/skills/gstack/browse/dist/browse"
-[ -z "$B" ] && B=~/.claude/skills/gstack/browse/dist/browse
+[ -n "$_ROOT" ] && [ -x "$_ROOT/.claude/skills/jstack/browse/dist/browse" ] && B="$_ROOT/.claude/skills/jstack/browse/dist/browse"
+[ -z "$B" ] && B=~/.claude/skills/jstack/browse/dist/browse
 if [ -x "$B" ]; then
   echo "READY: $B"
 else
@@ -346,7 +346,7 @@ fi
 ```
 
 If `NEEDS_SETUP`:
-1. Tell the user: "gstack browse needs a one-time build (~10 seconds). OK to proceed?" Then STOP and wait.
+1. Tell the user: "jstack browse needs a one-time build (~10 seconds). OK to proceed?" Then STOP and wait.
 2. Run: `cd <SKILL_DIR> && ./setup`
 3. If `bun` is not installed: `curl -fsSL https://bun.sh/install | bash`
 
@@ -358,15 +358,15 @@ positives and Chromium profile lock conflicts.
 
 ```bash
 # Kill any existing browse server
-if [ -f "$(git rev-parse --show-toplevel 2>/dev/null)/.gstack/browse.json" ]; then
-  _OLD_PID=$(cat "$(git rev-parse --show-toplevel)/.gstack/browse.json" 2>/dev/null | grep -o '"pid":[0-9]*' | grep -o '[0-9]*')
+if [ -f "$(git rev-parse --show-toplevel 2>/dev/null)/.jstack/browse.json" ]; then
+  _OLD_PID=$(cat "$(git rev-parse --show-toplevel)/.jstack/browse.json" 2>/dev/null | grep -o '"pid":[0-9]*' | grep -o '[0-9]*')
   [ -n "$_OLD_PID" ] && kill "$_OLD_PID" 2>/dev/null || true
   sleep 1
   [ -n "$_OLD_PID" ] && kill -9 "$_OLD_PID" 2>/dev/null || true
-  rm -f "$(git rev-parse --show-toplevel)/.gstack/browse.json"
+  rm -f "$(git rev-parse --show-toplevel)/.jstack/browse.json"
 fi
 # Clean Chromium profile locks (can persist after crashes)
-_PROFILE_DIR="$HOME/.gstack/chromium-profile"
+_PROFILE_DIR="$HOME/.jstack/chromium-profile"
 for _LF in SingletonLock SingletonSocket SingletonCookie; do
   rm -f "$_PROFILE_DIR/$_LF" 2>/dev/null || true
 done
@@ -381,11 +381,11 @@ $B connect
 
 This launches Playwright's bundled Chromium in headed mode with:
 - A visible window you can watch (not your regular Chrome — it stays untouched)
-- The gstack Chrome extension auto-loaded via `launchPersistentContext`
+- The jstack Chrome extension auto-loaded via `launchPersistentContext`
 - A golden shimmer line at the top of every page so you know which window is controlled
 - A sidebar agent process for chat commands
 
-The `connect` command auto-discovers the extension from the gstack install
+The `connect` command auto-discovers the extension from the jstack install
 directory. It always uses port **34567** so the extension can auto-connect.
 
 After connecting, print the full output to the user. Confirm you see
@@ -403,7 +403,7 @@ $B status
 Confirm the output shows `Mode: headed`. Read the port from the state file:
 
 ```bash
-cat "$(git rev-parse --show-toplevel 2>/dev/null)/.gstack/browse.json" 2>/dev/null | grep -o '"port":[0-9]*' | grep -o '[0-9]*'
+cat "$(git rev-parse --show-toplevel 2>/dev/null)/.jstack/browse.json" 2>/dev/null | grep -o '"port":[0-9]*' | grep -o '[0-9]*'
 ```
 
 The port should be **34567**. If it's different, note it — the user may need it
@@ -414,8 +414,8 @@ Also find the extension path so you can help the user if they need to load it ma
 ```bash
 _EXT_PATH=""
 _ROOT=$(git rev-parse --show-toplevel 2>/dev/null)
-[ -n "$_ROOT" ] && [ -f "$_ROOT/.claude/skills/gstack/extension/manifest.json" ] && _EXT_PATH="$_ROOT/.claude/skills/gstack/extension"
-[ -z "$_EXT_PATH" ] && [ -f "$HOME/.claude/skills/gstack/extension/manifest.json" ] && _EXT_PATH="$HOME/.claude/skills/gstack/extension"
+[ -n "$_ROOT" ] && [ -f "$_ROOT/.claude/skills/jstack/extension/manifest.json" ] && _EXT_PATH="$_ROOT/.claude/skills/jstack/extension"
+[ -z "$_EXT_PATH" ] && [ -f "$HOME/.claude/skills/jstack/extension/manifest.json" ] && _EXT_PATH="$HOME/.claude/skills/jstack/extension"
 echo "EXTENSION_PATH: ${_EXT_PATH:-NOT FOUND}"
 ```
 
@@ -423,14 +423,14 @@ echo "EXTENSION_PATH: ${_EXT_PATH:-NOT FOUND}"
 
 Use AskUserQuestion:
 
-> Chrome is launched with gstack control. You should see Playwright's Chromium
+> Chrome is launched with jstack control. You should see Playwright's Chromium
 > (not your regular Chrome) with a golden shimmer line at the top of the page.
 >
 > The Side Panel extension should be auto-loaded. To open it:
 > 1. Look for the **puzzle piece icon** (Extensions) in the toolbar — it may
->    already show the gstack icon if the extension loaded successfully
-> 2. Click the **puzzle piece** → find **gstack browse** → click the **pin icon**
-> 3. Click the pinned **gstack icon** in the toolbar
+>    already show the jstack icon if the extension loaded successfully
+> 2. Click the **puzzle piece** → find **jstack browse** → click the **pin icon**
+> 3. Click the pinned **jstack icon** in the toolbar
 > 4. The Side Panel should open on the right showing a live activity feed
 >
 > **Port:** 34567 (auto-detected — the extension connects automatically in the
@@ -447,7 +447,7 @@ If B: Tell the user:
 > sometimes it doesn't appear immediately. Try these steps:
 >
 > 1. Type `chrome://extensions` in the address bar
-> 2. Look for **"gstack browse"** — it should be listed and enabled
+> 2. Look for **"jstack browse"** — it should be listed and enabled
 > 3. If it's there but not pinned, go back to any page, click the puzzle piece
 >    icon, and pin it
 > 4. If it's NOT listed at all, click **"Load unpacked"** and navigate to:
@@ -457,7 +457,7 @@ If B: Tell the user:
 >
 > After loading, pin it and click the icon to open the Side Panel.
 >
-> If the Side Panel badge stays gray (disconnected), click the gstack icon
+> If the Side Panel badge stays gray (disconnected), click the jstack icon
 > and enter port **34567** manually.
 
 If C:
@@ -505,7 +505,7 @@ Tell the user:
 > You're all set! Here's what you can do with the connected Chrome:
 >
 > **Watch Claude work in real time:**
-> - Run any gstack skill (`/qa`, `/design-review`, `/benchmark`) and watch
+> - Run any jstack skill (`/qa`, `/design-review`, `/benchmark`) and watch
 >   every action happen in the visible Chrome window + Side Panel feed
 > - No cookie import needed — the Playwright browser shares its own session
 >

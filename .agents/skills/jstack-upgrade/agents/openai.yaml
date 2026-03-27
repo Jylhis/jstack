@@ -1,0 +1,6 @@
+interface:
+  display_name: "jstack-upgrade"
+  short_description: "Upgrade jstack to the latest version. Detects global vs vendored install, runs the upgrade, and shows what's new...."
+  default_prompt: "Use jstack-upgrade for this task."
+policy:
+  allow_implicit_invocation: true
