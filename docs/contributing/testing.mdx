@@ -1,0 +1,60 @@
+---
+title: "Testing"
+description: "Run tests and evals"
+---
+
+## Setup
+
+```bash
+cp .env.example .env
+# Edit .env → set ANTHROPIC_API_KEY=sk-ant-...
+bun install
+```
+
+## Test commands
+
+```bash
+bun test                     # Tier 1: free, <5s (run before every commit)
+bun run test:evals           # Tier 2+3: ~$4/run (run before shipping)
+bun run test:e2e             # Tier 2 only: E2E tests
+bun run test:gate            # Gate-tier tests only (CI default)
+bun run test:periodic        # Periodic-tier tests only
+```
+
+## Tier 1: Static validation (free)
+
+Runs automatically with `bun test`. No API keys needed.
+
+- Extracts every `$B` command from SKILL.md and validates against command registry
+- Validates SKILL.md files reference only real commands and flags
+- Tests the template system resolves placeholders correctly
+
+## Tier 2: E2E (~$3.85/run)
+
+Spawns `claude -p` as a subprocess, runs each skill end-to-end, scans for errors.
+
+```bash
+# Must run from a plain terminal — can't nest inside Claude Code
+EVALS=1 bun test test/skill-e2e-*.test.ts
+```
+
+### Diff-based selection
+
+Tests auto-select based on `git diff`. Use `EVALS_ALL=1` or `:all` variants to force all tests. Run `bun run eval:select` to preview which would run.
+
+## Tier 3: LLM-as-judge (~$0.15/run)
+
+Claude Sonnet scores SKILL.md docs on clarity, completeness, and actionability. Each dimension must score ≥ 4/5.
+
+## E2E observability
+
+| Tool | Command |
+|------|---------|
+| Live dashboard | `bun run eval:watch` |
+| List all runs | `bun run eval:list` |
+| Compare two runs | `bun run eval:compare` |
+| Aggregate stats | `bun run eval:summary` |
+
+## CI
+
+GitHub Action runs `bun run gen:skill-docs --dry-run` on every push — catches stale docs before merge.

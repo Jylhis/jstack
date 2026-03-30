@@ -1,0 +1,38 @@
+---
+title: "Security Model"
+description: "Localhost-only, bearer token auth, cookie security"
+---
+
+## Localhost only
+
+The HTTP server binds to `localhost`, not `0.0.0.0`. It's not reachable from the network.
+
+## Bearer token auth
+
+Every server session generates a random UUID token, written to the state file with mode 0o600 (owner-only read). Every HTTP request must include `Authorization: Bearer <token>`. If the token doesn't match, the server returns 401.
+
+This prevents other processes on the same machine from talking to your browse server. The cookie picker UI and health check endpoints are exempt.
+
+## Cookie security
+
+Cookies are the most sensitive data jstack handles:
+
+1. **Keychain access requires user approval**: First cookie import per browser triggers a macOS Keychain dialog.
+2. **Decryption in-process**: Cookie values are decrypted in memory (PBKDF2 + AES-128-CBC), loaded into Playwright, never written to disk in plaintext.
+3. **Database is read-only**: jstack copies the Chromium cookie DB to a temp file, opens it read-only. Never modifies your browser's cookies.
+4. **Per-session key caching**: Keychain password + derived AES key cached in memory, cleared on server shutdown.
+5. **No values in logs**: Console, network, and dialog logs never contain cookie values.
+
+## Shell injection prevention
+
+The browser registry (Comet, Chrome, Arc, Brave, Edge) is hardcoded. Database paths are constructed from known constants, never from user input. Keychain access uses `Bun.spawn()` with explicit argument arrays, not shell string interpolation.
+
+## Error messages
+
+Errors are for AI agents, not humans. Every error is actionable:
+
+- "Element not found" → "Element not found. Run `snapshot -i` to see available elements."
+- "Selector matched multiple" → "Use @refs from `snapshot` instead."
+- Timeout → "Navigation timed out after 30s. The page may be slow or the URL wrong."
+
+Playwright's native errors are rewritten through `wrapError()` to strip stack traces and add guidance.

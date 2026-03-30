@@ -1,0 +1,42 @@
+---
+title: "/browse"
+description: "Real Chromium browser — real clicks, real screenshots, ~100ms per command"
+---
+
+`/browse` gives the agent eyes. Before it, the agent could think and code but was half blind — guessing about UI state, auth flows, console errors. Now it can just go look.
+
+It is a compiled binary that talks to a persistent Chromium daemon built on [Playwright](https://playwright.dev/). First call starts the browser (~3s). Every call after: ~100ms. Cookies, tabs, and localStorage carry over between commands.
+
+## Example
+
+```
+You:   /browse staging.myapp.com — log in, test the signup flow
+
+Claude: [18 tool calls, ~60 seconds]
+
+        > $B goto https://staging.myapp.com/signup
+        > $B snapshot -i
+        > $B fill @e2 "test@example.com"
+        > $B fill @e3 "password123"
+        > $B click @e5                    (Submit)
+        > $B screenshot /tmp/signup.png
+
+        Signup works. Redirected to onboarding.
+        All 4 pages load correctly. No console errors.
+```
+
+18 tool calls, about a minute. Full QA pass.
+
+## Performance
+
+| Tool | First call | Subsequent | Context overhead |
+|------|-----------|------------|-----------------|
+| Chrome MCP | ~5s | ~2-5s | ~2000 tokens |
+| Playwright MCP | ~3s | ~1-3s | ~1500 tokens |
+| **jstack browse** | **~3s** | **~100ms** | **0 tokens** |
+
+The context overhead compounds fast. In a 20-command session, MCP tools burn 30,000-40,000 tokens on protocol framing. jstack burns zero.
+
+<Card title="Full Browser Reference" icon="globe" href="/browser/overview">
+  Commands, snapshots, refs, real browser mode, and more
+</Card>

@@ -1,0 +1,180 @@
+{
+  "$schema": "https://mintlify.com/schema.json",
+  "name": "jstack",
+  "logo": {
+    "dark": "/logo/dark.svg",
+    "light": "/logo/light.svg"
+  },
+  "favicon": "/favicon.svg",
+  "colors": {
+    "primary": "#F59E0B",
+    "light": "#FBBF24",
+    "dark": "#D97706",
+    "anchors": {
+      "from": "#F59E0B",
+      "to": "#D97706"
+    }
+  },
+  "topbarLinks": [
+    {
+      "name": "GitHub",
+      "url": "https://github.com/Jylhis/jstack"
+    }
+  ],
+  "topbarCtaButton": {
+    "name": "Install",
+    "url": "/getting-started/installation"
+  },
+  "anchors": [
+    {
+      "name": "GitHub",
+      "icon": "github",
+      "url": "https://github.com/Jylhis/jstack"
+    },
+    {
+      "name": "Changelog",
+      "icon": "list",
+      "url": "/changelog"
+    }
+  ],
+  "navigation": [
+    {
+      "group": "Getting Started",
+      "pages": [
+        "getting-started/introduction",
+        "getting-started/installation",
+        "getting-started/quickstart"
+      ]
+    },
+    {
+      "group": "The Sprint",
+      "pages": [
+        "sprint/overview",
+        "sprint/think",
+        "sprint/plan",
+        "sprint/build",
+        "sprint/review",
+        "sprint/test",
+        "sprint/ship",
+        "sprint/reflect"
+      ]
+    },
+    {
+      "group": "Skills",
+      "pages": [
+        "skills/overview",
+        {
+          "group": "Think",
+          "pages": [
+            "skills/office-hours",
+            "skills/design-consultation"
+          ]
+        },
+        {
+          "group": "Plan",
+          "pages": [
+            "skills/plan-ceo-review",
+            "skills/plan-eng-review",
+            "skills/plan-design-review",
+            "skills/autoplan"
+          ]
+        },
+        {
+          "group": "Build & Debug",
+          "pages": [
+            "skills/investigate",
+            "skills/browse",
+            "skills/setup-browser-cookies"
+          ]
+        },
+        {
+          "group": "Review",
+          "pages": [
+            "skills/review",
+            "skills/design-review",
+            "skills/codex",
+            "skills/cso"
+          ]
+        },
+        {
+          "group": "Test",
+          "pages": [
+            "skills/qa",
+            "skills/qa-only",
+            "skills/benchmark",
+            "skills/canary"
+          ]
+        },
+        {
+          "group": "Ship",
+          "pages": [
+            "skills/ship",
+            "skills/land-and-deploy",
+            "skills/document-release"
+          ]
+        },
+        {
+          "group": "Reflect",
+          "pages": [
+            "skills/retro"
+          ]
+        },
+        {
+          "group": "Safety & Utility",
+          "pages": [
+            "skills/careful",
+            "skills/freeze",
+            "skills/guard",
+            "skills/unfreeze",
+            "skills/setup-deploy",
+            "skills/jstack-upgrade"
+          ]
+        }
+      ]
+    },
+    {
+      "group": "Browser",
+      "pages": [
+        "browser/overview",
+        "browser/commands",
+        "browser/snapshots-and-refs",
+        "browser/real-browser-mode",
+        "browser/chrome-extension",
+        "browser/sidebar-agent",
+        "browser/handoff",
+        "browser/cookie-import"
+      ]
+    },
+    {
+      "group": "Architecture",
+      "pages": [
+        "architecture/overview",
+        "architecture/daemon-model",
+        "architecture/security",
+        "architecture/skill-template-system",
+        "architecture/testing"
+      ]
+    },
+    {
+      "group": "Contributing",
+      "pages": [
+        "contributing/getting-started",
+        "contributing/dev-mode",
+        "contributing/editing-skills",
+        "contributing/testing",
+        "contributing/dual-host"
+      ]
+    },
+    {
+      "group": "Philosophy",
+      "pages": [
+        "philosophy/ethos",
+        "philosophy/parallel-sprints"
+      ]
+    }
+  ],
+  "footerSocials": {
+    "x": "https://x.com/Jylhis",
+    "github": "https://github.com/Jylhis/jstack"
+  }
+}

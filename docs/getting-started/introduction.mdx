@@ -1,0 +1,127 @@
+---
+title: "Introduction"
+description: "Turn Claude Code into a virtual engineering team with 20+ specialist skills"
+---
+
+# jstack
+
+jstack turns Claude Code into a virtual engineering team — a CEO who rethinks the product, an eng manager who locks architecture, a designer who catches AI slop, a reviewer who finds production bugs, a QA lead who opens a real browser, a security officer who runs OWASP + STRIDE audits, and a release engineer who ships the PR.
+
+Twenty specialists and eight power tools, all slash commands, all Markdown, all free, MIT license.
+
+## Who this is for
+
+- **Founders and CEOs** — especially technical ones who still want to ship
+- **First-time Claude Code users** — structured roles instead of a blank prompt
+- **Tech leads and staff engineers** — rigorous review, QA, and release automation on every PR
+
+## The sprint
+
+jstack is a process, not a collection of tools. The skills run in the order a sprint runs:
+
+**Think &rarr; Plan &rarr; Build &rarr; Review &rarr; Test &rarr; Ship &rarr; Reflect**
+
+Each skill feeds into the next. `/office-hours` writes a design doc that `/plan-ceo-review` reads. `/plan-eng-review` writes a test plan that `/qa` picks up. `/review` catches bugs that `/ship` verifies are fixed. Nothing falls through the cracks because every step knows what came before it.
+
+## See it work
+
+```
+You:    I want to build a daily briefing app for my calendar.
+You:    /office-hours
+Claude: [asks about the pain — specific examples, not hypotheticals]
+
+You:    Multiple Google calendars, events with stale info, wrong locations.
+        Prep takes forever and the results aren't good enough...
+
+Claude: I'm going to push back on the framing. You said "daily briefing
+        app." But what you actually described is a personal chief of
+        staff AI.
+        [extracts 5 capabilities you didn't realize you were describing]
+        [challenges 4 premises — you agree, disagree, or adjust]
+        [generates 3 implementation approaches with effort estimates]
+        RECOMMENDATION: Ship the narrowest wedge tomorrow, learn from
+        real usage. The full vision is a 3-month project — start with
+        the daily briefing that actually works.
+        [writes design doc → feeds into downstream skills automatically]
+
+You:    /plan-ceo-review
+        [reads the design doc, challenges scope, runs 10-section review]
+
+You:    /plan-eng-review
+        [ASCII diagrams for data flow, state machines, error paths]
+        [test matrix, failure modes, security concerns]
+
+You:    Approve plan. Exit plan mode.
+        [writes 2,400 lines across 11 files. ~8 minutes.]
+
+You:    /review
+        [AUTO-FIXED] 2 issues. [ASK] Race condition → you approve fix.
+
+You:    /qa https://staging.myapp.com
+        [opens real browser, clicks through flows, finds and fixes a bug]
+
+You:    /ship
+        Tests: 42 → 51 (+9 new). PR: github.com/you/app/pull/42
+```
+
+Eight commands, end to end. That is not a copilot. That is a team.
+
+## All skills
+
+<CardGroup cols={2}>
+  <Card title="Think" icon="lightbulb">
+    `/office-hours` — YC-style product thinking
+
+    `/design-consultation` — Build a design system from scratch
+  </Card>
+  <Card title="Plan" icon="map">
+    `/plan-ceo-review` — CEO-level scope review
+
+    `/plan-eng-review` — Architecture and test planning
+
+    `/plan-design-review` — Interactive design audit
+
+    `/autoplan` — Automated review pipeline
+  </Card>
+  <Card title="Review" icon="magnifying-glass">
+    `/review` — Staff engineer code review
+
+    `/design-review` — Visual audit + fix loop
+
+    `/codex` — Multi-AI second opinion
+
+    `/cso` — OWASP + STRIDE security audit
+  </Card>
+  <Card title="Test" icon="flask-vial">
+    `/qa` — Real browser QA with bug fixes
+
+    `/qa-only` — Report-only QA
+
+    `/benchmark` — Performance regression detection
+
+    `/canary` — Post-deploy monitoring
+  </Card>
+  <Card title="Ship" icon="rocket">
+    `/ship` — Tests, review, PR in one command
+
+    `/land-and-deploy` — Merge, deploy, verify
+
+    `/document-release` — Auto-update docs
+  </Card>
+  <Card title="Reflect" icon="rotate">
+    `/retro` — Team-aware weekly retrospective
+  </Card>
+</CardGroup>
+
+### Power tools
+
+| Skill | What it does |
+|-------|-------------|
+| `/careful` | Warns before destructive commands (rm -rf, DROP TABLE, force-push) |
+| `/freeze` | Restrict file edits to one directory |
+| `/guard` | `/careful` + `/freeze` in one command |
+| `/unfreeze` | Remove the `/freeze` boundary |
+| `/browse` | Real Chromium browser, real clicks, ~100ms per command |
+| `/setup-browser-cookies` | Import cookies from your real browser |
+| `/setup-deploy` | One-time deploy configuration |
+| `/jstack-upgrade` | Self-update to latest version |

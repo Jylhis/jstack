@@ -1,0 +1,32 @@
+---
+title: "Dual-Host Development"
+description: "Generating skills for Claude and Codex"
+---
+
+jstack generates SKILL.md files for two hosts: **Claude** (`.claude/skills/`) and **Codex** (`.agents/skills/`). Every template change needs to be generated for both.
+
+## Generating for both hosts
+
+```bash
+bun run gen:skill-docs              # Claude output (default)
+bun run gen:skill-docs --host codex # Codex output
+bun run build                       # does both + compiles binaries
+```
+
+## What changes between hosts
+
+| Aspect | Claude | Codex |
+|--------|--------|-------|
+| Output directory | `{skill}/SKILL.md` | `.agents/skills/jstack-{skill}/SKILL.md` |
+| Frontmatter | Full (name, description, hooks, version) | Minimal (name + description only) |
+| Paths | `~/.claude/skills/jstack` | `$JSTACK_ROOT` |
+| Hook skills | `hooks:` frontmatter | Inline safety advisory prose |
+| `/codex` skill | Included | Excluded (self-referential) |
+
+## Testing Codex output
+
+```bash
+bun test                                    # includes Codex validation
+bun run gen:skill-docs --host codex --dry-run  # check freshness
+bun run skill:check                         # health dashboard (both hosts)
+```

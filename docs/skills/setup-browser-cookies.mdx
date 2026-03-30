@@ -1,0 +1,41 @@
+---
+title: "/setup-browser-cookies"
+description: "Import cookies from your real browser for authenticated testing"
+---
+
+Before `/qa` or `/browse` can test authenticated pages, they need cookies. Instead of manually logging in through the headless browser every time, `/setup-browser-cookies` imports your real sessions directly from your daily browser.
+
+## How it works
+
+It auto-detects installed Chromium browsers (Comet, Chrome, Arc, Brave, Edge), decrypts cookies via the macOS Keychain, and loads them into the Playwright session.
+
+An interactive picker UI lets you choose exactly which domains to import — no cookie values are ever displayed.
+
+## Example
+
+```
+You:   /setup-browser-cookies
+
+Claude: Cookie picker opened — select the domains you want to import.
+
+        [You pick github.com, myapp.com in the browser UI]
+
+You:    done
+
+Claude: Imported 2 domains (47 cookies). Session is ready.
+```
+
+Or skip the UI entirely:
+
+```
+You:   /setup-browser-cookies github.com
+
+Claude: Imported 12 cookies for github.com from Comet.
+```
+
+## Security
+
+- Keychain access requires explicit user approval (macOS dialog)
+- Decryption happens in-process, never written to disk in plaintext
+- Cookie database is read-only — jstack never modifies your real browser's cookies
+- No cookie values appear in logs

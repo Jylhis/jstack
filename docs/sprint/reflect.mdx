@@ -1,0 +1,50 @@
+---
+title: "Reflect"
+description: "Team-aware weekly retrospectives with data"
+---
+
+The Reflect phase closes the loop with a data-driven retrospective.
+
+## `/retro`
+
+At the end of the week, `/retro` analyzes commit history, work patterns, and shipping velocity. Not vibes — data.
+
+It identifies who is running the command, gives the deepest treatment on your own work, then breaks down every contributor with specific praise and growth opportunities.
+
+### Metrics tracked
+
+- Commits, LOC, test ratio, PR sizes, fix ratio
+- Coding sessions detected from commit timestamps
+- Hotspot files and shipping streaks
+- Test health: total test files, tests added, regression test commits
+
+### Example
+
+```
+Week of Mar 1: 47 commits (3 contributors), 3.2k LOC, 38% tests,
+12 PRs, peak: 10pm | Streak: 47d
+
+## Your Week
+32 commits, +2.4k LOC, 41% tests. Peak hours: 9-11pm.
+Biggest ship: cookie import system (browser decryption + picker UI).
+
+## Team Breakdown
+
+### Alice
+12 commits focused on app/services/. Every PR under 200 LOC.
+Opportunity: test ratio at 12%.
+
+### Bob
+3 commits — fixed the N+1 query on dashboard. Small but high-impact.
+Opportunity: only 1 active day this week.
+
+[Top 3 team wins, 3 things to improve, 3 habits for next week]
+```
+
+### Global mode
+
+`/retro global` runs across all your projects and AI tools (Claude Code, Codex, Gemini) for a complete picture.
+
+<Card title="/retro" icon="rotate" href="/skills/retro">
+  Deep dive into retrospectives
+</Card>

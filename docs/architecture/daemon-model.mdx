@@ -1,0 +1,63 @@
+---
+title: "Daemon Model"
+description: "Persistent browser, sub-second commands, automatic lifecycle"
+---
+
+## Why not start a browser per command?
+
+Playwright can launch Chromium in ~2-3 seconds. For a single screenshot, that's fine. For a QA session with 20+ commands, it's 40+ seconds of browser startup overhead. Worse: you lose all state between commands.
+
+The daemon model means:
+
+- **Persistent state**: Log in once, stay logged in. Tabs stay open. localStorage persists.
+- **Sub-second commands**: After first call, every command is just an HTTP POST. ~100-200ms.
+- **Automatic lifecycle**: Auto-starts on first use, auto-shuts down after 30 minutes idle.
+
+## State file
+
+The server writes `.jstack/browse.json` (atomic write, mode 0o600):
+
+```json
+{
+  "pid": 12345,
+  "port": 34567,
+  "token": "uuid-v4",
+  "startedAt": "...",
+  "binaryVersion": "abc123"
+}
+```
+
+The CLI reads this file to find the server. If the file is missing or the server fails a health check, the CLI spawns a new server.
+
+## Port selection
+
+Random port between 10000-60000 (retry up to 5 on collision). This means 10 workspaces can each run their own browser daemon with zero port conflicts.
+
+## Version auto-restart
+
+The build writes `git rev-parse HEAD` to `browse/dist/.version`. On each CLI invocation, if the binary's version doesn't match the running server's `binaryVersion`, the CLI kills the old server and starts a new one. Rebuild the binary, next command picks it up automatically.
+
+## Multi-workspace support
+
+Each workspace gets its own isolated browser instance:
+
+| Workspace | State file | Port |
+|-----------|------------|------|
+| `/code/project-a` | `/code/project-a/.jstack/browse.json` | random |
+| `/code/project-b` | `/code/project-b/.jstack/browse.json` | random |
+
+No port collisions. No shared state. Full isolation.
+
+## Crash recovery
+
+The server doesn't try to self-heal. If Chromium crashes, the server exits immediately. The CLI detects the dead server on the next command and auto-restarts. Simpler and more reliable than reconnecting to a half-dead process.
+
+## Logging
+
+Three ring buffers (50,000 entries each, O(1) push):
+
+```
+Browser events → CircularBuffer (in-memory) → Async flush to .jstack/*.log
+```
+
+Console, network, and dialog events each have their own buffer. Flushing happens every second. HTTP request handling is never blocked by disk I/O.

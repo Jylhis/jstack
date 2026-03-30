@@ -1,0 +1,35 @@
+---
+title: "Ship"
+description: "Tests, coverage audit, PR, deploy, and doc updates in one flow"
+---
+
+The Ship phase handles everything from the final test run to production verification and documentation updates.
+
+## Skills
+
+| Skill | Role | What it does |
+|-------|------|--------------|
+| `/ship` | Release Engineer | Sync main, run tests, audit coverage, push, open PR. |
+| `/land-and-deploy` | Release Engineer | Merge the PR, wait for CI and deploy, verify production health. |
+| `/document-release` | Technical Writer | Update all project docs to match what just shipped. |
+
+## Test bootstrap
+
+If your project doesn't have a test framework, `/ship` sets one up — detects your runtime, installs the right framework, writes 3-5 real tests, sets up CI/CD, and creates TESTING.md.
+
+## Coverage audit
+
+Every `/ship` run builds a code path map from your diff, searches for corresponding tests, and produces an ASCII coverage diagram. Gaps get tests auto-generated. Your PR body shows: `Tests: 42 → 47 (+5 new)`.
+
+## Automatic doc updates
+
+`/ship` auto-invokes `/document-release` — docs stay current without an extra command. README, ARCHITECTURE, CONTRIBUTING, CLAUDE.md, TODOS — all kept current automatically.
+
+<CardGroup cols={2}>
+  <Card title="/ship" icon="rocket" href="/skills/ship">
+    Deep dive into shipping
+  </Card>
+  <Card title="/land-and-deploy" icon="plane-arrival" href="/skills/land-and-deploy">
+    Merge and deploy
+  </Card>
+</CardGroup>

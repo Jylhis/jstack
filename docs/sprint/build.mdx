@@ -1,0 +1,37 @@
+---
+title: "Build"
+description: "Implement features with browser access and systematic debugging"
+---
+
+The Build phase is where code gets written. jstack gives the agent two key capabilities during implementation:
+
+## Skills
+
+| Skill | Role | What it does |
+|-------|------|--------------|
+| `/browse` | QA Engineer | Real Chromium browser, real clicks, real screenshots. ~100ms per command. |
+| `/investigate` | Debugger | Systematic root-cause debugging. No fixes without investigation. |
+
+## Browser access
+
+`/browse` closes the loop — the agent can see what it builds. Instead of guessing about UI state, auth flows, and console errors, it opens a real browser and looks.
+
+```bash
+$B goto https://localhost:3000
+$B snapshot -i
+$B click @e3
+$B screenshot /tmp/result.png
+```
+
+## Systematic debugging
+
+`/investigate` follows the Iron Law: no fixes without root cause investigation. It traces data flow, tests hypotheses one at a time, and stops after 3 failed fix attempts to question the architecture.
+
+<CardGroup cols={2}>
+  <Card title="Browser Reference" icon="globe" href="/browser/overview">
+    Full browser command reference
+  </Card>
+  <Card title="/investigate" icon="bug" href="/skills/investigate">
+    Deep dive into systematic debugging
+  </Card>
+</CardGroup>
