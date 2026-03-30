@@ -1,0 +1,62 @@
+---
+title: "/plan-design-review"
+sidebarTitle: "/plan-design-review"
+description: "Senior designer reviewing your plan. Rates each dimension 0-10, explains what a 10 looks like, then fixes the plan."
+---
+
+This is your **senior designer reviewing your plan** — before you write a single line of code.
+
+Most plans describe what the backend does but never specify what the user actually sees. Empty states? Error states? Loading states? Mobile layout? AI slop risk? These decisions get deferred to "figure it out during implementation" — and then an engineer ships "No items found." as the empty state.
+
+`/plan-design-review` catches all of this during planning, when it's cheap to fix.
+
+## How it works
+
+Seven passes over the plan:
+
+1. **Information architecture** — primary/secondary/tertiary content hierarchy
+2. **Interaction state coverage** — loading, empty, error, success, partial states
+3. **User journey** — end-to-end flow completeness
+4. **AI slop risk** — detecting generic patterns ("clean, modern UI with cards and icons")
+5. **Design system alignment** — consistency with DESIGN.md if it exists
+6. **Responsive/accessibility** — mobile behavior, a11y requirements
+7. **Unresolved design decisions** — genuine tradeoffs surfaced for your call
+
+For each pass, it rates the dimension 0-10, explains what a 10 looks like, and fixes the plan.
+
+## Example
+
+```
+/plan-design-review
+
+Claude: Initial Design Rating: 4/10
+
+        Pass 1 (Info Architecture): 3/10
+        "A 10 would define primary/secondary/tertiary content
+         hierarchy for every screen."
+        → Added information hierarchy section to plan
+
+        Pass 2 (Interaction States): 2/10
+        "The plan has 4 UI features but specifies 0 out of 20
+         interaction states (4 features × 5 states each)."
+        → Added interaction state table to plan
+
+        Pass 4 (AI Slop): 4/10
+        "The plan says 'clean, modern UI with cards and icons'
+         and 'hero section with gradient'. These are the top 2
+         AI-generated-looking patterns."
+        → Rewrote with specific, intentional alternatives
+
+        Overall: 4/10 → 8/10 after fixes
+```
+
+When you re-run, sections already at 8+ get a quick pass. For live-site visual audits post-implementation, use [`/design-review`](/skills/design-review).
+
+<CardGroup cols={2}>
+  <Card title="/plan-eng-review" icon="arrow-left" href="/skills/plan-eng-review">
+    Previous: Eng review.
+  </Card>
+  <Card title="/design-review" icon="arrow-right" href="/skills/design-review">
+    Post-implementation visual audit.
+  </Card>
+</CardGroup>

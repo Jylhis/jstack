@@ -1,0 +1,33 @@
+---
+title: "/autoplan"
+sidebarTitle: "/autoplan"
+description: "One command, fully reviewed plan. Runs CEO, design, and eng review automatically."
+---
+
+`/autoplan` is the automated review pipeline. One command runs all three reviews — CEO, design, and eng — automatically, with encoded decision principles. It surfaces only the taste decisions that need your approval.
+
+## How it works
+
+Instead of running `/plan-ceo-review`, `/plan-design-review`, and `/plan-eng-review` separately, `/autoplan` chains them together with six decision principles that handle routine choices automatically. Genuine tradeoffs — the decisions that require taste and judgment — get surfaced for your approval.
+
+## When to use it
+
+- You want a fully reviewed plan but don't want to run three separate reviews
+- You trust the encoded decision principles for routine choices
+- You want to focus only on the decisions that actually matter
+
+## Smart routing
+
+Not every plan needs every review. `/autoplan` routes intelligently:
+- Backend-only changes skip the design review
+- Infrastructure changes skip the CEO review
+- UI changes get all three reviews
+
+<CardGroup cols={2}>
+  <Card title="/plan-ceo-review" icon="briefcase" href="/skills/plan-ceo-review">
+    Run CEO review separately.
+  </Card>
+  <Card title="/plan-eng-review" icon="code" href="/skills/plan-eng-review">
+    Run eng review separately.
+  </Card>
+</CardGroup>

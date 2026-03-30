@@ -1,0 +1,55 @@
+---
+title: "/codex"
+sidebarTitle: "/codex"
+description: "Multi-AI second opinion. Independent code review from OpenAI Codex CLI with cross-model analysis."
+---
+
+This is **second opinion mode**.
+
+When `/review` catches bugs from Claude's perspective, `/codex` brings a completely different AI — OpenAI's Codex CLI — to review the same diff. Different training, different blind spots, different strengths.
+
+## Three modes
+
+| Mode | What it does |
+|------|-------------|
+| **Review** | Run `codex review` against the current diff. Classifies findings by severity (P1/P2/P3). Any P1 = FAIL. Fully independent — Codex doesn't see Claude's review. |
+| **Challenge** | Adversarial mode. Codex actively tries to break your code — edge cases, race conditions, security holes. Maximum reasoning effort. |
+| **Consult** | Open conversation with session continuity. Follow-up questions reuse the same session. |
+
+## Cross-model analysis
+
+When both `/review` (Claude) and `/codex` (OpenAI) have reviewed the same branch, you get a cross-model comparison:
+
+- **Overlap** — findings both caught (high confidence)
+- **Unique to Codex** — different perspective
+- **Unique to Claude** — complementary coverage
+
+This is the "two doctors, same patient" approach to code review.
+
+## Example
+
+```
+/codex review
+
+Claude: Running independent Codex review...
+
+        CODEX REVIEW: PASS (3 findings)
+        [P2] Race condition in payment handler — concurrent charges
+             can double-debit without advisory lock
+        [P3] Missing null check on user.email before downcase
+        [P3] Token comparison not using constant-time compare
+
+        Cross-model analysis (vs /review):
+        OVERLAP: Race condition in payment handler (both caught it)
+        UNIQUE TO CODEX: Token comparison timing attack
+        UNIQUE TO CLAUDE: N+1 query in listing photos
+```
+
+<CardGroup cols={2}>
+  <Card title="/review" icon="arrow-left" href="/skills/review">
+    Claude's code review.
+  </Card>
+  <Card title="/ship" icon="arrow-right" href="/skills/ship">
+    Ship when both reviews pass.
+  </Card>
+</CardGroup>

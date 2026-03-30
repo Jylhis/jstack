@@ -1,0 +1,94 @@
+---
+title: "Quickstart"
+sidebarTitle: "Quickstart"
+description: "Walk through a full jstack sprint — from idea to shipped PR in eight commands."
+---
+
+## Try it in 5 minutes
+
+After [installing jstack](/installation), run these commands in Claude Code:
+
+<Steps>
+  <Step title="Start with /office-hours">
+    Describe what you're building. jstack will push back on your framing and help you think clearly about the problem.
+    ```
+    You:    I want to build a daily briefing app for my calendar.
+    /office-hours
+    ```
+  </Step>
+  <Step title="Get a CEO review with /plan-ceo-review">
+    The CEO specialist reads your design doc, challenges scope, and runs a 10-section review.
+    ```
+    /plan-ceo-review
+    ```
+  </Step>
+  <Step title="Lock architecture with /plan-eng-review">
+    The eng manager creates ASCII diagrams for data flow, state machines, and error paths. Writes a test matrix.
+    ```
+    /plan-eng-review
+    ```
+  </Step>
+  <Step title="Build and review with /review">
+    Approve the plan, exit plan mode, and let Claude build. Then run review to catch bugs that would pass CI but break production.
+    ```
+    Approve plan. Exit plan mode.
+    ... [Claude writes code] ...
+    /review
+    ```
+  </Step>
+  <Step title="Test with /qa">
+    Open a real browser, click through flows, find and fix bugs with atomic commits.
+    ```
+    /qa https://staging.myapp.com
+    ```
+  </Step>
+  <Step title="Ship with /ship">
+    Sync main, run tests, audit coverage, push, and open a PR.
+    ```
+    /ship
+    ```
+  </Step>
+</Steps>
+
+## What just happened
+
+```
+You:    I want to build a daily briefing app for my calendar.
+/office-hours
+
+Claude: [asks about the pain — specific examples, not hypotheticals]
+
+You:    Multiple Google calendars, events with stale info, wrong locations.
+
+Claude: I'm going to push back on the framing. You said "daily briefing
+        app." But what you actually described is a personal chief of
+        staff AI.
+        [extracts 5 capabilities you didn't realize you were describing]
+        [challenges 4 premises — you agree, disagree, or adjust]
+        [generates 3 implementation approaches with effort estimates]
+        [writes design doc → feeds into downstream skills automatically]
+
+/plan-ceo-review → /plan-eng-review → Approve → Build
+
+/review
+        [AUTO-FIXED] 2 issues. [ASK] Race condition → you approve fix.
+
+/qa https://staging.myapp.com
+        [opens real browser, clicks through flows, finds and fixes a bug]
+
+/ship
+        Tests: 42 → 51 (+9 new). PR: github.com/you/app/pull/42
+```
+
+You said "daily briefing app." The agent said "you're building a chief of staff AI" — because it listened to your pain, not your feature request. Eight commands, end to end. That is not a copilot. That is a team.
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="The Sprint" icon="arrows-spin" href="/workflow-overview">
+    Understand the full workflow and how skills connect.
+  </Card>
+  <Card title="Browse all skills" icon="list" href="/skills/office-hours">
+    Deep dives into every skill with examples.
+  </Card>
+</CardGroup>

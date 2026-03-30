@@ -1,0 +1,169 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "maple",
+  "name": "jstack",
+  "colors": {
+    "primary": "#F59E0B",
+    "light": "#FBBF24",
+    "dark": "#D97706"
+  },
+  "appearance": {
+    "default": "dark"
+  },
+  "styling": {
+    "eyebrows": "breadcrumbs",
+    "codeblocks": "dark"
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "GitHub",
+        "href": "https://github.com/Jylhis/jstack"
+      }
+    ]
+  },
+  "footer": {
+    "socials": {
+      "github": "https://github.com/Jylhis/jstack"
+    }
+  },
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "pages": [
+          {
+            "group": "Getting Started",
+            "pages": [
+              "introduction",
+              "installation",
+              "quickstart"
+            ]
+          },
+          {
+            "group": "The Sprint",
+            "pages": [
+              "workflow-overview"
+            ]
+          },
+          {
+            "group": "Support",
+            "pages": [
+              "troubleshooting"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Skills",
+        "pages": [
+          {
+            "group": "Planning",
+            "pages": [
+              "skills/office-hours",
+              "skills/plan-ceo-review",
+              "skills/plan-eng-review",
+              "skills/plan-design-review",
+              "skills/autoplan"
+            ]
+          },
+          {
+            "group": "Design",
+            "pages": [
+              "skills/design-consultation",
+              "skills/design-review"
+            ]
+          },
+          {
+            "group": "Development",
+            "pages": [
+              "skills/review",
+              "skills/investigate",
+              "skills/codex"
+            ]
+          },
+          {
+            "group": "Testing",
+            "pages": [
+              "skills/qa",
+              "skills/qa-only",
+              "skills/benchmark"
+            ]
+          },
+          {
+            "group": "Deployment",
+            "pages": [
+              "skills/ship",
+              "skills/land-and-deploy",
+              "skills/canary",
+              "skills/setup-deploy"
+            ]
+          },
+          {
+            "group": "Documentation & Retro",
+            "pages": [
+              "skills/document-release",
+              "skills/retro"
+            ]
+          },
+          {
+            "group": "Security",
+            "pages": [
+              "skills/cso"
+            ]
+          },
+          {
+            "group": "Safety",
+            "pages": [
+              "skills/careful",
+              "skills/freeze",
+              "skills/guard",
+              "skills/unfreeze"
+            ]
+          },
+          {
+            "group": "Maintenance",
+            "pages": [
+              "skills/jstack-upgrade"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Browser",
+        "pages": [
+          {
+            "group": "Browser Tool",
+            "pages": [
+              "browser/overview",
+              "browser/commands",
+              "browser/setup-cookies",
+              "browser/connect-chrome",
+              "browser/chrome-extension",
+              "browser/sidebar-agent",
+              "browser/handoff"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Architecture",
+        "pages": [
+          {
+            "group": "System Design",
+            "pages": [
+              "architecture/overview",
+              "architecture/browser-internals"
+            ]
+          },
+          {
+            "group": "Philosophy",
+            "pages": [
+              "architecture/ethos"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

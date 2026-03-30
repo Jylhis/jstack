@@ -1,0 +1,73 @@
+---
+title: "Command Reference"
+sidebarTitle: "Commands"
+description: "Full reference for 50+ browse commands: navigate, read, snapshot, interact, inspect, and capture."
+---
+
+All commands are invoked via `$B <command>` (shorthand for the browse binary). All selector arguments accept CSS selectors, `@e` refs from `snapshot`, or `@c` refs from `snapshot -C`.
+
+## Command categories
+
+| Category | Commands | What for |
+|----------|----------|----------|
+| Navigate | `goto`, `back`, `forward`, `reload`, `url` | Get to a page |
+| Read | `text`, `html`, `links`, `forms`, `accessibility` | Extract content |
+| Snapshot | `snapshot [-i] [-c] [-d N] [-s sel] [-D] [-a] [-o] [-C]` | Get refs, diff, annotate |
+| Interact | `click`, `fill`, `select`, `hover`, `type`, `press`, `scroll`, `wait`, `viewport`, `upload` | Use the page |
+| Inspect | `js`, `eval`, `css`, `attrs`, `is`, `console`, `network`, `dialog`, `cookies`, `storage`, `perf` | Debug and verify |
+| Visual | `screenshot [--viewport] [--clip x,y,w,h] [sel\|@ref] [path]`, `pdf`, `responsive` | See what Claude sees |
+| Compare | `diff <url1> <url2>` | Spot differences between environments |
+| Dialogs | `dialog-accept [text]`, `dialog-dismiss` | Control alert/confirm/prompt |
+| Tabs | `tabs`, `tab`, `newtab`, `closetab` | Multi-page workflows |
+| Cookies | `cookie-import`, `cookie-import-browser` | Import cookies from file or real browser |
+| Multi-step | `chain` (JSON from stdin) | Batch commands in one call |
+| Handoff | `handoff [reason]`, `resume` | Switch to visible Chrome for user takeover |
+| Real browser | `connect`, `disconnect`, `focus` | Control real Chrome |
+
+## Screenshot modes
+
+| Mode | Syntax | Description |
+|------|--------|-------------|
+| Full page (default) | `screenshot [path]` | Captures the entire scrollable page |
+| Viewport only | `screenshot --viewport [path]` | Captures only the visible viewport |
+| Element crop | `screenshot "#sel" [path]` or `screenshot @e3 [path]` | Captures a specific element |
+| Region clip | `screenshot --clip x,y,w,h [path]` | Captures a rectangular region |
+
+## Snapshot flags
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--interactive` | `-i` | Show interactive elements only |
+| `--compact` | `-c` | Compact output |
+| `--depth N` | `-d N` | Limit tree depth |
+| `--selector sel` | `-s sel` | Scope to a CSS selector |
+| `--diff` | `-D` | Show diff from previous snapshot |
+| `--annotate` | `-a` | Take screenshot with ref labels |
+| `--output path` | `-o path` | Output path for annotated screenshot |
+| `--cursor-interactive` | `-C` | Include non-ARIA interactive elements (@c refs) |
+
+## JavaScript execution
+
+`js` runs a single expression, `eval` runs a JS file. Both support `await`:
+
+```bash
+$B js "await fetch('/api/data').then(r => r.json())"
+$B js "document.title"
+$B eval my-script.js
+```
+
+## Dialog handling
+
+Dialogs (alert, confirm, prompt) are auto-accepted by default. Use `dialog-accept [text]` and `dialog-dismiss` to control behavior. All dialogs are logged to the dialog buffer.
+
+## Multi-workspace support
+
+Each project gets its own isolated browser instance with its own Chromium process, tabs, cookies, and logs. State is stored in `.jstack/` inside the project root. No port collisions. No shared state.
+
+## Environment variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `BROWSE_PORT` | 0 (random) | Fixed port override |
+| `BROWSE_IDLE_TIMEOUT` | 1800000 (30 min) | Idle shutdown timeout in ms |
+| `BROWSE_STATE_FILE` | `.jstack/browse.json` | Path to state file |

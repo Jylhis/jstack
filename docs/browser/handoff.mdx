@@ -1,0 +1,51 @@
+---
+title: "Browser Handoff"
+sidebarTitle: "Handoff"
+description: "Switch to visible Chrome when the agent hits a CAPTCHA, MFA, or auth wall. Resume when done."
+---
+
+When the headless browser gets stuck — CAPTCHA, MFA, complex auth — `handoff` opens a visible Chrome window at the exact same page with all state preserved.
+
+## How it works
+
+```bash
+$B handoff "Stuck on CAPTCHA at login page"   # opens visible Chrome
+# User solves CAPTCHA...
+$B resume                                       # returns to headless with fresh snapshot
+```
+
+## Example
+
+```
+Claude: I'm stuck on a CAPTCHA at the login page.
+
+        > browse handoff "Stuck on CAPTCHA at login page"
+
+        Chrome opened at https://app.example.com/login with all your
+        cookies and tabs intact. Solve the CAPTCHA and tell me when done.
+
+You:    done
+
+Claude: > browse resume
+
+        Logged in successfully. Continuing QA.
+```
+
+## Key details
+
+- **State preserved**: Cookies, localStorage, tabs all carry over across the handoff
+- **Auto-suggest**: After 3 consecutive failures, the agent automatically suggests `handoff`
+- **Fresh snapshot**: After `resume`, the agent gets a fresh snapshot of wherever you left off
+
+<Warning>
+  `/browse` runs a persistent Chromium session. Cookies, localStorage, and session state carry over between commands. Do not use it against sensitive production environments unless you intend to — it is a real browser with real state.
+</Warning>
+
+<CardGroup cols={2}>
+  <Card title="Browser overview" icon="globe" href="/browser/overview">
+    How the browser works.
+  </Card>
+  <Card title="Cookie import" icon="cookie" href="/browser/setup-cookies">
+    Import sessions from your real browser.
+  </Card>
+</CardGroup>

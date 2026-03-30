@@ -1,0 +1,59 @@
+---
+title: "/plan-eng-review"
+sidebarTitle: "/plan-eng-review"
+description: "Eng manager mode. Lock in architecture, data flow, diagrams, edge cases, and tests."
+---
+
+This is **eng manager mode**.
+
+Once the product direction is right, you need a different kind of intelligence entirely. No more ideation. `/plan-eng-review` becomes your best technical lead — nailing architecture, system boundaries, data flow, state transitions, failure modes, edge cases, trust boundaries, and test coverage.
+
+One surprisingly big unlock: **diagrams**. LLMs get way more complete when you force them to draw the system. Sequence diagrams, state diagrams, component diagrams, data-flow diagrams, test matrices. Diagrams force hidden assumptions into the open.
+
+## Example
+
+Take a smart listing flow that uploads photos, identifies the product, enriches the listing from the web, and drafts a title and description.
+
+`/plan-eng-review` asks:
+
+- What is the architecture for upload, classification, enrichment, and draft generation?
+- Which steps happen synchronously, and which go to background jobs?
+- Where are the boundaries between app server, object storage, vision model, search/enrichment APIs, and the database?
+- What happens if upload succeeds but enrichment fails?
+- What happens if product identification is low-confidence?
+- How do retries work? How do we prevent duplicate jobs?
+
+Not "make the idea smaller." **Make the idea buildable.**
+
+## Review Readiness Dashboard
+
+Every review (CEO, Eng, Design) logs its result. At the end of each review:
+
+```
++====================================================================+
+|                    REVIEW READINESS DASHBOARD                       |
++====================================================================+
+| Review          | Runs | Last Run            | Status    | Required |
+|-----------------|------|---------------------|-----------|----------|
+| Eng Review      |  1   | 2026-03-16 15:00    | CLEAR     | YES      |
+| CEO Review      |  1   | 2026-03-16 14:30    | CLEAR     | no       |
+| Design Review   |  0   | —                   | —         | no       |
++--------------------------------------------------------------------+
+| VERDICT: CLEARED — Eng Review passed                                |
++====================================================================+
+```
+
+Eng Review is the only required gate. Disable with `jstack-config set skip_eng_review true`.
+
+## Plan-to-QA flow
+
+When `/plan-eng-review` finishes, it writes a test plan artifact to `~/.jstack/projects/`. When you later run `/qa`, it picks up that test plan automatically.
+
+<CardGroup cols={2}>
+  <Card title="/plan-ceo-review" icon="arrow-left" href="/skills/plan-ceo-review">
+    Previous: CEO review.
+  </Card>
+  <Card title="/review" icon="arrow-right" href="/skills/review">
+    Next: Code review after building.
+  </Card>
+</CardGroup>

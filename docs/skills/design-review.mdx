@@ -1,0 +1,51 @@
+---
+title: "/design-review"
+sidebarTitle: "/design-review"
+description: "Live-site visual audit + fix loop. 80-item audit, atomic commits, before/after screenshots."
+---
+
+This is **designer who codes mode**.
+
+`/plan-design-review` reviews your plan before implementation. `/design-review` audits and fixes the live site after.
+
+## How it works
+
+It runs an 80-item visual audit on your live site, then enters a fix loop: for each finding, it locates the source file, makes the minimal CSS/styling change, commits with `style(design): FINDING-NNN`, re-navigates to verify, and takes before/after screenshots. One commit per fix, fully bisectable.
+
+CSS-only changes get a free pass (inherently safe and reversible). Changes to component JSX/TSX files count against the risk budget. Hard cap at 30 fixes. If the risk score exceeds 20%, it stops and asks.
+
+## Example
+
+```
+/design-review https://myapp.com
+
+Claude: [Runs full 80-item visual audit]
+        Design Score: C  |  AI Slop Score: D
+        12 findings (4 high, 5 medium, 3 polish)
+
+        Fixing 9 design issues...
+
+        style(design): FINDING-001 — replace 3-column icon grid with asymmetric layout
+        style(design): FINDING-002 — add heading scale 48/32/24/18/16
+        style(design): FINDING-003 — remove gradient hero, use bold typography
+        style(design): FINDING-004 — add second font for headings
+        style(design): FINDING-005 — vary border-radius by element role
+        style(design): FINDING-006 — left-align body text, reserve center for headings
+        style(design): FINDING-007 — add hover/focus states to all interactive elements
+        style(design): FINDING-008 — add prefers-reduced-motion media query
+        style(design): FINDING-009 — set max content width to 680px for body text
+
+        Final: Design Score: C → B+  |  AI Slop Score: D → A
+        9 fixes applied. 3 deferred.
+```
+
+Nine commits, each touching one concern. The AI Slop score went from D to A because the three most recognizable AI-generated patterns are gone.
+
+<CardGroup cols={2}>
+  <Card title="/design-consultation" icon="arrow-left" href="/skills/design-consultation">
+    Build a design system from scratch.
+  </Card>
+  <Card title="/qa" icon="arrow-right" href="/skills/qa">
+    Functional QA testing.
+  </Card>
+</CardGroup>

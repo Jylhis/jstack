@@ -1,0 +1,76 @@
+---
+title: "Browser Internals"
+sidebarTitle: "Browser Internals"
+description: "The ref system, locator design, snapshot parser, and staleness detection."
+---
+
+This page covers the internals of jstack's browser tool for power users who want to understand how the snapshot system and ref-based interaction work.
+
+## The ref system
+
+Refs (`@e1`, `@e2`, `@c1`) are how the agent addresses page elements without writing CSS selectors or XPath.
+
+### How it works
+
+```
+1. Agent runs: $B snapshot -i
+2. Server calls Playwright's page.accessibility.snapshot()
+3. Parser walks the ARIA tree, assigns sequential refs: @e1, @e2, @e3...
+4. For each ref, builds a Playwright Locator: getByRole(role, { name }).nth(index)
+5. Stores Map<string, RefEntry> on the BrowserManager (role + name + Locator)
+6. Returns the annotated tree as plain text
+
+Later:
+7. Agent runs: $B click @e3
+8. Server resolves @e3 → Locator → locator.click()
+```
+
+### Why Locators, not DOM mutation
+
+The obvious approach is to inject `data-ref="@e1"` attributes into the DOM. This breaks on:
+
+- **CSP (Content Security Policy)** — many production sites block DOM modification
+- **React/Vue/Svelte hydration** — framework reconciliation strips injected attributes
+- **Shadow DOM** — can't reach inside shadow roots from the outside
+
+Playwright Locators are external to the DOM. They use the accessibility tree (maintained internally by Chromium) and `getByRole()` queries. No DOM mutation, no CSP issues, no framework conflicts.
+
+### Ref lifecycle
+
+Refs are cleared on navigation (`framenavigated` event on the main frame). After navigation, all locators are stale — the agent must run `snapshot` again. Stale refs fail loudly rather than clicking the wrong element.
+
+### Staleness detection
+
+SPAs can mutate the DOM without navigation (React router, tab switches, modals). This makes refs stale even though the URL didn't change. To catch this, `resolveRef()` performs an async `count()` check before using any ref — if the element count is 0, it throws immediately with a message telling the agent to re-run `snapshot`. Fails fast (~5ms) instead of waiting for Playwright's 30-second timeout.
+
+## Key components
+
+```
+browse/src/
+├── cli.ts              # Thin client — reads state file, sends HTTP, prints response
+├── server.ts           # Bun.serve HTTP server — routes commands to Playwright
+├── browser-manager.ts  # Chromium lifecycle — launch, tabs, ref map, crash handling
+├── snapshot.ts         # Accessibility tree → @ref assignment → Locator map
+├── read-commands.ts    # Non-mutating commands (text, html, links, js, css, etc.)
+├── write-commands.ts   # Mutating commands (click, fill, select, upload, etc.)
+├── meta-commands.ts    # Server management, chain, diff, snapshot routing
+├── cookie-import-browser.ts  # Decrypt + import cookies from real browsers
+├── cookie-picker-routes.ts   # HTTP routes for interactive cookie picker
+├── cookie-picker-ui.ts       # Self-contained HTML/CSS/JS for cookie picker
+├── activity.ts         # Activity streaming (SSE) for Chrome extension
+└── buffers.ts          # CircularBuffer<T> + console/network/dialog capture
+```
+
+## Console, network, and dialog capture
+
+The server hooks into Playwright events. All entries are kept in O(1) circular buffers (50,000 capacity each) and flushed to disk asynchronously:
+
+- Console: `.jstack/browse-console.log`
+- Network: `.jstack/browse-network.log`
+- Dialog: `.jstack/browse-dialog.log`
+
+The `console`, `network`, and `dialog` commands read from in-memory buffers, not disk.
+
+## Multi-workspace isolation
+
+Each project gets its own browser instance. State is stored in `.jstack/` inside the project root (detected via `git rev-parse --show-toplevel`). No port collisions. No shared state. Each project is fully isolated.

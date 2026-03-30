@@ -1,0 +1,90 @@
+---
+title: "Browser Overview"
+sidebarTitle: "Overview"
+description: "Give the agent eyes. Real Chromium browser with ~100ms latency, persistent sessions, and ref-based interaction."
+---
+
+`/browse` is the skill that closes the loop. Before it, the agent could think and code but was still half blind. Now it can just go look.
+
+It's a compiled CLI binary that talks to a persistent Chromium daemon — built on [Playwright](https://playwright.dev/). First call starts the browser (~3s). Every call after: ~100-200ms. The browser stays running between commands, so cookies, tabs, and localStorage carry over.
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  Claude Code                                                    │
+│                                                                 │
+│  "browse goto https://staging.myapp.com"                        │
+│       │                                                         │
+│       ▼                                                         │
+│  ┌──────────┐    HTTP POST     ┌──────────────┐                 │
+│  │ browse   │ ──────────────── │ Bun HTTP     │                 │
+│  │ CLI      │  localhost:rand  │ server       │                 │
+│  │          │  Bearer token    │              │                 │
+│  │ compiled │ ◄──────────────  │  Playwright  │──── Chromium    │
+│  │ binary   │  plain text      │  API calls   │    (headless)   │
+│  └──────────┘                  └──────────────┘                 │
+│   ~1ms startup                  persistent daemon               │
+│                                 auto-starts on first call       │
+│                                 auto-stops after 30 min idle    │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+## Lifecycle
+
+1. **First call**: CLI checks `.jstack/browse.json` for a running server. None found — spawns the server, launches headless Chromium, picks a random port. ~3 seconds.
+2. **Subsequent calls**: CLI reads state file, sends HTTP POST with bearer token, prints response. ~100-200ms.
+3. **Idle shutdown**: After 30 minutes with no commands, the server shuts down. Next call restarts automatically.
+4. **Crash recovery**: If Chromium crashes, the server exits. CLI detects the dead server on next call and starts fresh.
+
+## The snapshot system
+
+The browser's key innovation is ref-based element selection:
+
+1. `snapshot` returns a YAML-like accessibility tree
+2. The parser assigns refs (`@e1`, `@e2`, ...) to each element
+3. Commands like `click @e3` look up the ref and act on it
+
+No DOM mutation. No injected scripts. Just Playwright's native accessibility API.
+
+Extended features:
+- `--diff` (`-D`): Stores baselines. Returns unified diff showing what changed after an action.
+- `--annotate` (`-a`): Injects overlay divs at each ref's position, takes a labeled screenshot.
+- `--cursor-interactive` (`-C`): Finds non-ARIA interactive elements (divs with `cursor:pointer`, `onclick`). Assigns `@c1`, `@c2`... refs.
+
+## Performance
+
+| Tool | First call | Subsequent calls | Context overhead |
+|------|-----------|-----------------|-----------------|
+| Chrome MCP | ~5s | ~2-5s | ~2000 tokens/call |
+| Playwright MCP | ~3s | ~1-3s | ~1500 tokens/call |
+| **jstack browse** | **~3s** | **~100-200ms** | **0 tokens** |
+
+In a 20-command session, MCP tools burn 30,000-40,000 tokens on protocol framing. jstack burns zero.
+
+## Example
+
+```
+/browse staging.myapp.com — log in, test the signup flow
+
+Claude: [18 tool calls, ~60 seconds]
+
+        > browse goto https://staging.myapp.com/signup
+        > browse snapshot -i
+        > browse fill @e2 "test@example.com"
+        > browse fill @e3 "password123"
+        > browse click @e5
+        > browse screenshot /tmp/signup.png
+
+        Signup works. Redirected to onboarding.
+        All 4 pages load correctly. No console errors.
+```
+
+<CardGroup cols={2}>
+  <Card title="Command reference" icon="terminal" href="/browser/commands">
+    Full list of 50+ browse commands.
+  </Card>
+  <Card title="Setup cookies" icon="cookie" href="/browser/setup-cookies">
+    Import sessions from your real browser.
+  </Card>
+</CardGroup>

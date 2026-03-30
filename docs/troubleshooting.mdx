@@ -1,0 +1,80 @@
+---
+title: "Troubleshooting"
+sidebarTitle: "Troubleshooting"
+description: "Common issues and solutions for jstack."
+---
+
+<AccordionGroup>
+  <Accordion title="Skill not showing up">
+    Rebuild and re-register:
+    ```bash
+    cd ~/.claude/skills/jstack && ./setup
+    ```
+  </Accordion>
+
+  <Accordion title="/browse fails">
+    Reinstall dependencies and rebuild the binary:
+    ```bash
+    cd ~/.claude/skills/jstack && bun install && bun run build
+    ```
+  </Accordion>
+
+  <Accordion title="Stale install">
+    Run `/jstack-upgrade` inside Claude Code. Or set `auto_upgrade: true` in `~/.jstack/config.yaml` for automatic updates.
+  </Accordion>
+
+  <Accordion title="Want shorter commands?">
+    Switch from `/jstack-qa` to `/qa`:
+    ```bash
+    cd ~/.claude/skills/jstack && ./setup --no-prefix
+    ```
+    Your choice is remembered for future upgrades.
+  </Accordion>
+
+  <Accordion title="Want namespaced commands?">
+    Switch from `/qa` to `/jstack-qa` (useful if you run other skill packs):
+    ```bash
+    cd ~/.claude/skills/jstack && ./setup --prefix
+    ```
+  </Accordion>
+
+  <Accordion title='Codex says "Skipped loading skill(s) due to invalid SKILL.md"'>
+    Your Codex skill descriptions are stale. Fix:
+    ```bash
+    cd ~/.codex/skills/jstack && git pull && ./setup --host codex
+    ```
+    For repo-local installs:
+    ```bash
+    cd "$(readlink -f .agents/skills/jstack)" && git pull && ./setup --host codex
+    ```
+  </Accordion>
+
+  <Accordion title="Windows issues">
+    jstack works on Windows 11 via Git Bash or WSL. Node.js is required in addition to Bun — Bun has a known bug with Playwright's pipe transport on Windows. The browse server automatically falls back to Node.js. Make sure both `bun` and `node` are on your PATH.
+  </Accordion>
+
+  <Accordion title="Claude says it can't see the skills">
+    Make sure your project's `CLAUDE.md` has a jstack section:
+    ```
+    ## jstack
+    Use /browse from jstack for all web browsing. Never use mcp__claude-in-chrome__* tools.
+    Available skills: /office-hours, /plan-ceo-review, /plan-eng-review,
+    /plan-design-review, /design-consultation, /review, /ship, /land-and-deploy,
+    /canary, /benchmark, /browse, /qa, /qa-only, /design-review,
+    /setup-browser-cookies, /setup-deploy, /retro, /investigate,
+    /document-release, /codex, /cso, /autoplan, /careful, /freeze, /guard,
+    /unfreeze, /jstack-upgrade.
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Privacy and telemetry
+
+jstack includes **opt-in** usage telemetry to help improve the project:
+
+- **Default is off.** Nothing is sent unless you explicitly opt in.
+- **What's sent (if you opt in):** skill name, duration, success/fail, jstack version, OS.
+- **What's never sent:** code, file paths, repo names, branch names, prompts, or any user-generated content.
+- **Change anytime:** `jstack-config set telemetry off` disables everything instantly.
+
+**Local analytics are always available.** Run `jstack-analytics` to see your personal usage dashboard from the local JSONL file — no remote data needed.

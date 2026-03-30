@@ -1,0 +1,51 @@
+---
+title: "Sidebar Agent"
+sidebarTitle: "Sidebar Agent"
+description: "Type natural language instructions in the Chrome side panel. A child Claude instance executes them."
+---
+
+The Chrome side panel includes a chat interface. Type a message and a child Claude instance executes it in the browser.
+
+## How it works
+
+1. You type a message in the side panel chat
+2. The extension POSTs to the local browse server
+3. The server spawns `claude -p` with your message + current page context
+4. Claude executes browse commands via Bash
+5. Progress streams back to the side panel in real time
+
+## What you can do
+
+- "Take a snapshot and describe what you see"
+- "Click the Login button, fill in test@example.com / password123, and submit"
+- "Go through every row in this table and extract the names and emails"
+- "Navigate to Settings > Account and screenshot it"
+
+## Personal automation
+
+The sidebar agent works for any web task, not just dev workflows:
+
+> "Browse my kid's school parent portal and add all the other parents' names, phone numbers, and photos to my Google Contacts."
+
+Two ways to authenticate:
+1. Log in once in the headed browser — your session persists
+2. Run `/setup-browser-cookies` to import cookies from your real Chrome
+
+## Constraints
+
+| Property | Value |
+|----------|-------|
+| **Timeout** | 5 minutes per task |
+| **Session isolation** | Each task runs in its own git worktree |
+| **Tools available** | `Bash`, `Read`, `Glob`, `Grep` (read-only, no `Edit`/`Write`) |
+
+If a task times out, retry or break it into smaller steps.
+
+<CardGroup cols={2}>
+  <Card title="Chrome extension" icon="puzzle-piece" href="/browser/chrome-extension">
+    Extension setup and features.
+  </Card>
+  <Card title="Handoff" icon="hand" href="/browser/handoff">
+    Switch to manual control when stuck.
+  </Card>
+</CardGroup>

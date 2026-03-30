@@ -1,0 +1,85 @@
+---
+title: "Architecture"
+sidebarTitle: "Overview"
+description: "System design: why jstack is built the way it is. The daemon model, security, and CLI-over-MCP."
+---
+
+jstack gives Claude Code a persistent browser and a set of opinionated workflow skills. The browser is the hard part — everything else is Markdown.
+
+## The core insight
+
+An AI agent interacting with a browser needs **sub-second latency** and **persistent state**. If every command cold-starts a browser, you're waiting 3-5 seconds per tool call. If the browser dies between commands, you lose cookies, tabs, and login sessions.
+
+So jstack runs a long-lived Chromium daemon that the CLI talks to over localhost HTTP.
+
+## Why Bun
+
+1. **Compiled binaries.** `bun build --compile` produces a single ~58MB executable. No `node_modules` at runtime. The binary just runs.
+2. **Native SQLite.** Cookie decryption reads Chromium's SQLite cookie database directly. Bun has `new Database()` built in — no native addon compilation.
+3. **Native TypeScript.** The server runs as `bun run server.ts` during development. No compilation step.
+4. **Built-in HTTP server.** `Bun.serve()` handles ~10 routes. No framework needed.
+
+## The daemon model
+
+### Why not start a browser per command?
+
+Playwright can launch Chromium in ~2-3 seconds. For one screenshot, fine. For a QA session with 20+ commands, that's 40+ seconds of startup overhead plus all state lost between commands.
+
+The daemon model gives you:
+- **Persistent state** — log in once, stay logged in. Open a tab, it stays open.
+- **Sub-second commands** — ~100-200ms round trip after the first call
+- **Automatic lifecycle** — auto-starts on first use, auto-stops after 30 min idle
+
+### State file
+
+The server writes `.jstack/browse.json` (atomic write, mode 0o600):
+
+```json
+{
+  "pid": 12345,
+  "port": 34567,
+  "token": "uuid-v4",
+  "startedAt": "...",
+  "binaryVersion": "abc123"
+}
+```
+
+### Port selection
+
+Random port between 10000-60000. Ten Conductor workspaces can each run their own browse daemon with zero configuration and zero port conflicts.
+
+### Version auto-restart
+
+The build writes `git rev-parse HEAD` to `browse/dist/.version`. On each CLI invocation, if the binary's version doesn't match the running server's version, the CLI kills the old server and starts a new one. Rebuild the binary, next command picks it up automatically.
+
+## Security model
+
+### Localhost only
+
+The HTTP server binds to `localhost`, not `0.0.0.0`. Not reachable from the network.
+
+### Bearer token auth
+
+Every session generates a random UUID token, written to the state file with mode 0o600. Every request must include `Authorization: Bearer <token>`. The cookie picker UI and health check are exempt.
+
+### Cookie security
+
+1. **Keychain access requires user approval** — first cookie import per browser triggers a macOS Keychain dialog
+2. **Decryption happens in-process** — cookie values are in memory only, never written to disk in plaintext
+3. **Database is read-only** — jstack copies the Chromium cookie DB to a temp file, opens read-only
+4. **Key caching is per-session** — when the server shuts down, the cache is gone
+5. **No cookie values in logs** — values are truncated in all output
+
+### Shell injection prevention
+
+Browser registry is hardcoded. Database paths are constructed from known constants, never user input. Keychain access uses explicit argument arrays, not shell interpolation.
+
+## Why CLI over MCP
+
+MCP works well for remote services, but for local browser automation it adds pure overhead:
+
+- **Context bloat** — every MCP call includes full JSON schemas. A simple "get page text" costs 10x more tokens than needed.
+- **Connection fragility** — persistent WebSocket/stdio connections drop and fail to reconnect.
+- **Unnecessary abstraction** — Claude Code already has a Bash tool. CLI with plain text stdout is the simplest interface.
+
+jstack skips all of this. Compiled binary. Plain text in, plain text out. No protocol. No schema. No connection management.

@@ -1,0 +1,39 @@
+---
+title: "/investigate"
+sidebarTitle: "/investigate"
+description: "Systematic root-cause debugging. Iron Law: no fixes without investigation."
+---
+
+When something is broken and you don't know why, `/investigate` is your systematic debugger.
+
+## The Iron Law
+
+**No fixes without root cause investigation first.**
+
+Instead of guessing and patching, `/investigate` traces data flow, matches against known bug patterns, and tests hypotheses one at a time. If three fix attempts fail, it stops and questions the architecture instead of thrashing.
+
+This prevents the "let me try one more thing" spiral that wastes hours.
+
+## How it works
+
+1. **Trace data flow** — follows the path from input to failure
+2. **Match patterns** — compares against known bug categories
+3. **Test hypotheses** — one at a time, methodically
+4. **Auto-freeze** — detects the module being debugged and restricts edits to that directory (via [`/freeze`](/skills/freeze))
+5. **Stop at 3 failures** — if three fix attempts fail, it questions the architecture
+
+## When to use it
+
+- A bug that isn't obvious from the error message
+- A regression where you don't know what changed
+- An issue where the "obvious fix" didn't work
+- Any time you'd normally spend hours in a debugger
+
+<CardGroup cols={2}>
+  <Card title="/review" icon="search" href="/skills/review">
+    Find bugs before they reach production.
+  </Card>
+  <Card title="/freeze" icon="lock" href="/skills/freeze">
+    Manually restrict edits to one directory.
+  </Card>
+</CardGroup>

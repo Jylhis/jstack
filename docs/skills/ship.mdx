@@ -1,0 +1,57 @@
+---
+title: "/ship"
+sidebarTitle: "/ship"
+description: "Release engineer mode. Sync main, run tests, audit coverage, push, and open a PR."
+---
+
+This is **release machine mode**.
+
+Once you've built, reviewed, and tested, `/ship` handles the final mile. It is for a ready branch, not for deciding what to build.
+
+## What it does
+
+1. **Sync with main** — rebase or merge to ensure the branch is current
+2. **Run tests** — executes the project's test suite
+3. **Coverage audit** — builds a code path map from your diff, finds corresponding tests, produces an ASCII coverage diagram
+4. **Auto-generate tests** — fills coverage gaps with new tests
+5. **Push** — pushes the branch to remote
+6. **Create PR** — opens a pull request with coverage summary
+
+Your PR body shows: `Tests: 42 → 47 (+5 new)`.
+
+## Test bootstrap
+
+If your project doesn't have a test framework, `/ship` sets one up:
+
+- Detects your runtime and language
+- Researches the best framework
+- Installs it and writes 3-5 real tests for your actual code
+- Sets up CI/CD (GitHub Actions)
+- Creates TESTING.md
+
+100% test coverage is the goal — tests make vibe coding safe instead of yolo coding.
+
+## Review gate
+
+`/ship` checks the Review Readiness Dashboard before creating the PR. If the Eng Review is missing, it asks — but won't block you. Decisions are saved per-branch so you're never re-asked.
+
+## Greptile integration
+
+If [Greptile](https://greptile.com) is reviewing your PRs, `/ship` triages its comments:
+
+- **Valid issues** get fixed before shipping
+- **Already-fixed issues** get an auto-reply
+- **False positives** get pushed back with an explanation
+
+## Document release
+
+`/ship` auto-invokes [`/document-release`](/skills/document-release) to keep docs current without an extra command.
+
+<CardGroup cols={2}>
+  <Card title="/review" icon="arrow-left" href="/skills/review">
+    Review before shipping.
+  </Card>
+  <Card title="/land-and-deploy" icon="arrow-right" href="/skills/land-and-deploy">
+    Merge, deploy, and verify.
+  </Card>
+</CardGroup>

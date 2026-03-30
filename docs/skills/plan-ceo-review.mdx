@@ -1,0 +1,45 @@
+---
+title: "/plan-ceo-review"
+sidebarTitle: "/plan-ceo-review"
+description: "Founder mode. Rethink the problem and find the 10-star product hiding inside the request."
+---
+
+This is **founder mode**.
+
+The point is not to implement the obvious ticket. The point is to rethink the problem from the user's point of view and find the version that feels inevitable, delightful, and maybe even a little magical.
+
+## Example
+
+Say you're building a Craigslist-style listing app and you say: "Let sellers upload a photo for their item."
+
+A weak assistant will add a file picker and save an image. That is not the real product.
+
+`/plan-ceo-review` asks whether "photo upload" is even the feature. Maybe the real feature is helping someone create a listing that actually sells. Now the whole plan changes:
+
+- Can we identify the product from the photo?
+- Can we infer the SKU or model number?
+- Can we search the web and draft the title and description automatically?
+- Can we suggest which photo will convert best as the hero image?
+- Can we detect when the uploaded photo is ugly, dark, or cluttered?
+
+It asks: **"What is the 10-star product hiding inside this request?"**
+
+## Four modes
+
+| Mode | Behavior |
+|------|----------|
+| **Scope Expansion** | Dream big. The agent proposes the ambitious version. Every expansion is an individual decision you opt into. |
+| **Selective Expansion** | Hold your current scope as baseline, but see what else is possible. You cherry-pick opportunities. |
+| **Hold Scope** | Maximum rigor on the existing plan. No expansions surfaced. |
+| **Scope Reduction** | Find the minimum viable version. Cut everything else. |
+
+Visions and decisions are persisted to `~/.jstack/projects/` so they survive beyond the conversation. Exceptional visions can be promoted to `docs/designs/` in your repo for the team.
+
+<CardGroup cols={2}>
+  <Card title="/office-hours" icon="arrow-left" href="/skills/office-hours">
+    Previous: Start with office hours.
+  </Card>
+  <Card title="/plan-eng-review" icon="arrow-right" href="/skills/plan-eng-review">
+    Next: Lock in the architecture.
+  </Card>
+</CardGroup>

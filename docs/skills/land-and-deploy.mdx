@@ -1,0 +1,31 @@
+---
+title: "/land-and-deploy"
+sidebarTitle: "/land-and-deploy"
+description: "Merge the PR, wait for CI and deploy, verify production health. One command from approved to verified."
+---
+
+`/land-and-deploy` takes you from "PR approved" to "verified in production" in one command.
+
+## What it does
+
+1. **Merge the PR** — squash or merge based on your project's convention
+2. **Wait for CI** — monitors the CI pipeline until it completes
+3. **Wait for deploy** — monitors your deployment platform until the new version is live
+4. **Verify production** — runs canary checks against the production URL
+
+## Setup
+
+Run [`/setup-deploy`](/skills/setup-deploy) first to configure your deployment platform, production URL, and deploy commands. This is a one-time setup.
+
+## Supported platforms
+
+`/setup-deploy` auto-detects: Fly.io, Render, Vercel, Netlify, Heroku, and GitHub Actions.
+
+<CardGroup cols={2}>
+  <Card title="/ship" icon="arrow-left" href="/skills/ship">
+    Create the PR first.
+  </Card>
+  <Card title="/canary" icon="arrow-right" href="/skills/canary">
+    Post-deploy monitoring.
+  </Card>
+</CardGroup>

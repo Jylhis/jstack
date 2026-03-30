@@ -1,0 +1,44 @@
+---
+title: "/careful"
+sidebarTitle: "/careful"
+description: "Safety guardrails. Warns before destructive commands like rm -rf, DROP TABLE, and force-push."
+---
+
+Say "be careful" or run `/careful` when you're working near production, running destructive commands, or just want a safety net.
+
+## What it catches
+
+Every Bash command gets checked against known-dangerous patterns:
+
+| Pattern | Risk |
+|---------|------|
+| `rm -rf` / `rm -r` | Recursive delete |
+| `DROP TABLE` / `DROP DATABASE` / `TRUNCATE` | Data loss |
+| `git push --force` / `git push -f` | History rewrite |
+| `git reset --hard` | Discard commits |
+| `git checkout .` / `git restore .` | Discard uncommitted work |
+| `kubectl delete` | Production resource deletion |
+| `docker rm -f` / `docker system prune` | Container/image loss |
+
+## Whitelisted operations
+
+Common build artifact cleanups are whitelisted — no false alarms on routine operations:
+
+`rm -rf node_modules`, `dist`, `.next`, `__pycache__`, `build`, `coverage`
+
+## Override
+
+You can override any warning. The guardrails are accident prevention, not access control.
+
+## How it works
+
+`/careful` uses Claude Code's PreToolUse hooks — transparent, session-scoped, no configuration files. The hooks stay active for the rest of the session.
+
+<CardGroup cols={2}>
+  <Card title="/freeze" icon="lock" href="/skills/freeze">
+    Restrict edits to one directory.
+  </Card>
+  <Card title="/guard" icon="shield" href="/skills/guard">
+    Combine /careful + /freeze.
+  </Card>
+</CardGroup>

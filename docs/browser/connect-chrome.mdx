@@ -1,0 +1,50 @@
+---
+title: "Real Browser Mode"
+sidebarTitle: "Real Browser"
+description: "Launch your real Chrome controlled by Playwright. Watch every action live."
+---
+
+Instead of headless Chromium, `connect` launches your real Chrome as a headed window controlled by Playwright. You see everything Claude does in real time.
+
+## Commands
+
+```bash
+$B connect              # launch real Chrome, headed
+$B goto https://app.com # navigates in the visible window
+$B snapshot -i          # refs from the real page
+$B click @e3            # clicks in the real window
+$B focus                # bring Chrome to foreground (macOS)
+$B status               # shows Mode: cdp
+$B disconnect           # back to headless mode
+```
+
+## Visual indicators
+
+- A subtle **green shimmer line** at the top edge of the controlled window
+- A floating **"jstack" pill** in the bottom-right corner
+
+So you always know which Chrome window is being controlled.
+
+## When to use it
+
+- **QA testing** — watch Claude click through your app
+- **Design review** — see exactly what Claude sees
+- **Debugging** — when headless behavior differs from real Chrome
+- **Demos** — sharing your screen
+
+## How it works
+
+Playwright's `channel: 'chrome'` launches your system Chrome binary via a native pipe protocol. All existing browse commands work unchanged because they go through Playwright's abstraction layer.
+
+## CDP-aware skills
+
+When in real-browser mode, `/qa` and `/design-review` automatically skip cookie import prompts and headless workarounds.
+
+<CardGroup cols={2}>
+  <Card title="Chrome extension" icon="puzzle-piece" href="/browser/chrome-extension">
+    Side Panel with live activity feed.
+  </Card>
+  <Card title="Disconnect" icon="arrow-left" href="/browser/overview">
+    Return to headless mode.
+  </Card>
+</CardGroup>

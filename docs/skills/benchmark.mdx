@@ -1,0 +1,36 @@
+---
+title: "/benchmark"
+sidebarTitle: "/benchmark"
+description: "Performance regression detection. Baseline page load times, Core Web Vitals, and resource sizes."
+---
+
+`/benchmark` establishes performance baselines and detects regressions.
+
+## What it measures
+
+- **Page load times** — time to first byte, DOM content loaded, full load
+- **Core Web Vitals** — LCP, FID/INP, CLS
+- **Resource sizes** — JavaScript bundles, CSS, images, total transfer size
+
+## How it works
+
+1. Run `/benchmark` on your main branch to establish a baseline
+2. Make changes on a feature branch
+3. Run `/benchmark` again to compare before/after
+
+Regressions are flagged with specific thresholds. The comparison shows exactly which metrics changed and by how much.
+
+## When to use it
+
+- Before and after performance-sensitive changes
+- As part of a PR review for frontend work
+- To establish baselines for a new project
+
+<CardGroup cols={2}>
+  <Card title="/qa" icon="flask-conical" href="/skills/qa">
+    Functional QA testing.
+  </Card>
+  <Card title="/ship" icon="rocket" href="/skills/ship">
+    Ship with performance confidence.
+  </Card>
+</CardGroup>

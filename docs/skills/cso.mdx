@@ -1,0 +1,59 @@
+---
+title: "/cso"
+sidebarTitle: "/cso"
+description: "Chief Security Officer. OWASP Top 10 + STRIDE threat modeling security audit."
+---
+
+This is your **Chief Security Officer**.
+
+## What it scans
+
+Run `/cso` on any codebase for an OWASP Top 10 + STRIDE threat model audit:
+
+- **Injection** — SQL, command, LDAP injection
+- **Broken authentication** — weak session management, credential storage
+- **Sensitive data exposure** — plaintext secrets, missing encryption
+- **XML external entities** — XXE attacks
+- **Broken access control** — privilege escalation, IDOR
+- **Security misconfiguration** — default credentials, verbose errors
+- **Cross-site scripting** — stored, reflected, DOM-based XSS
+- **Insecure deserialization** — object injection attacks
+- **Known-vulnerable components** — outdated dependencies with CVEs
+- **Insufficient logging** — missing audit trails
+
+Each finding includes severity, evidence, a concrete exploit scenario, and a recommended fix.
+
+## Zero-noise design
+
+- 17 false positive exclusion patterns
+- 8/10+ confidence gate — low-confidence findings are suppressed
+- Independent verification of each finding before reporting
+
+## Example
+
+```
+/cso
+
+Claude: Running OWASP Top 10 + STRIDE security audit...
+
+        CRITICAL: SQL injection in user search (app/models/user.rb:47)
+        HIGH: Session tokens stored in localStorage (app/frontend/auth.ts:12)
+        MEDIUM: Missing rate limiting on /api/login endpoint
+        LOW: X-Frame-Options header not set
+
+        4 findings across 12 files scanned. 1 critical, 1 high.
+```
+
+## Two modes
+
+- **Daily** — zero-noise, 8/10+ confidence gate. For routine use.
+- **Monthly** — comprehensive deep scan. More thorough, may surface lower-confidence findings.
+
+<CardGroup cols={2}>
+  <Card title="/review" icon="search" href="/skills/review">
+    Code review for logic bugs.
+  </Card>
+  <Card title="/careful" icon="shield" href="/skills/careful">
+    Runtime safety guardrails.
+  </Card>
+</CardGroup>

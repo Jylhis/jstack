@@ -1,0 +1,41 @@
+---
+title: "/freeze"
+sidebarTitle: "/freeze"
+description: "Edit lock. Restrict all file edits to a single directory to prevent accidental changes."
+---
+
+`/freeze` restricts all file edits to a single directory. When you're debugging a billing bug, you don't want Claude accidentally "fixing" unrelated code in `src/auth/`.
+
+## Example
+
+```
+/freeze src/billing
+
+Claude: Edits restricted to src/billing/. Run /unfreeze to remove.
+
+        [Later, Claude tries to edit src/auth/middleware.ts]
+
+Claude: BLOCKED — Edit outside freeze boundary (src/billing/).
+        Skipping this change.
+```
+
+## How it works
+
+`/freeze` blocks Edit and Write tools outside the specified path. It uses Claude Code's PreToolUse hooks — session-scoped, no configuration files.
+
+<Note>
+  Bash commands like `sed` can still modify files outside the boundary — `/freeze` is accident prevention, not a security sandbox.
+</Note>
+
+## Auto-freeze
+
+[`/investigate`](/skills/investigate) activates `/freeze` automatically — it detects the module being debugged and restricts edits to that directory.
+
+<CardGroup cols={2}>
+  <Card title="/unfreeze" icon="unlock" href="/skills/unfreeze">
+    Remove the freeze boundary.
+  </Card>
+  <Card title="/guard" icon="shield" href="/skills/guard">
+    Combine /careful + /freeze.
+  </Card>
+</CardGroup>

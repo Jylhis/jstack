@@ -1,0 +1,62 @@
+---
+title: "/retro"
+sidebarTitle: "/retro"
+description: "Eng manager mode. Team-aware weekly retro with per-person breakdowns, shipping streaks, and growth opportunities."
+---
+
+This is **engineering manager mode**.
+
+At the end of the week, `/retro` analyzes commit history, work patterns, and shipping velocity to write a candid retrospective.
+
+## What it measures
+
+- **Commits, LOC, test ratio** — per person and team total
+- **PR sizes and fix ratio** — identifying healthy patterns
+- **Coding sessions** — detected from commit timestamps
+- **Hotspot files** — most-changed files this period
+- **Shipping streaks** — consecutive days with commits
+- **Biggest ship** — the most significant delivery of the week
+- **Test health** — total tests, tests added, regression test commits, trend deltas
+
+If test ratio drops below 20%, it flags it as a growth area.
+
+## Team awareness
+
+`/retro` identifies who is running the command and gives you the deepest treatment on your own work. Then it breaks down every contributor with specific praise and growth opportunities.
+
+## Example
+
+```
+/retro
+
+Claude: Week of Mar 1: 47 commits (3 contributors), 3.2k LOC, 38% tests
+
+        ## Your Week
+        32 commits, +2.4k LOC, 41% tests. Peak hours: 9-11pm.
+        Biggest ship: cookie import system (browser decryption + picker UI).
+
+        ## Team Breakdown
+
+        ### Alice
+        12 commits focused on app/services/. Every PR under 200 LOC.
+        Opportunity: test ratio at 12%.
+
+        ### Bob
+        3 commits — fixed the N+1 query on dashboard. High-impact.
+        Opportunity: only 1 active day — check if blocked.
+
+        [Top 3 wins, 3 things to improve, 3 habits for next week]
+```
+
+## Global mode
+
+`/retro global` runs across all your projects and AI tools (Claude Code, Codex, Gemini). Saves JSON snapshots to `.context/retros/` for trend tracking.
+
+<CardGroup cols={2}>
+  <Card title="/ship" icon="arrow-left" href="/skills/ship">
+    Ship before retro.
+  </Card>
+  <Card title="/office-hours" icon="arrow-right" href="/skills/office-hours">
+    Start the next sprint.
+  </Card>
+</CardGroup>

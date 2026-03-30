@@ -1,0 +1,83 @@
+---
+title: "Installation"
+sidebarTitle: "Installation"
+description: "Install jstack in 30 seconds on Claude Code, Codex, Gemini CLI, or Cursor."
+---
+
+## Requirements
+
+- [Claude Code](https://docs.anthropic.com/en/docs/claude-code), [Codex](https://github.com/openai/codex), [Gemini CLI](https://github.com/google-gemini/gemini-cli), or [Cursor](https://cursor.sh)
+- [Git](https://git-scm.com/)
+- [Bun](https://bun.sh/) v1.0+
+- [Node.js](https://nodejs.org/) (Windows only)
+
+<Tabs>
+  <Tab title="Claude Code">
+    ### Step 1: Install on your machine
+
+    Open Claude Code and paste this. Claude does the rest.
+
+    ```
+    Install jstack: run git clone --single-branch --depth 1
+    https://github.com/Jylhis/jstack.git ~/.claude/skills/jstack
+    && cd ~/.claude/skills/jstack && ./setup
+    ```
+
+    Then add a "jstack" section to your project's `CLAUDE.md` that lists the available skills.
+
+    ### Step 2: Add to your repo (optional)
+
+    So teammates get jstack automatically on `git clone`:
+
+    ```
+    Add jstack to this project: run cp -Rf ~/.claude/skills/jstack
+    .claude/skills/jstack && rm -rf .claude/skills/jstack/.git
+    && cd .claude/skills/jstack && ./setup
+    ```
+
+    Real files get committed to your repo (not a submodule), so `git clone` just works. Everything lives inside `.claude/`. Nothing touches your PATH or runs in the background.
+
+    <Note>
+      **Need full history?** The commands above use `--depth 1` for a fast install. If you plan to contribute, do a full clone: `git clone https://github.com/Jylhis/jstack.git ~/.claude/skills/jstack`
+    </Note>
+  </Tab>
+  <Tab title="Codex / Gemini / Cursor">
+    jstack works on any agent that supports the [SKILL.md standard](https://github.com/anthropics/claude-code). Skills live in `.agents/skills/` and are discovered automatically.
+
+    ### Install to one repo
+
+    ```bash
+    git clone --single-branch --depth 1 https://github.com/Jylhis/jstack.git .agents/skills/jstack
+    cd .agents/skills/jstack && ./setup --host codex
+    ```
+
+    When setup runs from `.agents/skills/jstack`, it installs the generated skills next to it in the same repo and does not write to `~/.codex/skills`.
+
+    ### Install globally
+
+    ```bash
+    git clone --single-branch --depth 1 https://github.com/Jylhis/jstack.git ~/jstack
+    cd ~/jstack && ./setup --host codex
+    ```
+
+    ### Auto-detect agents
+
+    ```bash
+    git clone --single-branch --depth 1 https://github.com/Jylhis/jstack.git ~/jstack
+    cd ~/jstack && ./setup --host auto
+    ```
+
+    All 28 skills work across all supported agents. Hook-based safety skills (careful, freeze, guard) use inline safety advisory prose on non-Claude hosts.
+  </Tab>
+</Tabs>
+
+## Setup options
+
+| Flag | What it does |
+|------|-------------|
+| `--host [claude\|codex\|kiro\|auto]` | Target agent. Auto-detects if omitted. |
+| `--local` | Install to repo-local `.claude/skills/` instead of global. |
+| `--prefix` | Namespaced commands: `/jstack-qa` instead of `/qa`. |
+| `--no-prefix` | Short commands: `/qa` instead of `/jstack-qa`. |
+
+Your prefix choice is remembered for future upgrades.

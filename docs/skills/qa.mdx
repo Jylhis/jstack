@@ -1,0 +1,52 @@
+---
+title: "/qa"
+sidebarTitle: "/qa"
+description: "QA lead mode. Test your app, find bugs, fix them with atomic commits, and auto-generate regression tests."
+---
+
+This is **QA lead mode**.
+
+`/browse` gives the agent eyes. `/qa` gives it a testing methodology.
+
+The most common use case: you're on a feature branch, you just finished coding, and you want to verify everything works. Just say `/qa` — it reads your git diff, identifies which pages your changes affect, spins up the browser, and tests each one. No URL required. No manual test plan.
+
+## Four modes
+
+| Mode | Behavior |
+|------|----------|
+| **Diff-aware** | Automatic on feature branches. Reads `git diff main`, identifies affected pages, tests them. |
+| **Full** | Systematic exploration of the entire app. 5-15 minutes. Documents 5-10 well-evidenced issues. |
+| **Quick** (`--quick`) | 30-second smoke test. Homepage + top 5 nav targets. |
+| **Regression** (`--regression baseline.json`) | Full mode, then diff against a previous baseline. |
+
+## Automatic regression tests
+
+When `/qa` fixes a bug and verifies it, it automatically generates a regression test that catches the exact scenario. Tests include full attribution tracing back to the QA report.
+
+## Example
+
+```
+/qa https://staging.myapp.com
+
+Claude: [Explores 12 pages, fills 3 forms, tests 2 flows]
+
+        QA Report: staging.myapp.com — Health Score: 72/100
+
+        Top 3 Issues:
+        1. CRITICAL: Checkout form submits with empty required fields
+        2. HIGH: Mobile nav menu doesn't close after selecting an item
+        3. MEDIUM: Dashboard chart overlaps sidebar below 1024px
+
+        [Full report with screenshots saved to .jstack/qa-reports/]
+```
+
+**Testing authenticated pages:** Use [`/setup-browser-cookies`](/browser/setup-cookies) first to import your real browser sessions.
+
+<CardGroup cols={2}>
+  <Card title="/review" icon="arrow-left" href="/skills/review">
+    Code review before QA.
+  </Card>
+  <Card title="/ship" icon="arrow-right" href="/skills/ship">
+    Ship after QA passes.
+  </Card>
+</CardGroup>

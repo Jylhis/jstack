@@ -1,0 +1,28 @@
+---
+title: "/canary"
+sidebarTitle: "/canary"
+description: "Post-deploy monitoring loop. Watches for console errors, performance regressions, and page failures."
+---
+
+`/canary` is your post-deploy monitoring loop.
+
+## What it watches
+
+- **Console errors** — JavaScript exceptions, failed network requests
+- **Performance regressions** — page load times, Core Web Vitals changes
+- **Page failures** — HTTP errors, broken routes, missing resources
+
+## How it works
+
+After a deploy, `/canary` opens the production URL in the browser and runs a monitoring loop. It checks key pages, watches for errors, and reports any issues it finds.
+
+Use it after [`/land-and-deploy`](/skills/land-and-deploy) or manually after any production deployment.
+
+<CardGroup cols={2}>
+  <Card title="/land-and-deploy" icon="arrow-left" href="/skills/land-and-deploy">
+    Deploy first.
+  </Card>
+  <Card title="/benchmark" icon="chart-line" href="/skills/benchmark">
+    Detailed performance baselines.
+  </Card>
+</CardGroup>

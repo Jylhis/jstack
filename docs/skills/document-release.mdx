@@ -1,0 +1,47 @@
+---
+title: "/document-release"
+sidebarTitle: "/document-release"
+description: "Technical writer mode. Update all project docs to match what you just shipped."
+---
+
+This is **technical writer mode**.
+
+After `/ship` creates the PR but before it merges, `/document-release` reads every documentation file in the project and cross-references it against the diff. It updates file paths, command lists, project structure trees, and anything else that drifted.
+
+Risky or subjective changes get surfaced as questions — everything else is handled automatically.
+
+## Example
+
+```
+/document-release
+
+Claude: Analyzing 21 files changed across 3 commits. Found 8 documentation files.
+
+        README.md: updated skill count from 9 to 10, added new skill to table
+        CLAUDE.md: added new directory to project structure
+        CONTRIBUTING.md: current — no changes needed
+        TODOS.md: marked 2 items complete, added 1 new item
+
+        All docs updated and committed. PR body updated with doc diff.
+```
+
+## What it touches
+
+- README.md, ARCHITECTURE.md, CONTRIBUTING.md, CLAUDE.md
+- CHANGELOG voice polishing (without overwriting entries)
+- TODOS.md cleanup (completed items marked done)
+- Cross-doc consistency checks
+- VERSION bump suggestions when appropriate
+
+<Note>
+  `/ship` auto-invokes `/document-release` — docs stay current without an extra command.
+</Note>
+
+<CardGroup cols={2}>
+  <Card title="/ship" icon="arrow-left" href="/skills/ship">
+    Ship the PR first.
+  </Card>
+  <Card title="/retro" icon="arrow-right" href="/skills/retro">
+    Weekly retrospective.
+  </Card>
+</CardGroup>

@@ -1,0 +1,29 @@
+---
+title: "/setup-deploy"
+sidebarTitle: "/setup-deploy"
+description: "One-time deploy configuration for /land-and-deploy. Detects your platform and writes config to CLAUDE.md."
+---
+
+`/setup-deploy` is a one-time configuration skill for [`/land-and-deploy`](/skills/land-and-deploy).
+
+## What it does
+
+1. Detects your deployment platform (Fly.io, Render, Vercel, Netlify, Heroku, GitHub Actions)
+2. Identifies your production URL
+3. Determines the deploy command and CI pipeline
+4. Writes the configuration to `CLAUDE.md`
+
+After running this once, `/land-and-deploy` knows how to merge, deploy, and verify for your project.
+
+## Supported platforms
+
+- Fly.io
+- Render
+- Vercel
+- Netlify
+- Heroku
+- GitHub Actions
+
+<Card title="/land-and-deploy" icon="rocket" href="/skills/land-and-deploy">
+  Use after setup to merge and deploy.
+</Card>

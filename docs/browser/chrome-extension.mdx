@@ -1,0 +1,56 @@
+---
+title: "Chrome Extension"
+sidebarTitle: "Chrome Extension"
+description: "Side Panel with live activity feed, @ref overlays, and connection status."
+---
+
+A Chrome extension that shows a live activity feed of browse commands in a Side Panel, plus @ref overlays on the page.
+
+## Automatic install (recommended)
+
+When you run `$B connect`, the extension **auto-loads** into the Playwright-controlled Chrome window. No manual steps needed.
+
+```bash
+$B connect              # launches Chrome with extension pre-loaded
+# Click the jstack icon in toolbar → Open Side Panel
+```
+
+## Manual install
+
+For your everyday Chrome (not the Playwright-controlled one):
+
+```bash
+bin/jstack-extension    # opens chrome://extensions, copies path to clipboard
+```
+
+Or manually:
+1. Go to `chrome://extensions`
+2. Toggle "Developer mode" ON
+3. Click "Load unpacked"
+4. Navigate to the extension folder: `~/.claude/skills/jstack/extension`
+5. Pin it, set the port from `$B status`, and open the Side Panel
+
+## Features
+
+| Feature | Description |
+|---------|-------------|
+| **Toolbar badge** | Green dot when server is reachable, gray when not |
+| **Side Panel** | Live scrolling feed of every browse command with duration and status |
+| **Refs tab** | After `$B snapshot`, shows the current @ref list (role + name) |
+| **@ref overlays** | Floating panel on the page showing current refs |
+| **Connection pill** | Small "jstack" pill in the bottom-right corner when connected |
+
+## Troubleshooting
+
+- **Badge stays gray:** Check the port. Run `$B status` and update in the popup.
+- **Side Panel is empty:** The feed shows activity after the extension connects. Run `$B snapshot` to verify.
+- **Extension disappeared:** Sideloaded extensions persist across updates. Reload from Step 3 if needed.
+
+<CardGroup cols={2}>
+  <Card title="Sidebar agent" icon="message-bot" href="/browser/sidebar-agent">
+    Chat interface in the Side Panel.
+  </Card>
+  <Card title="Real browser mode" icon="chrome" href="/browser/connect-chrome">
+    Launch headed Chrome.
+  </Card>
+</CardGroup>

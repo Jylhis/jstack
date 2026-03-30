@@ -1,0 +1,32 @@
+---
+title: "/guard"
+sidebarTitle: "/guard"
+description: "Full safety mode. Combines /careful + /freeze in one command."
+---
+
+`/guard` activates full safety mode — combining [`/careful`](/skills/careful) (destructive command warnings) and [`/freeze`](/skills/freeze) (directory-scoped edits) in one command.
+
+## When to use it
+
+- Working on production systems
+- Debugging live issues
+- Any time you want maximum safety
+
+## Example
+
+```
+/guard src/payments
+
+Claude: Safety mode active:
+        - Destructive command warnings enabled (/careful)
+        - Edits restricted to src/payments/ (/freeze)
+```
+
+<CardGroup cols={2}>
+  <Card title="/careful" icon="triangle-exclamation" href="/skills/careful">
+    Destructive command warnings only.
+  </Card>
+  <Card title="/freeze" icon="lock" href="/skills/freeze">
+    Directory-scoped edits only.
+  </Card>
+</CardGroup>

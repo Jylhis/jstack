@@ -1,0 +1,29 @@
+---
+title: "/qa-only"
+sidebarTitle: "/qa-only"
+description: "Report-only QA testing. Same methodology as /qa but produces only a bug report, no code changes."
+---
+
+`/qa-only` uses the same testing methodology as [`/qa`](/skills/qa) but produces only a bug report — no code changes.
+
+## When to use it
+
+- You want a pure bug report without any automated fixes
+- You're auditing a codebase you don't own
+- You want to review findings before deciding what to fix
+- You're running QA on a production URL where you can't make changes
+
+## How it works
+
+Same four modes as `/qa` (diff-aware, full, quick, regression). Same browser-based testing. Same QA report with screenshots and evidence. The only difference: no fix attempts, no commits, no regression test generation.
+
+The report is saved to `.jstack/qa-reports/` and can be used as input for manual fixing or handed to a team.
+
+<CardGroup cols={2}>
+  <Card title="/qa" icon="wrench" href="/skills/qa">
+    QA with automatic fixes.
+  </Card>
+  <Card title="/browse" icon="globe" href="/browser/overview">
+    Use the browser directly.
+  </Card>
+</CardGroup>

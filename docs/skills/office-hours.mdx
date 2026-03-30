@@ -1,0 +1,64 @@
+---
+title: "/office-hours"
+sidebarTitle: "/office-hours"
+description: "YC-style product thinking session. Six forcing questions that reframe your product before you write code."
+---
+
+This is where every project should start.
+
+Before you plan, before you review, before you write code — sit down with a YC-style partner and think about what you're actually building. Not what you think you're building. What you're *actually* building.
+
+## The reframe
+
+`/office-hours` listens to your pain, not your feature request. When a user said "I want to build a daily briefing app for my calendar," the skill asked about specific pain points. The answer revealed stale calendar info across multiple Google accounts, prep docs that were AI slop, and events with wrong locations.
+
+It came back with: *"I'm going to push back on the framing. You said 'daily briefing app.' But what you actually described is a personal chief of staff AI."*
+
+Then it extracted five capabilities the user didn't realize they were describing — calendar monitoring, real prep work, CRM management, time prioritization, and delegation opportunities.
+
+That reframe changed the entire project. They were about to build a calendar app. Now they're building something ten times more valuable.
+
+## Premise challenge
+
+After the reframe, it presents falsifiable claims about the product for you to validate:
+
+1. The calendar is the anchor data source, but the value is in the intelligence layer on top
+2. The assistant doesn't get replaced — they get superpowered
+3. The narrowest wedge is a daily briefing that actually works
+4. CRM integration is a must-have, not a nice-to-have
+
+You agree, disagree, or adjust. Every premise you accept becomes load-bearing in the design doc.
+
+## Implementation alternatives
+
+Then it generates 2-3 concrete approaches with honest effort estimates:
+
+- **Approach A: Daily Briefing First** — narrowest wedge, ships tomorrow, M effort
+- **Approach B: CRM-First** — build the relationship graph first, L effort
+- **Approach C: Full Vision** — everything at once, XL effort
+
+Recommends A because you learn from real usage.
+
+## Two modes
+
+<Tabs>
+  <Tab title="Startup mode">
+    For founders and intrapreneurs building a business. Six forcing questions distilled from how YC partners evaluate products: demand reality, status quo, desperate specificity, narrowest wedge, observation & surprise, and future-fit. These questions are uncomfortable on purpose.
+  </Tab>
+  <Tab title="Builder mode">
+    For hackathons, side projects, open source, and learning. An enthusiastic collaborator who helps you find the coolest version of your idea. What would make someone say "whoa"? The questions are generative, not interrogative.
+  </Tab>
+</Tabs>
+
+## The design doc
+
+Both modes produce a design doc written to `~/.jstack/projects/` that feeds directly into `/plan-ceo-review` and `/plan-eng-review`. The full lifecycle: office-hours → plan → implement → review → QA → ship → retro.
+
+<CardGroup cols={2}>
+  <Card title="/plan-ceo-review" icon="arrow-right" href="/skills/plan-ceo-review">
+    Next step: CEO review of your design doc.
+  </Card>
+  <Card title="/plan-eng-review" icon="arrow-right" href="/skills/plan-eng-review">
+    Lock in the architecture.
+  </Card>
+</CardGroup>

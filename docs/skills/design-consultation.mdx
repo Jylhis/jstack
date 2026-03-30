@@ -1,0 +1,84 @@
+---
+title: "/design-consultation"
+sidebarTitle: "/design-consultation"
+description: "Build a complete design system from scratch. Landscape research, creative risks, realistic mockups."
+---
+
+This is **design partner mode**.
+
+`/design-consultation` is for when you have nothing yet — no design system, no font choices, no color palette. You're starting from zero and you want a senior designer to sit down with you and build the whole visual identity together.
+
+## How it works
+
+The agent asks about your product, your users, and your audience. It thinks about what your product needs to communicate — trust, speed, craft, warmth — and works backward to concrete choices. Then it proposes a complete design system:
+
+- **Aesthetic direction** — industrial, editorial, playful, minimal
+- **Typography** — 3+ fonts with specific roles (display, body, data)
+- **Color palette** — with hex values and rationale
+- **Spacing scale** — base unit and density
+- **Layout approach** — grid system, breakpoints
+- **Motion strategy** — where animation aids comprehension
+
+Every recommendation comes with a rationale. Every choice reinforces every other choice.
+
+## Safe choices AND creative risks
+
+Every dev tool dashboard looks the same — clean sans-serif, muted grays, a blue accent. They're all coherent. They're all forgettable.
+
+`/design-consultation` proposes safe choices AND risks — and tells you which is which:
+
+> "Here are the choices that keep you literate in your category. And here is where I think you should break from convention, and why."
+
+You pick which risks to take. The agent checks that the whole system still coheres either way.
+
+## Landscape research
+
+The agent can research what's already out there in your space — take screenshots of real sites, analyze their fonts, colors, and spacing — so you see the landscape before you make choices.
+
+## Example
+
+```
+/design-consultation
+
+Claude: From the README, this looks like a developer analytics dashboard.
+        Would you like me to look at what's out there first?
+
+You:    Yes, show me what's out there.
+
+Claude: [browses Linear, Vercel, Datadog, Posthog — takes screenshots]
+
+        Here's the landscape. They all converge on clean sans-serifs
+        and muted blue-gray palettes.
+
+        My proposal:
+        TYPOGRAPHY: Geist (body), Instrument Serif (display), JetBrains Mono (data)
+        COLOR: Slate neutrals, single teal accent (#0D9488)
+
+        SAFE: Geist for body, slate neutrals, grid-disciplined layout
+        RISKS: Serif for headings (nobody in dev tools does this),
+               teal instead of blue, 4px compact density
+
+You:    Love the serif risk. Let's see it.
+
+Claude: [Opens interactive HTML preview with realistic dashboard mockup]
+
+You:    Ship it.
+
+Claude: Wrote DESIGN.md. Updated CLAUDE.md with design guidelines.
+```
+
+## Output
+
+After you agree on the system, it:
+1. Generates an interactive HTML preview with realistic product pages in light and dark mode
+2. Writes `DESIGN.md` to your repo root
+3. Updates `CLAUDE.md` so every future Claude Code session respects the system
+
+<CardGroup cols={2}>
+  <Card title="/design-review" icon="arrow-right" href="/skills/design-review">
+    Post-implementation visual audit against your design system.
+  </Card>
+  <Card title="/plan-design-review" icon="paintbrush" href="/skills/plan-design-review">
+    Review plan-level design decisions.
+  </Card>
+</CardGroup>

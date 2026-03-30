@@ -1,0 +1,35 @@
+---
+title: "/jstack-upgrade"
+sidebarTitle: "/jstack-upgrade"
+description: "Upgrade jstack to the latest version. Detects install type, syncs copies, shows what changed."
+---
+
+Keep jstack current with one command.
+
+## What it does
+
+1. Detects your install type (global at `~/.claude/skills/jstack` vs vendored at `.claude/skills/jstack`)
+2. Runs the upgrade
+3. Syncs both copies if you have dual installs
+4. Shows you what changed
+
+## Example
+
+```
+/jstack-upgrade
+
+Claude: Current version: 0.7.4
+        Latest version: 0.8.2
+
+        What's new:
+        - Browse handoff for CAPTCHAs and auth walls
+        - /codex multi-AI second opinion
+        - /qa always uses browser now
+        - Safety skills: /careful, /freeze, /guard
+
+        Upgraded to 0.8.2. Both global and project installs synced.
+```
+
+## Auto-upgrade
+
+Set `auto_upgrade: true` in `~/.jstack/config.yaml` to skip the prompt entirely — jstack upgrades silently at the start of each session when a new version is available.

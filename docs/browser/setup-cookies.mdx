@@ -1,0 +1,53 @@
+---
+title: "Cookie Import"
+sidebarTitle: "Cookie Import"
+description: "Import cookies from your real browser (Chrome, Arc, Brave, Edge) to test authenticated pages."
+---
+
+Before `/qa` or `/browse` can test authenticated pages, they need cookies. `/setup-browser-cookies` imports your real sessions directly from your daily browser.
+
+## How it works
+
+It auto-detects installed Chromium browsers (Comet, Chrome, Arc, Brave, Edge), decrypts cookies via the macOS Keychain, and loads them into the Playwright session.
+
+## Interactive picker
+
+An interactive UI lets you choose exactly which domains to import — no cookie values are ever displayed.
+
+```
+/setup-browser-cookies
+
+Claude: Cookie picker opened — select the domains you want to import.
+
+        [You pick github.com, myapp.com in the browser UI]
+
+You:    done
+
+Claude: Imported 2 domains (47 cookies). Session is ready.
+```
+
+## Direct import
+
+Skip the UI entirely by specifying domains:
+
+```
+/setup-browser-cookies github.com
+
+Claude: Imported 12 cookies for github.com from Comet.
+```
+
+## Security
+
+- Cookie values are never displayed in the UI or conversation
+- The Playwright session uses the cookies in memory only
+- Session auto-shuts down after 30 minutes of idle time
+- Bearer token authentication prevents other processes from accessing the browser
+
+<CardGroup cols={2}>
+  <Card title="/qa" icon="flask-conical" href="/skills/qa">
+    Test authenticated pages after importing cookies.
+  </Card>
+  <Card title="Browser overview" icon="globe" href="/browser/overview">
+    How the browser works.
+  </Card>
+</CardGroup>

@@ -1,0 +1,59 @@
+---
+title: "/review"
+sidebarTitle: "/review"
+description: "Paranoid staff engineer mode. Find the bugs that pass CI but blow up in production."
+---
+
+This is **paranoid staff engineer mode**.
+
+Passing tests do not mean the branch is safe. `/review` exists because there's a whole class of bugs that can survive CI and still punch you in the face in production. This is a structural audit, not a style nitpick pass.
+
+## What it looks for
+
+- N+1 queries
+- Stale reads and race conditions
+- Bad trust boundaries
+- Missing indexes
+- Escaping bugs and broken invariants
+- Bad retry logic
+- Tests that pass while missing the real failure mode
+- Forgotten enum handlers — traces new status/type constants through every switch statement and allowlist in your codebase
+
+## Fix-first
+
+Findings get action, not just listed:
+
+- **Obvious mechanical fixes** (dead code, stale comments, N+1 queries) are applied automatically — you see `[AUTO-FIXED] file:line Problem → what was done`
+- **Genuinely ambiguous issues** (security, race conditions, design decisions) get surfaced for your call
+
+## Completeness gaps
+
+`/review` flags shortcut implementations where the complete version costs less than 30 minutes of AI time. If you chose the 80% solution and the 100% solution is achievable, the review will call it out.
+
+## Example
+
+After implementing a smart listing flow with green tests, `/review` still asks:
+
+- Did I introduce an N+1 query when rendering listing photos?
+- Am I trusting client-provided file metadata instead of validating the actual file?
+- Can two tabs race and overwrite cover-photo selection?
+- Do failed uploads leave orphaned files in storage forever?
+- If enrichment APIs partially fail, do I degrade gracefully or save garbage?
+- Did I accidentally create a prompt injection by pulling web data into draft generation?
+
+## Greptile integration
+
+If [Greptile](https://greptile.com) is reviewing your PRs, `/review` is Greptile-aware. It reads Greptile's comments, classifies each one, and takes action:
+
+- **Valid issues** get added to critical findings and fixed
+- **Already-fixed issues** get an auto-reply acknowledging the catch
+- **False positives** get pushed back with an explanation
+
+<CardGroup cols={2}>
+  <Card title="/plan-eng-review" icon="arrow-left" href="/skills/plan-eng-review">
+    Previous: Eng review during planning.
+  </Card>
+  <Card title="/qa" icon="arrow-right" href="/skills/qa">
+    Next: QA testing.
+  </Card>
+</CardGroup>
