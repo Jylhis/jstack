@@ -10,12 +10,8 @@ DROP POLICY IF EXISTS "anon_select" ON update_checks;
 -- Drop dangerous UPDATE policy (was unrestricted on all columns)
 DROP POLICY IF EXISTS "anon_update_last_seen" ON installations;
 
--- Keep INSERT policies — old clients (pre-v0.11.16) still POST directly to
--- PostgREST. These will be dropped in a future migration once adoption of
--- edge-function-based sync is widespread.
--- (anon_insert_only ON telemetry_events — kept)
--- (anon_insert_only ON installations — kept)
--- (anon_insert_only ON update_checks — kept)
+-- INSERT policies were kept here for old client compat.
+-- They are dropped in 003_drop_anon_insert.sql.
 
 -- Explicitly revoke view access (belt-and-suspenders)
 REVOKE SELECT ON crash_clusters FROM anon;

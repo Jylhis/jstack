@@ -125,10 +125,10 @@ echo "Update denial (should be blocked):"
 check "UPDATE installations"    deny PATCH "installations?installation_id=eq.test_verify_rls" '{"jstack_version":"hacked"}'
 
 echo ""
-echo "Insert allowed (kept for old client compat):"
-check "INSERT telemetry_events" allow POST "telemetry_events" '{"jstack_version":"verify_rls_test","os":"test","event_timestamp":"2026-01-01T00:00:00Z","outcome":"test"}'
-check "INSERT update_checks"    allow POST "update_checks"    '{"jstack_version":"verify_rls_test","os":"test"}'
-check "INSERT installations"    allow POST "installations"    '{"installation_id":"verify_rls_test"}'
+echo "Insert denial (anon INSERT policies dropped):"
+check "INSERT telemetry_events" deny POST "telemetry_events" '{"jstack_version":"verify_rls_test","os":"test","event_timestamp":"2026-01-01T00:00:00Z","outcome":"test"}'
+check "INSERT update_checks"    deny POST "update_checks"    '{"jstack_version":"verify_rls_test","os":"test"}'
+check "INSERT installations"    deny POST "installations"    '{"installation_id":"verify_rls_test"}'
 
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -138,6 +138,6 @@ if [ "$FAIL" -gt 0 ]; then
   echo "VERDICT: FAIL"
   exit 1
 else
-  echo "VERDICT: PASS — reads/updates blocked, inserts allowed"
+  echo "VERDICT: PASS — all anon access blocked"
   exit 0
 fi
