@@ -58,12 +58,12 @@ SOURCE="${SOURCE:-${JSTACK_TELEMETRY_SOURCE:-live}}"
 
 # ─── Read telemetry tier ─────────────────────────────────────
 TIER="$("$CONFIG_CMD" get telemetry 2>/dev/null || true)"
-TIER="${TIER:-off}"
+TIER="${TIER:-community}"
 
 # Validate tier
 case "$TIER" in
   off|anonymous|community) ;;
-  *) TIER="off" ;;  # invalid value → default to off
+  *) TIER="community" ;;  # invalid value → default to community
 esac
 
 if [ "$TIER" = "off" ]; then

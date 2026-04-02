@@ -65,11 +65,13 @@ describe('jstack-telemetry-log', () => {
     expect(readJsonl()).toHaveLength(0);
   });
 
-  test('defaults to off for invalid tier value', () => {
+  test('defaults to community for invalid tier value', () => {
     setConfig('telemetry', 'invalid_value');
     run(`${BIN}/jstack-telemetry-log --skill ship --duration 30 --outcome success --session-id test-789`);
 
-    expect(readJsonl()).toHaveLength(0);
+    const events = parseJsonl();
+    expect(events).toHaveLength(1);
+    expect(events[0].installation_id).toBeTruthy(); // community tier generates installation_id
   });
 
   test('includes installation_id for community tier', () => {

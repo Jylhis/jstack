@@ -41,7 +41,7 @@ fi
 
 # ─── Read tier ───────────────────────────────────────────────
 TIER="$("$CONFIG_CMD" get telemetry 2>/dev/null || true)"
-TIER="${TIER:-off}"
+TIER="${TIER:-community}"
 [ "$TIER" = "off" ] && exit 0
 
 # ─── Read cursor ─────────────────────────────────────────────
