@@ -100,7 +100,7 @@ Deno.serve(async (req) => {
 
     // Insert events
     const { error: insertError } = await supabase
-      .from("telemetry_events")
+      .from("jstack_telemetry_events")
       .insert(rows);
 
     if (insertError) {
@@ -113,7 +113,7 @@ Deno.serve(async (req) => {
     // Upsert installations (update last_seen)
     for (const [id, data] of installationUpserts) {
       await supabase
-        .from("installations")
+        .from("jstack_installations")
         .upsert(
           {
             installation_id: id,

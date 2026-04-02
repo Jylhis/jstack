@@ -3,7 +3,7 @@
 #
 # Verifies:
 #   - SELECT denied on all tables and views (security fix)
-#   - UPDATE denied on installations (security fix)
+#   - UPDATE denied on jstack_installations (security fix)
 #   - INSERT still allowed on tables (kept for old client compat)
 #
 # Run manually after deploying the migration:
@@ -114,21 +114,21 @@ echo "RLS Verification (after 002_tighten_rls.sql)"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 echo "Read denial (should be blocked):"
-check "SELECT telemetry_events" deny GET "telemetry_events?select=*&limit=1"
-check "SELECT installations"    deny GET "installations?select=*&limit=1"
-check "SELECT update_checks"    deny GET "update_checks?select=*&limit=1"
-check "SELECT crash_clusters"   deny GET "crash_clusters?select=*&limit=1"
-check "SELECT skill_sequences"  deny GET "skill_sequences?select=skill_a&limit=1"
+check "SELECT jstack_telemetry_events" deny GET "jstack_telemetry_events?select=*&limit=1"
+check "SELECT jstack_installations"    deny GET "jstack_installations?select=*&limit=1"
+check "SELECT jstack_update_checks"    deny GET "jstack_update_checks?select=*&limit=1"
+check "SELECT jstack_crash_clusters"   deny GET "jstack_crash_clusters?select=*&limit=1"
+check "SELECT jstack_skill_sequences"  deny GET "jstack_skill_sequences?select=skill_a&limit=1"
 
 echo ""
 echo "Update denial (should be blocked):"
-check "UPDATE installations"    deny PATCH "installations?installation_id=eq.test_verify_rls" '{"jstack_version":"hacked"}'
+check "UPDATE jstack_installations"    deny PATCH "jstack_installations?installation_id=eq.test_verify_rls" '{"jstack_version":"hacked"}'
 
 echo ""
 echo "Insert denial (anon INSERT policies dropped):"
-check "INSERT telemetry_events" deny POST "telemetry_events" '{"jstack_version":"verify_rls_test","os":"test","event_timestamp":"2026-01-01T00:00:00Z","outcome":"test"}'
-check "INSERT update_checks"    deny POST "update_checks"    '{"jstack_version":"verify_rls_test","os":"test"}'
-check "INSERT installations"    deny POST "installations"    '{"installation_id":"verify_rls_test"}'
+check "INSERT jstack_telemetry_events" deny POST "jstack_telemetry_events" '{"jstack_version":"verify_rls_test","os":"test","event_timestamp":"2026-01-01T00:00:00Z","outcome":"test"}'
+check "INSERT jstack_update_checks"    deny POST "jstack_update_checks"    '{"jstack_version":"verify_rls_test","os":"test"}'
+check "INSERT jstack_installations"    deny POST "jstack_installations"    '{"installation_id":"verify_rls_test"}'
 
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"

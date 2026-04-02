@@ -24,7 +24,7 @@ Deno.serve(async (req) => {
     );
 
     // Log the update check (fire-and-forget)
-    await supabase.from("update_checks").insert({
+    await supabase.from("jstack_update_checks").insert({
       jstack_version: String(version).slice(0, 20),
       os: String(os).slice(0, 20),
     });

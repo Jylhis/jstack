@@ -1,7 +1,7 @@
 // jstack community-pulse edge function
 // Returns aggregated community stats for the dashboard:
 // weekly active count, top skills, crash clusters, version distribution.
-// Uses server-side cache (community_pulse_cache table) to prevent DoS.
+// Uses server-side cache (jstack_community_pulse_cache table) to prevent DoS.
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
@@ -16,7 +16,7 @@ Deno.serve(async () => {
   try {
     // Check cache first
     const { data: cached } = await supabase
-      .from("community_pulse_cache")
+      .from("jstack_community_pulse_cache")
       .select("data, refreshed_at")
       .eq("id", 1)
       .single();
@@ -40,13 +40,13 @@ Deno.serve(async () => {
 
     // Weekly active (update checks this week)
     const { count: thisWeek } = await supabase
-      .from("update_checks")
+      .from("jstack_update_checks")
       .select("*", { count: "exact", head: true })
       .gte("checked_at", weekAgo);
 
     // Last week (for change %)
     const { count: lastWeek } = await supabase
-      .from("update_checks")
+      .from("jstack_update_checks")
       .select("*", { count: "exact", head: true })
       .gte("checked_at", twoWeeksAgo)
       .lt("checked_at", weekAgo);
@@ -59,7 +59,7 @@ Deno.serve(async () => {
 
     // Top skills (last 7 days)
     const { data: skillRows } = await supabase
-      .from("telemetry_events")
+      .from("jstack_telemetry_events")
       .select("skill")
       .eq("event_type", "skill_run")
       .gte("event_timestamp", weekAgo)
@@ -79,14 +79,14 @@ Deno.serve(async () => {
 
     // Crash clusters (top 5)
     const { data: crashes } = await supabase
-      .from("crash_clusters")
+      .from("jstack_crash_clusters")
       .select("error_class, jstack_version, total_occurrences, identified_users")
       .limit(5);
 
     // Version distribution (last 7 days)
     const versionCounts: Record<string, number> = {};
     const { data: versionRows } = await supabase
-      .from("telemetry_events")
+      .from("jstack_telemetry_events")
       .select("jstack_version")
       .eq("event_type", "skill_run")
       .gte("event_timestamp", weekAgo)
@@ -112,7 +112,7 @@ Deno.serve(async () => {
 
     // Upsert cache
     await supabase
-      .from("community_pulse_cache")
+      .from("jstack_community_pulse_cache")
       .upsert({
         id: 1,
         data: result,
