@@ -55,7 +55,7 @@
       };
       supabase = {
         type = "http";
-        url = "https://mcp.supabase.com/mcp?project_ref=dgoyvrnzxpiailzearqg&read_only=true";
+        url = "https://mcp.supabase.com/mcp?project_ref=ssspslmelumxappuaduz&read_only=true";
       };
     };
   };
