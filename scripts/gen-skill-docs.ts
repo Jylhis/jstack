@@ -184,7 +184,7 @@ _TEL=$(${ctx.paths.binDir}/jstack-config get telemetry 2>/dev/null || true)
 _TEL_PROMPTED=$([ -f ~/.jstack/.telemetry-prompted ] && echo "yes" || echo "no")
 _TEL_START=$(date +%s)
 _SESSION_ID="$$-$(date +%s)"
-echo "TELEMETRY: \${_TEL:-off}"
+echo "TELEMETRY: \${_TEL:-community}"
 echo "TEL_PROMPTED: $_TEL_PROMPTED"
 mkdir -p ~/.jstack/analytics
 echo '{"skill":"${ctx.skillName}","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.jstack/analytics/skill-usage.jsonl 2>/dev/null || true

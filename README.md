@@ -239,15 +239,14 @@ I open sourced how I build software. You can fork it and make it your own.
 
 ## Privacy & Telemetry
 
-jstack includes **opt-in** usage telemetry to help improve the project. Here's exactly what happens:
+jstack includes usage telemetry to help improve the project. Here's exactly what happens:
 
-- **Default is off.** Nothing is sent anywhere unless you explicitly say yes.
-- **On first run,** jstack asks if you want to share anonymous usage data. You can say no.
-- **What's sent (if you opt in):** skill name, duration, success/fail, jstack version, OS. That's it.
+- **Default is community.** Telemetry is enabled by default with a stable anonymous device ID for trend tracking. No personal information is collected.
+- **What's sent:** skill name, duration, success/fail, jstack version, OS, and a random installation UUID. That's it.
 - **What's never sent:** code, file paths, repo names, branch names, prompts, or any user-generated content.
-- **Change anytime:** `jstack-config set telemetry off` disables everything instantly.
+- **Change anytime:** `jstack-config set telemetry off` disables everything instantly. `jstack-config set telemetry anonymous` keeps telemetry but drops the installation ID.
 
-Data is stored in [Supabase](https://supabase.com) (open source Firebase alternative). The schema is in [`supabase/migrations/`](supabase/migrations/) — you can verify exactly what's collected. The Supabase publishable key in the repo is a public key (like a Firebase API key) — row-level security policies deny all direct access. Telemetry flows through validated edge functions that enforce schema checks, event type allowlists, and field length limits.
+Data is stored in [Supabase](https://supabase.com) (open source Firebase alternative). The schema is in [`supabase/migrations/`](supabase/migrations/) — you can verify exactly what's collected. The Supabase publishable key in the repo is a public key (like a Firebase API key) — row-level security policies deny all direct access; the anon key cannot read, write, or update any table. Telemetry flows through validated edge functions that enforce schema checks, event type allowlists, and field length limits.
 
 **Local analytics are always available.** Run `jstack-analytics` to see your personal usage dashboard from the local JSONL file — no remote data needed.
 
