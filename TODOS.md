@@ -495,7 +495,7 @@ Shipped: Default model changed to Sonnet for structure tests (~30), Opus retaine
 
 **Effort:** S
 **Priority:** P2
-**Depends on:** `Jylhis/team-supabase-store` branch landing on main
+**Depends on:** Team store infrastructure being available
 
 ### /yc-prep skill
 

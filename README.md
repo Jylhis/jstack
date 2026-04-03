@@ -247,7 +247,7 @@ jstack includes **opt-in** usage telemetry to help improve the project. Here's e
 - **What's never sent:** code, file paths, repo names, branch names, prompts, or any user-generated content.
 - **Change anytime:** `jstack-config set telemetry off` disables everything instantly.
 
-Data is stored in [Supabase](https://supabase.com) (open source Firebase alternative). The schema is in [`supabase/migrations/`](supabase/migrations/) — you can verify exactly what's collected. The Supabase publishable key in the repo is a public key (like a Firebase API key) — row-level security policies deny all direct access. Telemetry flows through validated edge functions that enforce schema checks, event type allowlists, and field length limits.
+Events are captured via [PostHog](https://posthog.com) using a public capture-only API key (similar to a Firebase public config). The key can only send events, not read data. All analytics are available in PostHog dashboards.
 
 **Local analytics are always available.** Run `jstack-analytics` to see your personal usage dashboard from the local JSONL file — no remote data needed.
 
