@@ -15,7 +15,6 @@ bun.lock
 .env.local
 .env.*
 !.env.example
-supabase/.temp/
 
 # Claude Code
 .claude/settings.json

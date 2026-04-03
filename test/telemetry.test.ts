@@ -320,28 +320,28 @@ describe('jstack-analytics', () => {
 });
 
 describe('jstack-telemetry-sync', () => {
-  test('exits silently with no Supabase URL configured', () => {
-    // Default: JSTACK_SUPABASE_URL is not set → exit 0
+  test('exits silently with no PostHog host configured', () => {
+    // Default: JSTACK_POSTHOG_HOST is not set → exit 0
     const result = run(`${BIN}/jstack-telemetry-sync`);
     expect(result).toBe('');
   });
 
   test('exits silently with no JSONL file', () => {
-    const result = run(`${BIN}/jstack-telemetry-sync`, { JSTACK_SUPABASE_URL: 'http://localhost:9999' });
+    const result = run(`${BIN}/jstack-telemetry-sync`, { JSTACK_POSTHOG_HOST: 'http://localhost:9999' });
     expect(result).toBe('');
   });
 
-  test('does not rename JSONL field names (edge function expects raw names)', () => {
+  test('local JSONL preserves raw field names for PostHog sync', () => {
     setConfig('telemetry', 'anonymous');
     run(`${BIN}/jstack-telemetry-log --skill qa --duration 60 --outcome success --session-id raw-fields-1`);
 
     const events = parseJsonl();
     expect(events).toHaveLength(1);
-    // Edge function expects these raw field names, NOT Postgres column names
+    // JSONL uses these raw field names which get mapped to PostHog properties
     expect(events[0]).toHaveProperty('v');
     expect(events[0]).toHaveProperty('ts');
     expect(events[0]).toHaveProperty('sessions');
-    // Should NOT have Postgres column names
+    // Should NOT have old Postgres column names
     expect(events[0]).not.toHaveProperty('schema_version');
     expect(events[0]).not.toHaveProperty('event_timestamp');
     expect(events[0]).not.toHaveProperty('concurrent_sessions');
@@ -349,22 +349,10 @@ describe('jstack-telemetry-sync', () => {
 });
 
 describe('jstack-community-dashboard', () => {
-  test('shows unconfigured message when no Supabase config available', () => {
-    // Use a fake JSTACK_DIR with no supabase/config.sh
-    const output = run(`${BIN}/jstack-community-dashboard`, {
-      JSTACK_DIR: tmpDir,
-      JSTACK_SUPABASE_URL: '',
-      JSTACK_SUPABASE_ANON_KEY: '',
-    });
-    expect(output).toContain('Supabase not configured');
-    expect(output).toContain('jstack-analytics');
-  });
-
-  test('connects to Supabase when config exists', () => {
-    // Use the real JSTACK_DIR which has supabase/config.sh
+  test('shows PostHog redirect message', () => {
     const output = run(`${BIN}/jstack-community-dashboard`);
     expect(output).toContain('jstack community dashboard');
-    // Should not show "not configured" since config.sh exists
-    expect(output).not.toContain('Supabase not configured');
+    expect(output).toContain('PostHog');
+    expect(output).toContain('jstack-analytics');
   });
 });

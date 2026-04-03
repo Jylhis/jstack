@@ -158,23 +158,25 @@ fi
 # ─── Step 4: Slow path — fetch remote version ────────────────
 mkdir -p "$STATE_DIR"
 
-# Fire Supabase install ping in background (parallel, non-blocking)
-# This logs an update check event for community health metrics via edge function.
-# If Supabase is not configured or telemetry is off, this is a no-op.
-if [ -z "${JSTACK_SUPABASE_URL:-}" ] && [ -f "$JSTACK_DIR/supabase/config.sh" ]; then
-  . "$JSTACK_DIR/supabase/config.sh"
+# Fire PostHog install ping in background (parallel, non-blocking)
+# This logs an update check event for community health metrics.
+# If PostHog is not configured or telemetry is off, this is a no-op.
+if [ -z "${JSTACK_POSTHOG_HOST:-}" ] && [ -f "$JSTACK_DIR/posthog/config.sh" ]; then
+  . "$JSTACK_DIR/posthog/config.sh"
 fi
-_SUPA_URL="${JSTACK_SUPABASE_URL:-}"
-_SUPA_KEY="${JSTACK_SUPABASE_ANON_KEY:-}"
-# Respect telemetry opt-out — don't ping Supabase if user set telemetry: off
+_PH_HOST="${JSTACK_POSTHOG_HOST:-}"
+_PH_KEY="${JSTACK_POSTHOG_API_KEY:-}"
+# Respect telemetry opt-out — don't ping PostHog if user set telemetry: off
 _TEL_TIER="$("$JSTACK_DIR/bin/jstack-config" get telemetry 2>/dev/null || true)"
-if [ -n "$_SUPA_URL" ] && [ -n "$_SUPA_KEY" ] && [ "${_TEL_TIER:-off}" != "off" ]; then
+if [ -n "$_PH_HOST" ] && [ -n "$_PH_KEY" ] && [ "${_TEL_TIER:-off}" != "off" ]; then
   _OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
+  _INSTALL_ID=""
+  [ -f "$HOME/.jstack/installation-id" ] && _INSTALL_ID="$(cat "$HOME/.jstack/installation-id" 2>/dev/null || true)"
+  _DID="${_INSTALL_ID:-anon-$(od -An -tx1 -N8 /dev/urandom 2>/dev/null | tr -d ' \n')}"
   curl -sf --max-time 5 \
-    -X POST "${_SUPA_URL}/functions/v1/update-check" \
+    -X POST "${_PH_HOST}/capture/" \
     -H "Content-Type: application/json" \
-    -H "apikey: ${_SUPA_KEY}" \
-    -d "{\"version\":\"$LOCAL\",\"os\":\"$_OS\"}" \
+    -d "{\"api_key\":\"${_PH_KEY}\",\"event\":\"update_check\",\"distinct_id\":\"${_DID}\",\"properties\":{\"version\":\"$LOCAL\",\"os\":\"$_OS\"}}" \
     >/dev/null 2>&1 &
 fi
 
