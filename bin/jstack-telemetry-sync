@@ -89,11 +89,10 @@ while IFS= read -r LINE; do
   [ -z "$LINE" ] && continue
   echo "$LINE" | grep -q '^{' || continue
 
-  # Strip local-only fields
-  CLEAN="$(echo "$LINE" | sed \
-    -e 's/,"_repo_slug":"[^"]*"//g' \
-    -e 's/,"_branch":"[^"]*"//g' \
-    -e 's/,"repo":"[^"]*"//g')"
+  # Strip local-only fields (handle field appearing first, middle, or last in JSON)
+  CLEAN="$(echo "$LINE" | sed -E \
+    -e 's/"(_repo_slug|_branch|repo)":"[^"]*",?//g' \
+    -e 's/,\"(_repo_slug|_branch|repo)\":\"[^\"]*\"//g')"
 
   # Extract event_type and ts for PostHog top-level fields
   EVENT_TYPE="$(echo "$CLEAN" | grep -o '"event_type":"[^"]*"' | head -1 | sed 's/"event_type":"//;s/"//')"
@@ -106,7 +105,7 @@ while IFS= read -r LINE; do
   else
     # Anonymous tier: use per-batch random ID, strip installation_id
     DID="$ANON_DID"
-    CLEAN="$(echo "$CLEAN" | sed 's/,"installation_id":"[^"]*"//g; s/,"installation_id":null//g')"
+    CLEAN="$(echo "$CLEAN" | sed -E 's/"installation_id":(\"[^\"]*\"|null),?//g; s/,"installation_id":(\"[^\"]*\"|null)//g')"
   fi
 
   # Remove event_type and ts from properties (they become top-level PostHog fields)
@@ -136,6 +135,7 @@ done <<< "$UNSENT"
 
 # ─── POST to PostHog /batch/ ────────────────────────────────
 RESP_FILE="$(mktemp /tmp/jstack-sync-XXXXXX 2>/dev/null || echo "/tmp/jstack-sync-$$")"
+trap 'rm -f "$RESP_FILE"' EXIT
 HTTP_CODE="$(curl -s -w '%{http_code}' --max-time 10 \
   -X POST "${POSTHOG_HOST}/batch/" \
   -H "Content-Type: application/json" \
@@ -149,8 +149,6 @@ case "$HTTP_CODE" in
     echo "$NEW_CURSOR" > "$CURSOR_FILE" 2>/dev/null || true
     ;;
 esac
-
-rm -f "$RESP_FILE" 2>/dev/null || true
 
 # Update rate limit marker
 touch "$RATE_FILE" 2>/dev/null || true

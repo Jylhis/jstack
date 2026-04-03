@@ -172,7 +172,7 @@ if [ -n "$_PH_HOST" ] && [ -n "$_PH_KEY" ] && [ "${_TEL_TIER:-off}" != "off" ]; 
   _OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
   _INSTALL_ID=""
   [ -f "$HOME/.jstack/installation-id" ] && _INSTALL_ID="$(cat "$HOME/.jstack/installation-id" 2>/dev/null || true)"
-  _DID="${_INSTALL_ID:-anon-$(od -An -tx1 -N8 /dev/urandom 2>/dev/null | tr -d ' ')}"
+  _DID="${_INSTALL_ID:-anon-$(od -An -tx1 -N8 /dev/urandom 2>/dev/null | tr -d ' \n')}"
   curl -sf --max-time 5 \
     -X POST "${_PH_HOST}/capture/" \
     -H "Content-Type: application/json" \
