@@ -1565,7 +1565,9 @@ describe('Codex generation (--host codex)', () => {
 // installed Claude-format source dirs for Codex users.
 
 describe('setup script validation', () => {
-  const setupContent = fs.readFileSync(path.join(ROOT, 'setup'), 'utf-8');
+  // setup sources lib/setup-lib.sh for shared functions; read both
+  const setupContent = fs.readFileSync(path.join(ROOT, 'setup'), 'utf-8')
+    + '\n' + fs.readFileSync(path.join(ROOT, 'lib', 'setup-lib.sh'), 'utf-8');
 
   test('setup has separate link functions for Claude and Codex', () => {
     expect(setupContent).toContain('link_claude_skill_dirs');
@@ -1575,20 +1577,20 @@ describe('setup script validation', () => {
   });
 
   test('Claude install uses link_claude_skill_dirs', () => {
-    // The Claude install section (section 4) should use the Claude function
+    // The Claude install section should use the Claude function
     const claudeSection = setupContent.slice(
-      setupContent.indexOf('# 4. Install for Claude'),
-      setupContent.indexOf('# 5. Install for Codex')
+      setupContent.indexOf('Install for Claude'),
+      setupContent.indexOf('Install for Codex')
     );
     expect(claudeSection).toContain('link_claude_skill_dirs');
     expect(claudeSection).not.toContain('link_codex_skill_dirs');
   });
 
   test('Codex install uses link_codex_skill_dirs', () => {
-    // The Codex install section (section 5) should use the Codex function
+    // The Codex install section should use the Codex function
     const codexSection = setupContent.slice(
-      setupContent.indexOf('# 5. Install for Codex'),
-      setupContent.indexOf('# 6. Create')
+      setupContent.indexOf('Install for Codex'),
+      setupContent.indexOf('Install for Kiro')
     );
     expect(codexSection).toContain('create_codex_runtime_root');
     expect(codexSection).toContain('link_codex_skill_dirs');
