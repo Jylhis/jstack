@@ -3,12 +3,13 @@ on:
   # Rebuild weekly (Monday 6am UTC) to pick up CLI updates
   schedule:
     - cron: '0 6 * * 1'
-  # Rebuild on Dockerfile or lockfile changes
+  # Rebuild on devenv config or lockfile changes
   push:
     branches: [main]
     paths:
-      - '.github/docker/Dockerfile.ci'
-      - 'package.json'
+      - 'devenv.nix'
+      - 'devenv.yaml'
+      - 'devenv.lock'
   # Manual trigger
   workflow_dispatch:
 
@@ -21,20 +22,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Copy lockfile + package.json into Docker build context
-      - run: cp package.json .github/docker/
+      - uses: cachix/install-nix-action@v30
 
-      - uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: cachix/devenv-action@v1
 
-      - uses: docker/build-push-action@v6
-        with:
-          context: .github/docker
-          file: .github/docker/Dockerfile.ci
-          push: true
-          tags: |
-            ghcr.io/${{ github.repository }}/ci:latest
-            ghcr.io/${{ github.repository }}/ci:${{ github.sha }}
+      - name: Build and push CI container
+        run: |
+          devenv container copy ci \
+            --copy-args "--dest-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}"
+          # Also tag with the commit SHA
+          skopeo copy \
+            --src-creds "${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}" \
+            --dest-creds "${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}" \
+            "docker://ghcr.io/${{ github.repository }}/ci:latest" \
+            "docker://ghcr.io/${{ github.repository }}/ci:${{ github.sha }}"
