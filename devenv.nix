@@ -14,6 +14,14 @@
     pkgs.git
     pkgs.gh
     pkgs.playwright-driver
+    pkgs.curl
+    pkgs.unzip
+    pkgs.jq
+    pkgs.bc
+    pkgs.gnupg
+  ]
+  ++ lib.optionals config.container.isBuilding [
+    pkgs.claude-code
   ];
 
   # Bun runtime + auto-install deps on shell entry
@@ -53,6 +61,21 @@
         };
       };
     };
+  };
+
+  # CI container — replaces Dockerfile.ci, inherits all packages from this config
+  containers.ci = {
+    # Note: GHCR lowercases all image names. Keep lowercase to match.
+    name = "ghcr.io/jylhis/jstack/ci";
+    copyToRoot = pkgs.runCommand "ci-root" { } ''
+      mkdir -p $out/etc $out/home/runner/.jstack $out/home/runner/.bun $out/tmp
+      # /etc/passwd + /etc/group for non-root user (UID 1000, used by GH Actions --user 1000)
+      echo 'root:x:0:0:root:/root:/bin/bash' > $out/etc/passwd
+      echo 'runner:x:1000:1000:runner:/home/runner:/bin/bash' >> $out/etc/passwd
+      echo 'root:x:0:' > $out/etc/group
+      echo 'runner:x:1000:' >> $out/etc/group
+    '';
+    startupCommand = "${pkgs.bash}/bin/bash";
   };
 
   # dev-teardown: remove dev skill symlinks, restore global jstack install
@@ -121,10 +144,9 @@
       fi
     fi
 
-    # 3-5. Create skill symlinks (idempotent — skip if jstack symlink already correct)
+    # 2. Create root jstack + agents symlinks (idempotent)
     _JSTACK_LINK="$_REPO_ROOT/.claude/skills/jstack"
     _AGENTS_LINK="$_REPO_ROOT/.agents/skills/jstack"
-    _NEEDS_SETUP=0
 
     if [ -L "$_JSTACK_LINK" ] && [ "$(readlink "$_JSTACK_LINK")" = "$_REPO_ROOT" ]; then
       : # symlink exists and points to the right place
@@ -136,7 +158,6 @@
       else
         [ -L "$_JSTACK_LINK" ] && rm "$_JSTACK_LINK"
         ln -s "$_REPO_ROOT" "$_JSTACK_LINK"
-        _NEEDS_SETUP=1
       fi
     fi
 
@@ -150,10 +171,32 @@
       ln -s "$_REPO_ROOT" "$_AGENTS_LINK"
     fi
 
-    # 6. Run setup through the symlink (only if symlinks were just created or per-skill symlinks missing)
-    if [ "$_NEEDS_SETUP" -eq 1 ] || [ ! -L "$_REPO_ROOT/.claude/skills/review" ]; then
-      "$_JSTACK_LINK/setup"
+    # 3. Source shared setup library (deterministic functions)
+    export SOURCE_JSTACK_DIR="$_REPO_ROOT"
+    export IS_WINDOWS=0
+    source "$_REPO_ROOT/lib/setup-lib.sh"
+
+    # Read saved prefix preference (no interactive prompt in devenv)
+    _saved_prefix="$("$_REPO_ROOT/bin/jstack-config" get skill_prefix 2>/dev/null || true)"
+    if [ "$_saved_prefix" = "true" ]; then
+      export SKILL_PREFIX=1
+    else
+      export SKILL_PREFIX=0
     fi
+
+    # 4. Build browse binary if stale (bun install handled by devenv)
+    smart_rebuild "$_REPO_ROOT" "$_REPO_ROOT/browse/dist/browse" || true
+
+    # 5. Generate .agents/ skill docs
+    gen_agents_skill_docs "$_REPO_ROOT"
+
+    # 6. Create per-skill Claude symlinks (idempotent — skip if already present)
+    if [ ! -L "$_REPO_ROOT/.claude/skills/review" ] && [ ! -L "$_REPO_ROOT/.claude/skills/jstack-review" ]; then
+      link_claude_skill_dirs "$_REPO_ROOT" "$_REPO_ROOT/.claude/skills"
+    fi
+
+    # 7. Create .agents sidecar
+    create_agents_sidecar "$_REPO_ROOT"
 
     echo "jstack dev shell ready — bun $(bun --version), playwright ${pkgs.playwright-driver.version}"
   '';
