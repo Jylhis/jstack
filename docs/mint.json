@@ -23,7 +23,7 @@
   ],
   "topbarCtaButton": {
     "name": "Install",
-    "url": "/getting-started/installation"
+    "url": "/installation"
   },
   "anchors": [
     {
@@ -41,15 +41,16 @@
     {
       "group": "Getting Started",
       "pages": [
-        "getting-started/introduction",
-        "getting-started/installation",
-        "getting-started/quickstart"
+        "introduction",
+        "installation",
+        "quickstart",
+        "troubleshooting"
       ]
     },
     {
       "group": "The Sprint",
       "pages": [
-        "sprint/overview",
+        "workflow-overview",
         "sprint/think",
         "sprint/plan",
         "sprint/build",
@@ -138,11 +139,11 @@
         "browser/overview",
         "browser/commands",
         "browser/snapshots-and-refs",
-        "browser/real-browser-mode",
+        "browser/connect-chrome",
         "browser/chrome-extension",
         "browser/sidebar-agent",
         "browser/handoff",
-        "browser/cookie-import"
+        "browser/setup-cookies"
       ]
     },
     {
@@ -150,8 +151,10 @@
       "pages": [
         "architecture/overview",
         "architecture/daemon-model",
+        "architecture/browser-internals",
         "architecture/security",
         "architecture/skill-template-system",
+        "architecture/ethos",
         "architecture/testing"
       ]
     },
@@ -168,7 +171,6 @@
     {
       "group": "Philosophy",
       "pages": [
-        "philosophy/ethos",
         "philosophy/parallel-sprints"
       ]
     }
