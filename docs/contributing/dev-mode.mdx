@@ -1,0 +1,63 @@
+---
+title: "Dev Mode"
+description: "Develop jstack with live-reloading skills"
+---
+
+jstack skills are Markdown files that Claude Code discovers from a `skills/` directory. Normally they live at `~/.claude/skills/jstack/`. In dev mode, you want Claude Code to use skills from your working tree — so edits take effect instantly.
+
+## How it works
+
+`devenv shell` symlinks your repo into `.claude/skills/` so Claude Code reads skills straight from your checkout:
+
+```
+jstack/                          ← your working tree
+├── .claude/skills/              ← created by devenv shell (gitignored)
+│   ├── jstack -> ../../         ← symlink back to repo root
+│   ├── review -> jstack/review  ← short names (default)
+│   ├── ship -> jstack/ship
+│   └── ...
+├── review/
+│   └── SKILL.md                 ← edit this, test with /review
+├── ship/
+│   └── SKILL.md
+└── ...
+```
+
+## Day-to-day workflow
+
+```bash
+devenv shell              # 1. Enter dev mode
+vim review/SKILL.md       # 2. Edit a skill
+                          # 3. Test it: /review (changes are live)
+bun run build             # 4. Rebuild if browse source changed
+dev-teardown              # 5. Done for the day
+```
+
+## Testing in a real project
+
+Symlink your checkout into any project:
+
+```bash
+# In your core project (not jstack repo)
+ln -sfn /path/to/your/jstack-checkout .claude/skills/jstack
+cd .claude/skills/jstack && bun install && bun run build && ./setup
+```
+
+Edit a template, run `bun run gen:skill-docs`, and the next skill call picks it up immediately.
+
+### Going back to stable
+
+```bash
+rm .claude/skills/jstack    # falls back to ~/.claude/skills/jstack/
+```
+
+## Conductor workspaces
+
+If using [Conductor](https://conductor.build) for parallel sessions, `conductor.json` wires up workspace lifecycle automatically:
+
+| Hook | Script | What it does |
+|------|--------|-------------|
+| `setup` | `devenv shell` | Copies `.env`, installs deps, symlinks skills |
+| `archive` | `devenv shell -- dev-teardown` | Removes symlinks, cleans up |
+
+Put `ANTHROPIC_API_KEY` in `.env` in the main repo — every workspace inherits it.

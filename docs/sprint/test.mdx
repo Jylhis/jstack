@@ -1,0 +1,30 @@
+---
+title: "Test"
+description: "Real browser QA, benchmarks, and post-deploy monitoring"
+---
+
+The Test phase uses a real browser to verify everything works, detect performance regressions, and monitor production after deploy.
+
+## Skills
+
+| Skill | Role | What it does |
+|-------|------|--------------|
+| `/qa` | QA Lead | Opens a real browser, finds bugs, fixes them with atomic commits, re-verifies. |
+| `/qa-only` | QA Reporter | Same methodology, report only — no code changes. |
+| `/benchmark` | Performance Engineer | Baseline page load times, Core Web Vitals, and resource sizes. |
+| `/canary` | SRE | Post-deploy monitoring loop. Watches for console errors and page failures. |
+
+## Four QA modes
+
+- **Diff-aware** (automatic) — reads `git diff main`, identifies affected pages, tests them
+- **Full** — systematic exploration of the entire app. 5-15 minutes.
+- **Quick** (`--quick`) — 30-second smoke test
+- **Regression** (`--regression baseline.json`) — diff against a previous baseline
+
+## Automatic regression tests
+
+When `/qa` fixes a bug and verifies it, it automatically generates a regression test that catches the exact scenario. Tests include full attribution tracing back to the QA report.
+
+<Card title="/qa" icon="flask-vial" href="/skills/qa">
+  Deep dive into QA
+</Card>

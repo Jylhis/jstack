@@ -1,0 +1,64 @@
+---
+title: "Testing Architecture"
+description: "Three-tier testing: static validation, E2E via claude -p, and LLM-as-judge"
+---
+
+## Test tiers
+
+| Tier | Command | Cost | Speed | What it tests |
+|------|---------|------|-------|---------------|
+| 1 — Static | `bun test` | Free | <5s | Command validation, snapshot flags, SKILL.md correctness |
+| 2 — E2E | `bun run test:e2e` | ~$3.85 | ~20min | Full skill execution via `claude -p` subprocess |
+| 3 — LLM eval | `bun run test:evals` | ~$0.15 | ~30s | LLM-as-judge scoring of SKILL.md quality |
+
+Tier 1 runs on every commit. Tiers 2+3 are gated behind `EVALS=1`.
+
+## Tier 1: Static validation (free)
+
+- **Skill parser**: Extracts every `$B` command from SKILL.md and validates against the command registry
+- **Skill validation**: Verifies SKILL.md files reference only real commands and flags
+- **Generator tests**: Verifies placeholders resolve correctly and include value hints
+
+## Tier 2: E2E via `claude -p` (~$3.85/run)
+
+Spawns `claude -p` as a subprocess with `--output-format stream-json --verbose`, streams NDJSON for real-time progress, and scans for errors.
+
+- Gated by `EVALS=1` (prevents accidental expensive runs)
+- Auto-skips if running inside Claude Code
+- API connectivity pre-check
+- Saves full NDJSON transcripts and failure JSON
+
+### Diff-based test selection
+
+Tests auto-select based on `git diff` against the base branch. Each test declares its file dependencies. Changes to global touchfiles trigger all tests. Use `EVALS_ALL=1` to force all tests.
+
+### Two-tier system
+
+| Tier | When it runs | Criteria |
+|------|-------------|----------|
+| `gate` | Every CI run | Safety guardrails, deterministic functional tests |
+| `periodic` | Weekly cron | Quality benchmarks, Opus model tests, external services |
+
+## Tier 3: LLM-as-judge (~$0.15/run)
+
+Claude Sonnet scores generated SKILL.md docs on three dimensions:
+
+- **Clarity** — Can an AI agent understand without ambiguity?
+- **Completeness** — Are all commands and flags documented?
+- **Actionability** — Can the agent execute tasks using only this doc?
+
+Each dimension scored 1-5. Threshold: every dimension must score ≥ 4.
+
+## E2E session runner
+
+Tests spawn `claude -p` as a completely independent subprocess:
+
+1. Write the prompt to a temp file
+2. Spawn `sh -c 'cat prompt | claude -p --output-format stream-json --verbose'`
+3. Stream NDJSON from stdout for real-time progress
+4. Race against a configurable timeout
+5. Parse the transcript into structured results
+
+## CI
+
+GitHub Action runs `bun run gen:skill-docs --dry-run` on every push and PR. If generated SKILL.md files differ from committed, CI fails.

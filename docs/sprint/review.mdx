@@ -1,0 +1,32 @@
+---
+title: "Review"
+description: "Find the bugs that pass CI but break in production"
+---
+
+The Review phase catches problems across four dimensions: code correctness, visual quality, multi-AI consensus, and security.
+
+## Skills
+
+| Skill | Role | What it does |
+|-------|------|--------------|
+| `/review` | Staff Engineer | Finds bugs that pass CI but blow up in production. Auto-fixes obvious ones. |
+| `/design-review` | Designer Who Codes | 80-item visual audit + fix loop. Atomic commits, before/after screenshots. |
+| `/codex` | Second Opinion | Independent review from OpenAI Codex CLI. Cross-model analysis. |
+| `/cso` | Chief Security Officer | OWASP Top 10 + STRIDE threat model. Zero-noise. |
+
+## Fix-first approach
+
+`/review` doesn't just list issues. Obvious mechanical fixes (dead code, N+1 queries, stale comments) are applied automatically. Genuinely ambiguous issues (security, race conditions, design decisions) get surfaced for your call.
+
+## Multi-AI review
+
+When both `/review` (Claude) and `/codex` (OpenAI) have reviewed the same branch, you get a cross-model comparison: which findings overlap (high confidence), which are unique to each. Different training, different blind spots — the overlap tells you what's definitely real.
+
+<CardGroup cols={2}>
+  <Card title="/review" icon="magnifying-glass" href="/skills/review">
+    Staff engineer code review
+  </Card>
+  <Card title="/cso" icon="shield" href="/skills/cso">
+    Security audit
+  </Card>
+</CardGroup>

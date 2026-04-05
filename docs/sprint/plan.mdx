@@ -1,0 +1,35 @@
+---
+title: "Plan"
+description: "Lock scope, architecture, and design before building"
+---
+
+The Plan phase has three lenses — product (CEO), engineering (Eng Manager), and design (Senior Designer). Each catches different problems.
+
+## Skills
+
+| Skill | Role | What it does |
+|-------|------|--------------|
+| `/plan-ceo-review` | CEO / Founder | Find the 10-star product. Four modes: Expansion, Selective Expansion, Hold Scope, Reduction. |
+| `/plan-eng-review` | Eng Manager | Architecture, data flow, diagrams, edge cases, tests. Forces hidden assumptions into the open. |
+| `/plan-design-review` | Senior Designer | Rates each design dimension 0-10, explains what a 10 looks like, then edits the plan to get there. |
+| `/autoplan` | Review Pipeline | Runs CEO &rarr; design &rarr; eng review automatically. Surfaces only taste decisions for your approval. |
+
+## Review Readiness Dashboard
+
+Every review logs its result. At the end of each review, you see a dashboard showing which reviews have passed and which are outstanding:
+
+```
++====================================================================+
+|                    REVIEW READINESS DASHBOARD                       |
++====================================================================+
+| Review          | Runs | Last Run            | Status    | Required |
+|-----------------|------|---------------------|-----------|----------|
+| Eng Review      |  1   | 2026-03-16 15:00    | CLEAR     | YES      |
+| CEO Review      |  1   | 2026-03-16 14:30    | CLEAR     | no       |
+| Design Review   |  0   | —                   | —         | no       |
++--------------------------------------------------------------------+
+| VERDICT: CLEARED — Eng Review passed                                |
++====================================================================+
+```
+
+Eng Review is the only required gate (disable with `jstack-config set skip_eng_review true`). CEO and Design are informational.

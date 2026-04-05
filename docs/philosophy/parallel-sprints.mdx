@@ -1,0 +1,32 @@
+---
+title: "Parallel Sprints"
+description: "Run 10-15 sprints simultaneously with Conductor"
+---
+
+jstack is powerful with one sprint. It is transformative with ten running at once.
+
+## How it works
+
+[Conductor](https://conductor.build) runs multiple Claude Code sessions in parallel — each in its own isolated workspace. One session running `/office-hours` on a new idea, another doing `/review` on a PR, a third implementing a feature, a fourth running `/qa` on staging. All at the same time.
+
+The sprint structure is what makes parallelism work. Without a process, ten agents is ten sources of chaos. With a process — think, plan, build, review, test, ship — each agent knows exactly what to do and when to stop. You manage them the way a CEO manages a team: check in on the decisions that matter, let the rest run.
+
+## Key features
+
+**Design at the heart.** `/design-consultation` researches what's out there, proposes creative risks, generates realistic mockups, and writes `DESIGN.md` — then `/design-review` and `/plan-eng-review` read what you chose.
+
+**`/qa` was a massive unlock.** Let me go from 6 to 12 parallel workers. Claude Code saying "I SEE THE ISSUE" and actually fixing it, generating a regression test, and verifying the fix.
+
+**Smart review routing.** CEO doesn't have to look at infra bug fixes, design review isn't needed for backend changes. jstack figures out what's appropriate.
+
+**Test everything.** `/ship` bootstraps test frameworks from scratch. Every `/ship` run produces a coverage audit. Every `/qa` bug fix generates a regression test.
+
+**`/document-release` is the engineer you never had.** Reads every doc file, cross-references the diff, and updates everything that drifted. `/ship` auto-invokes it.
+
+**Real browser mode.** `$B connect` launches your actual Chrome as a headed window. You watch Claude click, fill, and navigate in real time.
+
+**Multi-AI second opinion.** `/codex` gets an independent review from OpenAI's Codex CLI. Cross-model analysis when both have reviewed the same branch.
+
+**Safety guardrails on demand.** `/careful` warns before destructive commands. `/freeze` locks edits to one directory. `/guard` activates both.
+
+**Proactive skill suggestions.** jstack notices what stage you're in and suggests the right skill. Say "stop suggesting" and it remembers.

@@ -1,0 +1,44 @@
+---
+title: "Editing Skills"
+description: "How to edit SKILL.md templates"
+---
+
+SKILL.md files are **generated** from `.tmpl` templates. Don't edit the `.md` directly — your changes will be overwritten on the next build.
+
+## Workflow
+
+```bash
+# 1. Edit the template
+vim SKILL.md.tmpl
+
+# 2. Regenerate
+bun run gen:skill-docs
+
+# 3. Check health
+bun run skill:check
+
+# Or use watch mode — auto-regenerates on save
+bun run dev:skill
+```
+
+## Template authoring rules
+
+SKILL.md.tmpl files are prompt templates read by Claude, not bash scripts. Each bash code block runs in a separate shell — variables don't persist between blocks.
+
+- **Use natural language for logic and state**: Don't use shell variables between blocks. Tell Claude what to remember in prose.
+- **Don't hardcode branch names**: Detect dynamically. Use `{{BASE_BRANCH_DETECT}}` for PR-targeting skills.
+- **Keep bash blocks self-contained**: Each should work independently.
+- **Express conditionals as English**: "1. If X, do Y. 2. Otherwise, do Z."
+
+## Adding a new skill
+
+1. Create `{skill}/SKILL.md.tmpl`
+2. Run `bun run gen:skill-docs` (Claude output) and `bun run gen:skill-docs --host codex` (Codex output)
+3. Commit `{skill}/SKILL.md` — `.agents/` is generated at setup time and gitignored
+
+## Adding a browse command
+
+1. Add the handler in `read-commands.ts` (non-mutating) or `write-commands.ts` (mutating)
+2. Register the route in `server.ts`
+3. Add a test case in `browse/test/commands.test.ts`
+4. Run `bun test` then `bun run build`

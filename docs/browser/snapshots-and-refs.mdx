@@ -1,0 +1,58 @@
+---
+title: "Snapshots & Refs"
+description: "How ref-based element selection works"
+---
+
+Refs (`@e1`, `@e2`, `@c1`) are how the agent addresses page elements without writing CSS selectors or XPath.
+
+## How it works
+
+1. Agent runs `$B snapshot -i`
+2. Server calls Playwright's accessibility tree API
+3. Parser walks the ARIA tree, assigns sequential refs: `@e1`, `@e2`, `@e3`...
+4. For each ref, builds a Playwright Locator using `getByRole(role, { name }).nth(index)`
+5. Stores the ref-to-Locator map in memory
+6. Returns the annotated tree as plain text
+
+Later:
+7. Agent runs `$B click @e3`
+8. Server resolves `@e3` → Locator → `locator.click()`
+
+## Why Locators, not DOM mutation
+
+The obvious approach is to inject `data-ref` attributes into the DOM. This breaks on:
+
+- **CSP**: Many production sites block DOM modification
+- **Framework hydration**: React/Vue/Svelte reconciliation strips injected attributes
+- **Shadow DOM**: Can't reach inside shadow roots from outside
+
+Playwright Locators are external to the DOM. They use the accessibility tree and `getByRole()` queries. No DOM mutation, no CSP issues, no framework conflicts.
+
+## Ref lifecycle
+
+Refs are cleared on navigation (`framenavigated` event on main frame). After navigation, all locators are stale — the agent must run `snapshot` again. Stale refs fail loudly instead of clicking the wrong element.
+
+## Staleness detection
+
+SPAs can mutate the DOM without triggering navigation (React router, tab switches, modals). `resolveRef()` performs an async `count()` check before using any ref:
+
+```
+resolveRef(@e3) → entry = refMap.get("e3")
+                → count = await entry.locator.count()
+                → if count === 0: throw "Ref @e3 is stale"
+                → if count > 0: return { locator }
+```
+
+This fails fast (~5ms) instead of waiting for Playwright's 30-second timeout.
+
+## Cursor-interactive refs (`@c`)
+
+The `-C` flag finds elements that are clickable but not in the ARIA tree — `cursor: pointer` divs, elements with `onclick`, custom `tabindex`. These get `@c1`, `@c2` refs in a separate namespace. This catches custom components that frameworks render as `<div>` but are actually buttons.
+
+## Diff mode (`-D`)
+
+Stores each snapshot as a baseline. On the next `-D` call, returns a unified diff showing what changed. Use this to verify that an action actually worked.
+
+## Annotate mode (`-a`)
+
+Injects temporary overlay divs at each ref's bounding box, takes a screenshot with ref labels visible, then removes the overlays. Use `-o <path>` to control the output path.

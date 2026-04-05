@@ -1,0 +1,53 @@
+---
+title: "Contributing"
+description: "How to contribute to jstack"
+---
+
+Thanks for wanting to make jstack better. Whether you're fixing a typo in a skill prompt or building an entirely new workflow, this guide gets you up and running fast.
+
+## Quick start
+
+```bash
+git clone <repo> && cd jstack
+devenv shell              # enter dev shell (auto-installs deps, activates dev mode)
+```
+
+Now edit any `SKILL.md`, invoke it in Claude Code (e.g. `/review`), and see your changes live.
+
+```bash
+dev-teardown              # deactivate — back to global install
+```
+
+## Contributor mode
+
+Enable contributor mode and Claude Code will periodically reflect on its jstack experience — rating it 0-10, filing reports to `~/.jstack/contributor-logs/` when something isn't a 10.
+
+```bash
+~/.claude/skills/jstack/bin/jstack-config set jstack_contributor true
+```
+
+The logs are for you. When something bugs you enough to fix, the report is already written.
+
+## The contributor workflow
+
+1. Use jstack normally — contributor mode logs issues automatically
+2. Check your logs: `ls ~/.jstack/contributor-logs/`
+3. Fork and clone jstack
+4. Symlink your fork into the project where you hit the bug:
+   ```bash
+   ln -sfn /path/to/your/jstack-fork .claude/skills/jstack
+   cd .claude/skills/jstack && bun install && bun run build && ./setup
+   ```
+5. Fix the issue — changes are live immediately
+6. Test by actually using jstack
+7. Open a PR
+
+## Community PR triage
+
+When community PRs accumulate, they're batched into themed waves:
+
+1. **Categorize** — group by theme (security, features, infra, docs)
+2. **Deduplicate** — pick the one that changes fewer lines
+3. **Collector branch** — merge clean PRs, verify with `bun test && bun run build`
+4. **Close with context** — every closed PR gets a comment explaining why
+5. **Ship as one PR** — single PR to main with attributions preserved
