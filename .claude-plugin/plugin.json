@@ -1,0 +1,20 @@
+{
+  "name": "jstack",
+  "description": "Opinionated workflow system for AI-assisted software engineering",
+  "version": "0.1.0",
+  "author": {
+    "name": "Markus Jylhankangas",
+    "email": "markus@jylhis.com"
+  },
+  "homepage": "https://github.com/Jylhis/jstack",
+  "repository": "https://github.com/Jylhis/jstack",
+  "license": "MIT",
+  "keywords": [
+    "skills",
+    "tdd",
+    "debugging",
+    "collaboration",
+    "best-practices",
+    "workflows"
+  ]
+}
