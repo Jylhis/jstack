@@ -1,0 +1,201 @@
+---
+name: constitution
+description: |
+  Define or customize project-level engineering principles, governance rules,
+  and quality standards. Built-in principles from lib/constitution-builtin.md
+  always apply; this skill layers project-specific customizations on top.
+  Three sub-roles: extend (add rules), override (change defaults), full (write
+  from scratch). Use when starting a new project, onboarding to an existing one,
+  or when engineering standards need to be formalized.
+allowed-tools:
+  - Bash
+  - Read
+  - Write
+  - Edit
+  - Grep
+  - Glob
+  - Agent
+  - AskUserQuestion
+  - WebSearch
+---
+
+> **Preamble:** Read and apply `lib/preamble.md` before proceeding.
+
+# Constitution
+
+You are running the `/constitution` workflow. Your job is to help the user define
+project-level principles that guide all downstream skills. The built-in constitution
+(lib/constitution-builtin.md) always applies. This skill creates a project-level
+`constitution.md` that extends, overrides, or fully customizes those defaults.
+
+---
+
+## Artifact Contract
+
+```
+PRODUCES: constitution.md
+REQUIRES: nothing
+OPTIONAL:
+  - audit.md (for existing projects -- grounds principles in real architecture)
+CONSUMED BY: /specify, /plan, /implement, /review, /qa -- all downstream skills
+```
+
+**Key principle:** The built-in constitution is always active. A project constitution
+EXTENDS it by default. It can OVERRIDE specific built-in rules with explicit justification.
+It never silently replaces the built-in.
+
+---
+
+## Sub-Roles
+
+### Auto-Detection Logic
+
+```
+IF constitution.md already exists AND user wants to add rules
+  -> :extend
+ELSE IF constitution.md already exists AND user wants to change defaults
+  -> :override
+ELSE IF no constitution.md exists
+  -> :extend (start with built-in, add project-specific rules)
+```
+
+The user can always override: `/constitution:full` to write everything from scratch.
+
+### :extend (default)
+
+Behavior: Read the built-in principles. Ask the user what project-specific rules
+to add on top. Produce a `constitution.md` that only contains the additions.
+The built-in rules remain implied.
+
+### :override
+
+Behavior: Read the built-in principles. Identify which specific rules the user
+wants to change. Require explicit justification for each override. Produce a
+`constitution.md` with an `## Overrides` section that names the built-in rule
+and states the replacement.
+
+### :full
+
+Behavior: Write a complete constitution from scratch. Still reference the built-in
+as a starting point, but the output is self-contained. Use when the project has
+unusual constraints that make the built-in a poor fit.
+
+---
+
+## Steps
+
+### Step 1: Load Context
+
+1. Read `lib/constitution-builtin.md`. This is always the starting point.
+2. Read existing `constitution.md` if it exists. Note what is already customized.
+3. Read `audit.md` if it exists. Extract:
+   - Tech stack and architecture patterns in use.
+   - Existing test coverage and quality signals.
+   - CI/CD pipeline characteristics.
+   - Any red flags that the constitution should address.
+4. Read `CLAUDE.md` if it exists for project-specific context.
+
+### Step 2: Detect Sub-Role
+
+Apply the auto-detection logic. Announce:
+"Running as :extend / :override / :full based on [signal]. Override with `/constitution:<role>`."
+
+### Step 3: Discover Project Norms
+
+Use AskUserQuestion to understand the project's engineering culture. Ask ONE question
+at a time from this list (skip questions already answered by audit.md or CLAUDE.md):
+
+1. "What language(s) and frameworks does this project use?"
+2. "What's your testing philosophy? (TDD strict, test-after, only integration, etc.)"
+3. "Any strong opinions on code style, naming, or architecture patterns?"
+4. "What are the non-negotiable quality bars? (e.g., no direct DB queries in handlers, all errors must be typed)"
+5. "Anything the built-in principles get wrong for your project?"
+
+Skip questions whose answers are already clear from context.
+
+### Step 4: Draft Principles
+
+**For :extend:**
+Draft 5-15 project-specific principles organized by category. Each principle:
+- Is one clear sentence.
+- Is testable (you can look at code and determine compliance).
+- Does not duplicate built-in principles.
+
+**For :override:**
+For each override:
+- Name the built-in rule being overridden.
+- State the replacement rule.
+- State the justification (why the built-in is wrong for this project).
+
+**For :full:**
+Write a complete set of principles covering:
+- Engineering standards
+- Quality bars
+- Process rules
+- Communication norms
+- Architecture constraints (if known from audit.md)
+
+### Step 5: Review with User
+
+Present the draft principles via AskUserQuestion:
+"Here are the proposed project principles. For each one: keep, modify, or remove?"
+
+Iterate until the user approves.
+
+### Step 6: Write Artifact
+
+Write `constitution.md` with the following structure.
+
+---
+
+## Output Format
+
+```markdown
+# Project Constitution
+
+Generated by /constitution:{sub-role} on {date}
+Status: ACTIVE
+
+> Built-in principles from lib/constitution-builtin.md are always active.
+> This document extends (and optionally overrides) those defaults.
+
+## Project Context
+{Language, framework, architecture style -- one paragraph}
+
+## Principles
+
+### Engineering
+- {principle 1}
+- {principle 2}
+
+### Quality
+- {principle 1}
+- {principle 2}
+
+### Process
+- {principle 1}
+- {principle 2}
+
+### Architecture
+- {principle 1 -- if applicable}
+
+## Overrides (:override and :full only)
+
+| Built-in Rule | Override | Justification |
+|---------------|----------|---------------|
+| ...           | ...      | ...           |
+
+## Governance
+{Who can modify this constitution. How disagreements are resolved.}
+```
+
+---
+
+## Important Rules
+
+- **Built-in principles are always active.** Never produce a constitution that silently drops built-in rules. Overrides must be explicit.
+- **Principles must be testable.** "Write good code" is not a principle. "All public functions have doc comments" is.
+- **Fewer is better.** 5 sharp principles beat 30 vague ones. Every principle adds cognitive load.
+- **Justify overrides.** Changing a built-in default requires stating why. This prevents cargo-culting.
+- **One question at a time.** Never batch multiple questions into one AskUserQuestion.
+- **This is a living document.** Include governance rules for how the constitution evolves.
