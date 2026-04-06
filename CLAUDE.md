@@ -33,4 +33,4 @@ skills/           # Each subdirectory has one SKILL.md
 - Don't hardcode branch names, detect dynamically
 - Keep bash blocks self-contained
 - Express conditionals as English, not nested if/elif/else
-- Direct, concrete, no AI vocabulary, no em dashes
+- Direct, concrete, no AI vocabulary 
