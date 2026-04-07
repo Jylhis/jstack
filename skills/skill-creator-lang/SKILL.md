@@ -43,6 +43,13 @@ This is a meta skill. It does not write application code. It produces other skil
      package manager)
    - Known footguns and anti-patterns
    - Security advisories and unsafe APIs
+   - **LSP servers** for the language. If none exist, say so. If one clearly
+     dominates, pick it. If several are viable, list them with a short reason for
+     each, recommend one, and ask the user to choose.
+   - **MCP servers** relevant to the language or stack (official SDKs, ecosystem
+     tools, package registries, docs servers). Same rule: none → say so;
+     one obvious → pick it; several → list with reasoning, recommend one, ask
+     the user to choose.
 
    Do not synthesize from training knowledge alone. Verify against current sources.
 
@@ -70,6 +77,10 @@ This is a meta skill. It does not write application code. It produces other skil
      tools, with the command to start each
    - **Security pitfalls:** language-specific CVE patterns, unsafe APIs to avoid,
      sandboxing notes if relevant
+   - **LSP server:** the chosen language server, how to launch it, which editor
+     integrations are common. State explicitly if none exists.
+   - **MCP servers:** the chosen MCP server(s) for this ecosystem and what each
+     exposes. State explicitly if none exist.
 
 7. **Be opinionated.** For every choice, pick one recommendation and commit. Do not
    list alternatives. If the user asks why later, the research notes back the choice.
@@ -154,6 +165,14 @@ description: <one sentence: what this skill teaches Claude>
 ## Security
 
 <unsafe APIs, common CVE patterns>
+
+## LSP server
+
+<chosen language server, launch command, editor integration notes — or "none available">
+
+## MCP servers
+
+<chosen MCP server(s) and what they expose — or "none available">
 
 ## References
 
