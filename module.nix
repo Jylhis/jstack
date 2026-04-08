@@ -5,6 +5,15 @@ let
   runtimePkg = import (/. + cfg.repoPath + "/runtime");
   mkLink = path:
     config.lib.file.mkOutOfStoreSymlink (cfg.repoPath + "/" + path);
+
+  pluginsDir = /. + cfg.repoPath + "/plugins";
+  pluginBundles = lib.pipe (builtins.readDir pluginsDir) [
+    (lib.filterAttrs (_: type: type == "directory"))
+    (lib.filterAttrs (name: _:
+      builtins.pathExists (pluginsDir + "/${name}/.claude-plugin/plugin.json")
+    ))
+    (lib.mapAttrsToList (name: _: pluginsDir + "/${name}"))
+  ];
 in
 {
   options.programs.jstack = {
@@ -18,9 +27,14 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+    # Delegate settings and memory to upstream programs.claude-code
+    programs.claude-code.settings = import ((/. + cfg.repoPath) + "/settings.nix");
+    programs.claude-code.memory.source = mkLink "CLAUDE.md";
+    programs.claude-code.plugins = pluginBundles;
+
+    # Live-editable directory symlinks (not using upstream Dir options
+    # which copy to the Nix store and lose live editing)
     home.file = {
-      ".claude/settings.json".source = mkLink "settings.json";
-      ".claude/CLAUDE.md".source = mkLink "CLAUDE.md";
       ".claude/skills".source = mkLink "skills";
       ".claude/agents".source = mkLink "agents";
       ".claude/commands".source = mkLink "commands";

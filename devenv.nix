@@ -11,6 +11,7 @@
     coreutils
     gnused
     shellcheck
+    just
   ];
 
   enterShell = ''
@@ -76,55 +77,55 @@
   '';
 
   # https://devenv.sh/tests/
-  # Seven smoke tests validating the dev environment.
+  # Eight smoke tests validating the dev environment.
   # Run with: `devenv test`
   enterTest = ''
     set -euo pipefail
     fail() { echo "FAIL: $*" >&2; exit 1; }
     pass() { echo "PASS: $*"; }
 
-    echo "==> devenv test suite (7 tests)"
+    echo "==> devenv test suite (8 tests)"
 
     # 1. Required CLI tools resolve on PATH.
-    echo "-- test 1/7: required tools on PATH"
-    for bin in jq yq rg fd shellcheck markdownlint-cli2 treefmt git node npins; do
+    echo "-- test 1/8: required tools on PATH"
+    for bin in jq yq rg fd shellcheck markdownlint-cli2 treefmt git node npins just; do
       command -v "$bin" >/dev/null || fail "missing $bin"
     done
     pass "required tools available"
 
     # 2. settings.json is valid JSON.
-    echo "-- test 2/7: settings.json parses as JSON"
+    echo "-- test 2/8: settings.json parses as JSON"
     jq empty settings.json || fail "settings.json invalid"
     pass "settings.json valid"
 
     # 3. Project nix files exist and are non-empty.
-    echo "-- test 3/7: project nix files present"
+    echo "-- test 3/8: project nix files present"
     for f in devenv.nix default.nix runtime/default.nix npins/default.nix; do
       [ -s "$f" ] || fail "missing or empty $f"
     done
     pass "nix files present"
 
     # 4. Project bash scripts pass `bash -n` syntax check.
-    echo "-- test 4/7: bash -n on scripts"
+    echo "-- test 4/8: bash -n on scripts"
     for f in scripts/install.bash scripts/eval.bash; do
       bash -n "$f" || fail "syntax error in $f"
     done
     pass "scripts parse"
 
     # 5. shellcheck on bundled scripts (errors only, not style/info).
-    echo "-- test 5/7: shellcheck --severity=error"
+    echo "-- test 5/8: shellcheck --severity=error"
     shellcheck --severity=error scripts/install.bash scripts/eval.bash \
       || fail "shellcheck reported errors"
     pass "shellcheck clean"
 
     # 6. treefmt is wired up and can resolve its generated config.
-    echo "-- test 6/7: treefmt loads config"
+    echo "-- test 6/8: treefmt loads config"
     treefmt --version >/dev/null || fail "treefmt not runnable"
     pass "treefmt available"
 
     # 7. Any plugin manifests that exist are valid JSON.
     # Zero plugins is allowed (e.g. base configuration / fresh setup).
-    echo "-- test 7/7: plugin .claude-plugin/plugin.json files valid"
+    echo "-- test 7/8: plugin .claude-plugin/plugin.json files valid"
     found=0
     for f in plugins/*/.claude-plugin/plugin.json; do
       [ -e "$f" ] || continue
@@ -133,6 +134,13 @@
     done
     pass "$found plugin manifests valid"
 
-    echo "==> all 7 tests passed"
+    # 8. settings.json matches settings.nix (canonical source).
+    echo "-- test 8/8: settings.json in sync with settings.nix"
+    expected=$(nix eval --impure --json --expr 'import ./settings.nix' | jq -S .)
+    actual=$(jq -S . settings.json)
+    [ "$expected" = "$actual" ] || fail "settings.json out of sync with settings.nix — run: just generate-settings"
+    pass "settings.json in sync"
+
+    echo "==> all 8 tests passed"
   '';
 }
