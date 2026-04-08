@@ -1,0 +1,44 @@
+- description: "flakes skill triggers on flake.nix question"
+  vars:
+    prompt: "How do I structure a flake.nix with devShells?"
+  metadata:
+    tags: ["@routing", "@nix-dev"]
+  assert:
+    - type: contains-any
+      value: ["flake", "devShell", "outputs"]
+
+- description: "nix-language skill triggers on let-in syntax"
+  vars:
+    prompt: "Explain Nix let-in bindings and rec"
+  metadata:
+    tags: ["@routing", "@nix-dev"]
+  assert:
+    - type: contains-any
+      value: ["let", "rec", "binding"]
+
+- description: "home-manager skill triggers on home.nix question"
+  vars:
+    prompt: "How do I configure home-manager programs modules?"
+  metadata:
+    tags: ["@routing", "@nix-dev"]
+  assert:
+    - type: contains-any
+      value: ["home-manager", "programs", "home.nix"]
+
+- description: "devenv skill triggers on devenv.nix question"
+  vars:
+    prompt: "How do I set up languages and processes in devenv.nix?"
+  metadata:
+    tags: ["@routing", "@nix-dev"]
+  assert:
+    - type: contains-any
+      value: ["devenv", "languages", "processes"]
+
+- description: "nixpkgs skill triggers on overlay question"
+  vars:
+    prompt: "How do I write a nixpkgs overlay with overrideAttrs?"
+  metadata:
+    tags: ["@routing", "@nix-dev"]
+  assert:
+    - type: contains-any
+      value: ["overlay", "overrideAttrs", "nixpkgs"]

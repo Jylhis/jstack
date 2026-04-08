@@ -1,0 +1,19 @@
+{ pkgs }:
+{
+  name = "rust-dev";
+  version = "1.0.0";
+  description = "Rust development intelligence: 29 skills covering ownership, lifetimes, error handling, concurrency, domain patterns, and LSP tooling plus rust-analyzer integration";
+  author.name = "Markus Jylhänkangas";
+
+  packages = [ ];
+
+  lspServers = {
+    rust = {
+      command = "rust-analyzer";
+      args = [ ];
+      extensionToLanguage = {
+        ".rs" = "rust";
+      };
+    };
+  };
+}

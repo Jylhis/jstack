@@ -14,11 +14,8 @@ defaultTest:
       id: anthropic:messages:claude-sonnet-4-6
 
 tests:
-  - description: placeholder routing test
-    vars:
-      prompt: "say hello"
-    metadata:
-      tags: ["@routing"]
-    assert:
-      - type: contains-any
-        value: ["hello", "Hello", "hi", "Hi"]
+  # Per-plugin routing tests
+  - file://cases/nix-dev-routing.yaml
+  - file://cases/rust-dev-routing.yaml
+  - file://cases/golang-dev-routing.yaml
+  - file://cases/discovery-tests.yaml

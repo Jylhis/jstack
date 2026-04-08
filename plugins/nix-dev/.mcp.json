@@ -1,9 +1,13 @@
 {
   "mcpServers": {
     "mcp-nixos": {
-      "type": "stdio",
+      "args": [
+        "run",
+        "github:utensils/mcp-nixos",
+        "--"
+      ],
       "command": "nix",
-      "args": ["run", "github:utensils/mcp-nixos", "--"]
+      "type": "stdio"
     }
   }
 }

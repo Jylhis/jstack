@@ -1,0 +1,35 @@
+- description: "ownership skill triggers on borrow checker error"
+  vars:
+    prompt: "I'm getting E0382 value moved after use, how do I fix this?"
+  metadata:
+    tags: ["@routing", "@rust-dev"]
+  assert:
+    - type: contains-any
+      value: ["ownership", "move", "borrow", "clone"]
+
+- description: "error-handling skill triggers on Result question"
+  vars:
+    prompt: "When should I use anyhow vs thiserror for error handling in Rust?"
+  metadata:
+    tags: ["@routing", "@rust-dev"]
+  assert:
+    - type: contains-any
+      value: ["anyhow", "thiserror", "Result", "error"]
+
+- description: "concurrency skill triggers on async question"
+  vars:
+    prompt: "How do I use tokio for async concurrency with channels?"
+  metadata:
+    tags: ["@routing", "@rust-dev"]
+  assert:
+    - type: contains-any
+      value: ["tokio", "async", "channel", "spawn"]
+
+- description: "performance skill triggers on optimization question"
+  vars:
+    prompt: "How do I profile and optimize Rust code with criterion benchmarks?"
+  metadata:
+    tags: ["@routing", "@rust-dev"]
+  assert:
+    - type: contains-any
+      value: ["criterion", "benchmark", "profil", "flamegraph"]

@@ -1,0 +1,35 @@
+- description: "concurrency skill triggers on goroutine question"
+  vars:
+    prompt: "How do I use goroutines with channels and select in Go?"
+  metadata:
+    tags: ["@routing", "@golang-dev"]
+  assert:
+    - type: contains-any
+      value: ["goroutine", "channel", "select", "go func"]
+
+- description: "error-handling skill triggers on error wrapping"
+  vars:
+    prompt: "How should I wrap and handle errors idiomatically in Go?"
+  metadata:
+    tags: ["@routing", "@golang-dev"]
+  assert:
+    - type: contains-any
+      value: ["errors.Is", "errors.As", "fmt.Errorf", "%w"]
+
+- description: "testing skill triggers on table-driven test"
+  vars:
+    prompt: "Show me how to write table-driven tests with testify in Go"
+  metadata:
+    tags: ["@routing", "@golang-dev"]
+  assert:
+    - type: contains-any
+      value: ["table", "test", "testify", "assert"]
+
+- description: "naming skill triggers on naming convention"
+  vars:
+    prompt: "What are Go naming conventions for packages and interfaces?"
+  metadata:
+    tags: ["@routing", "@golang-dev"]
+  assert:
+    - type: contains-any
+      value: ["naming", "convention", "package", "interface"]

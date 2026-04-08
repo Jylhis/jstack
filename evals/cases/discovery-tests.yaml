@@ -1,0 +1,17 @@
+- description: "can reference nix-dev skills by name"
+  vars:
+    prompt: "What Nix skills are available for flakes and home-manager?"
+  metadata:
+    tags: ["@routing", "@discovery"]
+  assert:
+    - type: contains-any
+      value: ["flake", "home-manager", "nix"]
+
+- description: "can reference golang skills by name"
+  vars:
+    prompt: "What Go skills help with testing and concurrency?"
+  metadata:
+    tags: ["@routing", "@discovery"]
+  assert:
+    - type: contains-any
+      value: ["test", "concurrency", "goroutine"]

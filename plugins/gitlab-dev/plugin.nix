@@ -1,0 +1,8 @@
+{ pkgs }:
+{
+  name = "gitlab-dev";
+  description = "GitLab workflow automation: glab CLI operations, CI/CD pipeline configuration, merge requests, issues, components, and deployment patterns";
+  author.name = "Markus Jylhänkangas";
+
+  packages = [ ];
+}

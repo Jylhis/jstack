@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# install.sh — link the jstack repo into ~/.claude/, build runtime,
+# install.bash — link the jstack repo into agent config dirs, build runtime,
 # update shell rc. Idempotent. Re-run safely.
 #
 # Flags:
@@ -8,9 +8,11 @@
 #   --seed-from-live  Seed repo/CLAUDE.md from ~/.claude/CLAUDE.md if both
 #                     conditions hold: repo CLAUDE.md is empty AND live one
 #                     is a still-resolvable nix-store symlink. Default off.
+#   --target <agent>  Deploy to: claude (default), codex, gemini, or all
 #
 # Environment overrides:
 #   CLAUDE_HOME       Override ~/.claude (useful for testing)
+#   CODEX_HOME        Override ~/.codex
 #   XDG_STATE_HOME    Override ~/.local/state
 
 set -euo pipefail
@@ -20,6 +22,8 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 CLAUDE_DIR="${CLAUDE_HOME:-$HOME/.claude}"
+CODEX_DIR="${CODEX_HOME:-$HOME/.codex}"
+GEMINI_DIR="$HOME/.gemini"
 STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/jstack"
 TS="$(date -u +%Y%m%dT%H%M%SZ)"
 BACKUP_ROOT="$CLAUDE_DIR/.jstack-backups/$TS"
@@ -27,6 +31,7 @@ BACKUP_ROOT="$CLAUDE_DIR/.jstack-backups/$TS"
 DRY_RUN=0
 VERBOSE=0
 SEED_FROM_LIVE=0
+TARGET="claude"
 
 # ------------------------------------------------------------------ flags --
 
@@ -35,8 +40,13 @@ while [[ $# -gt 0 ]]; do
     --dry-run)        DRY_RUN=1 ;;
     --verbose|-v)     VERBOSE=1 ;;
     --seed-from-live) SEED_FROM_LIVE=1 ;;
+    --target)
+      shift
+      [[ $# -gt 0 ]] || { echo "--target needs a value (claude, codex, gemini, all)" >&2; exit 2; }
+      TARGET="$1"
+      ;;
     -h|--help)
-      sed -n '2,16p' "$0" | sed 's/^# \{0,1\}//'
+      sed -n '2,18p' "$0" | sed 's/^# \{0,1\}//'
       exit 0
       ;;
     *) echo "unknown flag: $1" >&2; exit 2 ;;
@@ -100,13 +110,13 @@ preflight() {
   [[ $EUID -ne 0 ]] || die "do not run as root"
   [[ -f "$REPO_ROOT/settings.json" && -d "$REPO_ROOT/skills" ]] \
     || die "REPO_ROOT does not look like the jstack repo: $REPO_ROOT"
-  for tool in git ln readlink awk nix-build; do
+  for tool in git ln readlink awk jq nix; do
     command -v "$tool" >/dev/null 2>&1 || die "missing required tool: $tool"
   done
   if [[ $DRY_RUN -eq 0 ]]; then
     mkdir -p "$CLAUDE_DIR" "$STATE_DIR"
   fi
-  log_action ok preflight "REPO_ROOT=$REPO_ROOT CLAUDE_DIR=$CLAUDE_DIR"
+  log_action ok preflight "REPO_ROOT=$REPO_ROOT TARGET=$TARGET"
 }
 
 # link_one_file SRC DST
@@ -144,13 +154,6 @@ link_one_file() {
   log_action LINK "$dst" "-> $src"
 }
 
-link_files() {
-  phase "link files"
-  for name in settings.json CLAUDE.md; do
-    link_one_file "$REPO_ROOT/$name" "$CLAUDE_DIR/$name"
-  done
-}
-
 # link_one_dir SRC DST
 link_one_dir() {
   local src="$1" dst="$2"
@@ -184,6 +187,62 @@ link_one_dir() {
 
   run ln -s "$src" "$dst"
   log_action LINK "$dst" "-> $src"
+}
+
+# ------------------------------------------------------------------ manifest generation --
+
+build_manifests() {
+  phase "generate manifests from plugin.nix"
+  for plugin_dir_raw in "$REPO_ROOT"/plugins/*/; do
+    local plugin_dir="${plugin_dir_raw%/}"
+    local name; name="$(basename "$plugin_dir")"
+    local plugin_nix="$plugin_dir/plugin.nix"
+    [ -f "$plugin_nix" ] || continue
+
+    # Generate .claude-plugin/plugin.json
+    local manifest_json
+    manifest_json=$(nix eval --impure --json --expr "
+      let pkgs = import $REPO_ROOT/npins {}; p = import $plugin_nix { inherit pkgs; };
+      in { inherit (p) name description; }
+        // (if p ? version then { inherit (p) version; } else {})
+        // { author = p.author or {}; }
+    ")
+    if [[ $DRY_RUN -eq 0 ]]; then
+      mkdir -p "$plugin_dir/.claude-plugin"
+      echo "$manifest_json" | jq -S . > "$plugin_dir/.claude-plugin/plugin.json"
+    fi
+
+    # Generate .mcp.json if mcpServers defined
+    local mcp_json
+    mcp_json=$(nix eval --impure --json --expr "
+      let pkgs = import $REPO_ROOT/npins {}; p = import $plugin_nix { inherit pkgs; };
+      in if p ? mcpServers && p.mcpServers != {} then { mcpServers = p.mcpServers; } else null
+    ")
+    if [[ "$mcp_json" != "null" && $DRY_RUN -eq 0 ]]; then
+      echo "$mcp_json" | jq -S . > "$plugin_dir/.mcp.json"
+    fi
+
+    # Generate .lsp.json if lspServers defined
+    local lsp_json
+    lsp_json=$(nix eval --impure --json --expr "
+      let pkgs = import $REPO_ROOT/npins {}; p = import $plugin_nix { inherit pkgs; };
+      in if p ? lspServers && p.lspServers != {} then p.lspServers else null
+    ")
+    if [[ "$lsp_json" != "null" && $DRY_RUN -eq 0 ]]; then
+      echo "$lsp_json" | jq -S . > "$plugin_dir/.lsp.json"
+    fi
+
+    log_action GEN "$plugin_dir" "manifests from plugin.nix"
+  done
+}
+
+# ------------------------------------------------------------------ claude target --
+
+link_files() {
+  phase "link files"
+  for name in settings.json CLAUDE.md; do
+    link_one_file "$REPO_ROOT/$name" "$CLAUDE_DIR/$name"
+  done
 }
 
 link_dirs() {
@@ -249,7 +308,7 @@ update_shell_rc() {
 
   local block
   block=$'# >>> jstack >>>\n'
-  block+=$'# Managed by scripts/install.sh — do not edit between markers.\n'
+  block+=$'# Managed by scripts/install.bash — do not edit between markers.\n'
   block+="export JSTACK_RUNTIME=\"\$HOME/.local/state/jstack/runtime\""$'\n'
   block+=$'case ":$PATH:" in *":$JSTACK_RUNTIME/bin:"*) ;; *) PATH="$JSTACK_RUNTIME/bin:$PATH" ;; esac\n'
   block+=$'# <<< jstack <<<'
@@ -276,7 +335,6 @@ update_shell_rc() {
   fi
 
   if grep -q '^# >>> jstack >>>$' "$rc" 2>/dev/null; then
-    # Already present — replace block atomically
     if [[ $DRY_RUN -eq 0 ]]; then
       awk -v block="$block" '
         /^# >>> jstack >>>$/ {skip=1; print block; next}
@@ -292,6 +350,78 @@ update_shell_rc() {
     log_action APPEND "$rc" "marker block"
   fi
 }
+
+deploy_claude() {
+  build_manifests
+  link_files
+  link_dirs
+  migrate_plugins
+  build_runtime
+  update_shell_rc
+}
+
+# ------------------------------------------------------------------ codex target --
+
+deploy_codex() {
+  phase "deploy codex"
+  if [[ $DRY_RUN -eq 0 ]]; then
+    mkdir -p "$CODEX_DIR"
+  fi
+
+  # Link skills directory
+  link_one_dir "$REPO_ROOT/skills" "$CODEX_DIR/skills"
+
+  # Link plugin skill directories as flat skill entries
+  for plugin_dir in "$REPO_ROOT"/plugins/*/skills; do
+    [ -d "$plugin_dir" ] || continue
+    local plugin_name; plugin_name="$(basename "$(dirname "$plugin_dir")")"
+    for skill_dir in "$plugin_dir"/*/; do
+      [ -d "$skill_dir" ] || continue
+      local skill_name; skill_name="$(basename "$skill_dir")"
+      local dst="$CODEX_DIR/skills/$skill_name"
+      if [[ ! -e "$dst" ]]; then
+        run ln -s "$skill_dir" "$dst"
+        log_action LINK "$dst" "-> $skill_dir"
+      else
+        log_action skip "$dst" "already exists"
+      fi
+    done
+  done
+
+  log_action ok "codex" "deployed to $CODEX_DIR"
+}
+
+# ------------------------------------------------------------------ gemini target --
+
+deploy_gemini() {
+  phase "deploy gemini"
+  if [[ $DRY_RUN -eq 0 ]]; then
+    mkdir -p "$GEMINI_DIR"
+  fi
+
+  # Link skills directory
+  link_one_dir "$REPO_ROOT/skills" "$GEMINI_DIR/skills"
+
+  # Link plugin skill directories as flat skill entries
+  for plugin_dir in "$REPO_ROOT"/plugins/*/skills; do
+    [ -d "$plugin_dir" ] || continue
+    for skill_dir in "$plugin_dir"/*/; do
+      [ -d "$skill_dir" ] || continue
+      local skill_name; skill_name="$(basename "$skill_dir")"
+      local dst="$GEMINI_DIR/skills/$skill_name"
+      if [[ ! -e "$dst" ]]; then
+        run ln -s "$skill_dir" "$dst"
+        log_action LINK "$dst" "-> $skill_dir"
+      else
+        log_action skip "$dst" "already exists"
+      fi
+    done
+  done
+
+  log_action ok "gemini" "deployed to $GEMINI_DIR"
+}
+
+# ------------------------------------------------------------------ seed + cleanup --
 
 seed_claude_md() {
   [[ $SEED_FROM_LIVE -eq 1 ]] || return 0
@@ -333,6 +463,7 @@ cleanup_empty_backup() {
 
 summary() {
   phase "summary"
+  printf '  target:  %s\n' "$TARGET"
   printf '  taken:   %d\n' "$ACTIONS_TAKEN"
   printf '  skipped: %d\n' "$ACTIONS_SKIPPED"
   if [[ $BACKUP_USED -eq 1 && -d "$BACKUP_ROOT" ]]; then
@@ -347,7 +478,7 @@ summary() {
   1. If any "NIX-STORE symlink" warnings appeared above:
        - Disable programs.jstack.enable in your home-manager config
        - Run: home-manager switch
-       - Re-run scripts/install.sh
+       - Re-run scripts/install.bash
   2. exec zsh    (or open a new shell to pick up the PATH change)
 EOF
   if [[ ${#NEXT_STEPS[@]} -gt 0 ]]; then
@@ -363,11 +494,21 @@ EOF
 main() {
   preflight
   seed_claude_md
-  link_files
-  link_dirs
-  migrate_plugins
-  build_runtime
-  update_shell_rc
+
+  case "$TARGET" in
+    claude) deploy_claude ;;
+    codex)  deploy_codex ;;
+    gemini) deploy_gemini ;;
+    all)
+      deploy_claude
+      deploy_codex
+      deploy_gemini
+      ;;
+    *)
+      die "unknown target: $TARGET (expected: claude, codex, gemini, all)"
+      ;;
+  esac
+
   cleanup_empty_backup
   summary
 }

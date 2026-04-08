@@ -31,6 +31,12 @@ while [[ $# -gt 0 ]]; do
       args+=(--filter-pattern "$1")
       filter_set=1
       ;;
+    --plugin)
+      shift
+      [[ $# -gt 0 ]] || { echo "--plugin needs a value" >&2; exit 2; }
+      args+=(--filter-pattern "@$1")
+      filter_set=1
+      ;;
     *)
       args+=("$1")
       ;;

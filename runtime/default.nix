@@ -1,17 +1,30 @@
 let
   sources = import ../npins;
   pkgs = import sources.nixpkgs { };
+
+  # Auto-aggregate packages from all plugin.nix definitions
+  pluginsDir = ../plugins;
+  entries = builtins.readDir pluginsDir;
+  pluginNames = builtins.filter (
+    n: entries.${n} == "directory" && builtins.pathExists (pluginsDir + "/${n}/plugin.nix")
+  ) (builtins.attrNames entries);
+
+  loadPackages =
+    name:
+    let
+      pluginDef = import (pluginsDir + "/${name}/plugin.nix") { inherit pkgs; };
+    in
+    pluginDef.packages or [ ];
+
+  pluginPackages = builtins.concatLists (map loadPackages pluginNames);
+
+  basePackages = with pkgs; [
+    # Always-included LSPs
+    pyright
+    typescript-language-server
+  ];
 in
 pkgs.buildEnv {
   name = "claude-runtime";
-  paths = with pkgs; [
-    # LSPs
-    pyright
-    nil
-    typescript-language-server
-
-    # MCP servers — populate as needs surface
-
-    # eval harness — promptfoo via npm in devenv shell for now
-  ];
+  paths = basePackages ++ pluginPackages;
 }

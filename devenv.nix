@@ -103,7 +103,7 @@ in
     fail() { echo "FAIL: $*" >&2; exit 1; }
     pass() { echo "PASS: $*"; }
 
-    echo "==> devenv test suite (8 tests)"
+    echo "==> devenv test suite (13 tests)"
 
     # 1. Required CLI tools resolve on PATH.
     echo "-- test 1/8: required tools on PATH"
@@ -160,6 +160,48 @@ in
     [ "$expected" = "$actual" ] || fail "settings.json out of sync with settings.nix — run: just generate-settings"
     pass "settings.json in sync"
 
-    echo "==> all 8 tests passed"
+    # 9. lib/discover.nix can discover skills from plugins/.
+    echo "-- test 9/13: lib/discover.nix discovers skills"
+    skill_count=$(nix eval --impure --json --expr '
+      let d = import ./lib/discover.nix;
+          c = d { path = ./plugins/nix-dev/skills; namespace = "nix-dev"; };
+      in builtins.length (builtins.attrNames c)
+    ')
+    [ "$skill_count" -gt 0 ] || fail "discover.nix found zero skills"
+    pass "discover.nix found $skill_count skills in nix-dev"
+
+    # 10. plugin.nix files exist for all plugin directories.
+    echo "-- test 10/13: plugin.nix files present"
+    plugin_count=0
+    for d in plugins/*/; do
+      d="''${d%/}"
+      name=$(basename "$d")
+      [ -f "$d/plugin.nix" ] || continue
+      plugin_count=$((plugin_count + 1))
+    done
+    pass "$plugin_count plugin.nix files present"
+
+    # 11. Generated manifests match plugin.nix data.
+    echo "-- test 11/13: manifest generation round-trip"
+    nix_name=$(nix eval --impure --json --expr '
+      let pkgs = import ./npins {}; p = import ./plugins/nix-dev/plugin.nix { inherit pkgs; };
+      in p.name
+    ')
+    [ "$nix_name" = '"nix-dev"' ] || fail "plugin.nix name mismatch: $nix_name"
+    pass "manifest generation consistent"
+
+    # 12. sources.nix parses without error.
+    echo "-- test 12/13: sources.nix parses"
+    nix eval --impure --json --expr 'import ./sources.nix' > /dev/null \
+      || fail "sources.nix failed to parse"
+    pass "sources.nix valid"
+
+    # 13. promptfoo config is valid YAML.
+    echo "-- test 13/13: promptfoo config valid"
+    [ -f evals/promptfooconfig.yaml ] || fail "missing evals/promptfooconfig.yaml"
+    yq '.' evals/promptfooconfig.yaml > /dev/null || fail "promptfooconfig.yaml invalid"
+    pass "promptfooconfig.yaml valid"
+
+    echo "==> all 13 tests passed"
   '';
 }
