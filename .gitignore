@@ -26,3 +26,9 @@ devenv.local.yaml
 
 # pre-commit
 .pre-commit-config.yaml
+
+# generated/local artifacts
+all-skills.txt
+all-skills-deduplicated.txt
+plugins/install-counts-cache.json
+settings.json.back
