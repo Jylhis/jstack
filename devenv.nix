@@ -15,7 +15,7 @@
   ];
 
   enterShell = ''
-    echo "claude-config dev shell"
+    echo "jstack dev shell"
     echo "skills: $(ls skills 2>/dev/null | wc -l)  agents: $(ls agents 2>/dev/null | wc -l)  commands: $(ls commands 2>/dev/null | wc -l)  plugins: $(ls plugins 2>/dev/null | wc -l)"
   '';
 

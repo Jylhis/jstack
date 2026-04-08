@@ -30,7 +30,7 @@ bash scripts/install.bash --verbose
 </CodeGroup>
 
 After applying, open a new shell so the updated `PATH` (which adds the
-nix-built runtime under `~/.local/state/claude-config/runtime/bin`) is
+nix-built runtime under `~/.local/state/jstack/runtime/bin`) is
 picked up:
 
 ```bash
@@ -49,7 +49,7 @@ actions.
 | `link files` | Symlink `settings.json` and `CLAUDE.md` into `~/.claude/` |
 | `link directories` | Symlink `skills/`, `agents/`, `commands/`, `hooks/` into `~/.claude/` |
 | `migrate plugins` | Symlink `plugins/` into `~/.claude/plugins`, backing up any existing tree |
-| `build runtime` | `nix-build runtime/default.nix` and link the result under `~/.local/state/claude-config/runtime` |
+| `build runtime` | `nix-build runtime/default.nix` and link the result under `~/.local/state/jstack/runtime` |
 | `shell rc` | Append a marker block to `~/.zshrc` (or `~/.bashrc`) that prepends the runtime to `PATH` |
 
 ## Backups
@@ -57,7 +57,7 @@ actions.
 Anything the installer would overwrite is moved aside first. Backups land at:
 
 ```
-~/.claude/.claude-config-backups/<timestamp>/
+~/.claude/.jstack-backups/<timestamp>/
 ```
 
 A `RESTORE.md` is dropped alongside the backup describing how to recover.
@@ -71,7 +71,7 @@ the symlink on the next `home-manager switch`. Disable the module first:
 
 <Steps>
   <Step title="Remove the home-manager module">
-    Delete `programs.claude-config.enable = true;` (or equivalent) from your
+    Delete `programs.jstack.enable = true;` (or equivalent) from your
     home-manager configuration.
   </Step>
   <Step title="Switch home-manager">

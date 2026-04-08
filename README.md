@@ -1,4 +1,4 @@
-# jstack — claude-config
+# jstack
 
 Personal Claude Code configuration: skills, agents, slash commands, hooks,
 settings, and plugin bundles. Installed into `~/.claude/` via a
@@ -51,7 +51,7 @@ exec zsh                                # pick up the PATH change
 
 The install is idempotent — re-running reports zero actions if nothing
 changed. A timestamped backup of any displaced files lands in
-`~/.claude/.claude-config-backups/<timestamp>/` along with a
+`~/.claude/.jstack-backups/<timestamp>/` along with a
 `RESTORE.md`.
 
 ### First-run prerequisites
@@ -62,7 +62,7 @@ symlink into the nix store (managed by an existing home-manager module),
 the link on the next `home-manager switch`. Disable the module
 out-of-band first:
 
-1. Remove `programs.claude-config.enable = true;` (or equivalent) from
+1. Remove `programs.jstack.enable = true;` (or equivalent) from
    your home-manager configuration
 2. Run `home-manager switch`
 3. Then run `bash scripts/install.bash`

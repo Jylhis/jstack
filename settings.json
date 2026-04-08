@@ -1,6 +1,5 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
-  "alwaysThinkingEnabled": true,
   "env": {
     "CLAUDE_CODE_EFFORT_LEVEL": "high"
   },
@@ -15,9 +14,12 @@
       "mcp__fetch__fetch"
     ]
   },
-  "spinnerTipsEnabled": false,
   "statusLine": {
-    "command": "wt list statusline --format=claude-code",
-    "type": "command"
-  }
+    "type": "command",
+    "command": "wt list statusline --format=claude-code"
+  },
+  "spinnerTipsEnabled": false,
+  "alwaysThinkingEnabled": true,
+  "effortLevel": "high",
+  "model": "opus[1m]"
 }

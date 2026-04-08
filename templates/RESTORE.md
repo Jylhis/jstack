@@ -1,7 +1,7 @@
 # Restore from this backup
 
 This directory was created by `scripts/install.bash` when it migrated your
-existing `~/.claude/` content into the claude-config repo.
+existing `~/.claude/` content into the jstack repo.
 
 ## Roll back the plugins migration
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# install.sh — link the claude-config repo into ~/.claude/, build runtime,
+# install.sh — link the jstack repo into ~/.claude/, build runtime,
 # update shell rc. Idempotent. Re-run safely.
 #
 # Flags:
@@ -20,9 +20,9 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 CLAUDE_DIR="${CLAUDE_HOME:-$HOME/.claude}"
-STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/claude-config"
+STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/jstack"
 TS="$(date -u +%Y%m%dT%H%M%SZ)"
-BACKUP_ROOT="$CLAUDE_DIR/.claude-config-backups/$TS"
+BACKUP_ROOT="$CLAUDE_DIR/.jstack-backups/$TS"
 
 DRY_RUN=0
 VERBOSE=0
@@ -99,7 +99,7 @@ preflight() {
   phase "preflight"
   [[ $EUID -ne 0 ]] || die "do not run as root"
   [[ -f "$REPO_ROOT/settings.json" && -d "$REPO_ROOT/skills" ]] \
-    || die "REPO_ROOT does not look like the claude-config repo: $REPO_ROOT"
+    || die "REPO_ROOT does not look like the jstack repo: $REPO_ROOT"
   for tool in git ln readlink awk nix-build; do
     command -v "$tool" >/dev/null 2>&1 || die "missing required tool: $tool"
   done
@@ -248,11 +248,11 @@ update_shell_rc() {
   esac
 
   local block
-  block=$'# >>> claude-config >>>\n'
+  block=$'# >>> jstack >>>\n'
   block+=$'# Managed by scripts/install.sh — do not edit between markers.\n'
-  block+="export CLAUDE_CONFIG_RUNTIME=\"\$HOME/.local/state/claude-config/runtime\""$'\n'
-  block+=$'case ":$PATH:" in *":$CLAUDE_CONFIG_RUNTIME/bin:"*) ;; *) PATH="$CLAUDE_CONFIG_RUNTIME/bin:$PATH" ;; esac\n'
-  block+=$'# <<< claude-config <<<'
+  block+="export JSTACK_RUNTIME=\"\$HOME/.local/state/jstack/runtime\""$'\n'
+  block+=$'case ":$PATH:" in *":$JSTACK_RUNTIME/bin:"*) ;; *) PATH="$JSTACK_RUNTIME/bin:$PATH" ;; esac\n'
+  block+=$'# <<< jstack <<<'
 
   if [[ ! -e "$rc" ]]; then
     if [[ $DRY_RUN -eq 0 ]]; then
@@ -262,18 +262,25 @@ update_shell_rc() {
     return 0
   fi
 
-  if [[ ! -w "$rc" ]]; then
-    warn "$rc not writable — skipping shell rc update"
-    log_action skip "$rc" "not writable"
+  if [[ -L "$rc" && "$(readlink "$rc")" == /nix/store/* ]] || [[ ! -w "$rc" ]]; then
+    warn "$rc is managed by Nix — skipping shell rc update"
+    printf '\n  Use the home-manager module instead:\n\n'
+    printf '    imports = [ %s/module.nix ];\n' "$REPO_ROOT"
+    printf '    programs.jstack = {\n'
+    printf '      enable = true;\n'
+    printf '      repoPath = "%s";\n' "$REPO_ROOT"
+    printf '    };\n\n'
+    log_action skip "$rc" "managed by Nix"
+    NEXT_STEPS+=("Add the jstack home-manager module to your configuration (see above)")
     return 0
   fi
 
-  if grep -q '^# >>> claude-config >>>$' "$rc" 2>/dev/null; then
+  if grep -q '^# >>> jstack >>>$' "$rc" 2>/dev/null; then
     # Already present — replace block atomically
     if [[ $DRY_RUN -eq 0 ]]; then
       awk -v block="$block" '
-        /^# >>> claude-config >>>$/ {skip=1; print block; next}
-        /^# <<< claude-config <<<$/ {skip=0; next}
+        /^# >>> jstack >>>$/ {skip=1; print block; next}
+        /^# <<< jstack <<<$/ {skip=0; next}
         !skip {print}
       ' "$rc" > "$rc.tmp" && mv "$rc.tmp" "$rc"
     fi
@@ -338,7 +345,7 @@ summary() {
   printf '\n%s\n' "$(cyan 'NEXT STEPS:')"
   cat <<'EOF'
   1. If any "NIX-STORE symlink" warnings appeared above:
-       - Disable programs.claude-config.enable in your home-manager config
+       - Disable programs.jstack.enable in your home-manager config
        - Run: home-manager switch
        - Re-run scripts/install.sh
   2. exec zsh    (or open a new shell to pick up the PATH change)

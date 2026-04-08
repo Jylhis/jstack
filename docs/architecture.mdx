@@ -38,12 +38,12 @@ file or directory, it:
 4. Symlinks `skills/`, `agents/`, `commands/`, `hooks/`, and `plugins/`
    into `~/.claude/`.
 5. Builds the runtime via `nix-build runtime/default.nix` and links the
-   result under `~/.local/state/claude-config/runtime`.
-6. Updates the shell `rc` so `~/.local/state/claude-config/runtime/bin` is
+   result under `~/.local/state/jstack/runtime`.
+6. Updates the shell `rc` so `~/.local/state/jstack/runtime/bin` is
    on `PATH`.
 
 Anything the installer would displace is moved into a timestamped backup
-under `~/.claude/.claude-config-backups/<timestamp>/`. A `RESTORE.md` is
+under `~/.claude/.jstack-backups/<timestamp>/`. A `RESTORE.md` is
 dropped alongside.
 
 The installer is **idempotent**: re-running on a clean tree reports zero

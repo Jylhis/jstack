@@ -1,4 +1,4 @@
-description: claude-config skill and routing evals
+description: jstack skill and routing evals
 
 prompts:
   - "{{prompt}}"
