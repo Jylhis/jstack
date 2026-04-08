@@ -1,5 +1,4 @@
-{ pkgs, ... }:
-{
+{ pkgs, ... }: {
   packages = with pkgs; [
     markdownlint-cli2
     jq
@@ -12,12 +11,6 @@
     coreutils
     gnused
     shellcheck
-    # https://devenv.sh/integrations/treefmt/
-    # treefmt + the formatters it drives, configured via ./treefmt.toml.
-    treefmt
-    nixfmt-rfc-style
-    shfmt
-    nodePackages.prettier
   ];
 
   enterShell = ''
@@ -27,6 +20,42 @@
 
   # https://devenv.sh/integrations/claude-code/
   claude.code.enable = true;
+
+  # https://devenv.sh/integrations/treefmt/
+  treefmt = {
+    enable = true;
+    config = {
+      projectRootFile = "devenv.nix";
+      programs = {
+        nixfmt.enable = true;
+        shfmt.enable = true;
+        prettier = {
+          enable = true;
+          package = pkgs.nodePackages.prettier;
+        };
+      };
+      # Only format files authored by this project. Plugin bundles,
+      # scripts/, docs/, etc. are vendored/upstream-owned and left alone.
+      settings.global.excludes = [
+        "plugins/**"
+        "docs/**"
+        "scripts/**"
+        "runtime/**"
+        "npins/**"
+        "evals/**"
+        "hooks/**"
+        "agents/**"
+        "commands/**"
+        "skills/**"
+        "*.md"
+        "devenv.lock"
+        "settings.json"
+        ".claude/**"
+        ".mcp.json"
+        ".github/**"
+      ];
+    };
+  };
 
   scripts.lint.exec = ''
     treefmt --fail-on-change
@@ -88,10 +117,9 @@
       || fail "shellcheck reported errors"
     pass "shellcheck clean"
 
-    # 6. treefmt is wired up and can read its config.
+    # 6. treefmt is wired up and can resolve its generated config.
     echo "-- test 6/7: treefmt loads config"
     treefmt --version >/dev/null || fail "treefmt not runnable"
-    [ -f treefmt.toml ] || fail "treefmt.toml missing"
     pass "treefmt available"
 
     # 7. Any plugin manifests that exist are valid JSON.
