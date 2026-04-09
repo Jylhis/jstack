@@ -1,4 +1,7 @@
 # yaml-language-server: $schema=https://devenv.sh/devenv.schema.json
+imports:
+  - ./modules/claude-skills.nix
+
 inputs:
   nixpkgs:
     url: github:cachix/devenv-nixpkgs/rolling
@@ -8,6 +11,10 @@ inputs:
       nixpkgs:
         follows: nixpkgs
 
+secretspec:
+  enable: true
+  provider: env #onepassword  # keyring, dotenv, env, 1password, lastpass
+  profile: development   # profile from secretspec.toml
 # https://devenv.sh/binary-caching/
 cachix:
   pull:

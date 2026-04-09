@@ -13,4 +13,8 @@
 #      };
 #   3. Skills are auto-discovered and available for selection.
 {
+  promptfoo = {
+    namespace = "promptfoo";
+    skillsRoot = ".claude/skills";
+  };
 }

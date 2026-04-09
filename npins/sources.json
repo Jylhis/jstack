@@ -5,6 +5,22 @@
       "name": "nixpkgs-unstable",
       "url": "https://releases.nixos.org/nixpkgs/nixpkgs-26.05pre976537.a3db02183b5d/nixexprs.tar.xz",
       "hash": "sha256-rFByy+vYdvd2IZ7GYibTcc4fuJKj5+g/YkJxqxvt2+o="
+    },
+    "promptfoo": {
+      "type": "GitRelease",
+      "repository": {
+        "type": "GitHub",
+        "owner": "promptfoo",
+        "repo": "promptfoo"
+      },
+      "pre_releases": false,
+      "version_upper_bound": null,
+      "release_prefix": null,
+      "submodules": false,
+      "version": "0.121.3",
+      "revision": "4197b03c384adad2e26a369b5ee7aeb2013a71bc",
+      "url": "https://api.github.com/repos/promptfoo/promptfoo/tarball/refs/tags/0.121.3",
+      "hash": "sha256-3ki3pDl8At6oX9x2X+z9S9zXINPu/aZfrUuonIiDRec="
     }
   },
   "version": 7

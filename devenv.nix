@@ -2,12 +2,15 @@
 let
   settings = import ./settings.nix;
   runtimePkg = import ./runtime;
+  pinnedSources = import ./npins;
 in
 {
   packages = with pkgs; [
     markdownlint-cli2
+    secretspec
     jq
     yq-go
+    promptfoo
     npins
     git
     fd
@@ -18,22 +21,59 @@ in
     just
     runtimePkg
   ];
-
-  env.JSTACK_RUNTIME = "${runtimePkg}";
-
+  env = {
+    JSTACK_RUNTIME = "${runtimePkg}";
+    ANTHROPIC_API_KEY = config.secretspec.secrets.ANTHROPIC_API_KEY or "";
+    OPENAI_API_KEY = config.secretspec.secrets.OPENAI_API_KEY or "";
+    PROMPTFOO_DISABLE_TELEMETRY = 1;
+    PROMPTFOO_DISABLE_UPDATE = 1;
+  };
   enterShell = ''
     echo "jstack dev shell"
     echo "skills: $(ls skills 2>/dev/null | wc -l)  agents: $(ls agents 2>/dev/null | wc -l)  commands: $(ls commands 2>/dev/null | wc -l)  plugins: $(ls plugins 2>/dev/null | wc -l)"
 
     # Symlink content dirs into .claude/ so Claude picks them up for this project.
     # Uses real paths (not nix store copies) to preserve live editing.
-    for dir in plugins skills agents commands hooks; do
+    for dir in plugins agents commands hooks; do
       ln -sfn "$DEVENV_ROOT/$dir" "$DEVENV_ROOT/.claude/$dir"
+    done
+
+    # Skills dir is a real directory so local and third-party skills coexist.
+    mkdir -p "$DEVENV_ROOT/.claude/skills"
+    for skill in "$DEVENV_ROOT/skills"/*/; do
+      [ -d "$skill" ] && ln -sfn "$skill" "$DEVENV_ROOT/.claude/skills/$(basename "$skill")"
     done
   '';
 
   # https://devenv.sh/integrations/claude-code/
   claude.code.enable = true;
+  claude.code.skills = {
+    promptfoo = {
+      source = pinnedSources.promptfoo;
+      skillsRoot = ".claude/skills";
+      namespace = "promptfoo";
+    };
+  };
+  claude.code.mcpServers = {
+    devenv = {
+      type = "stdio";
+      command = "devenv";
+      args = [ "mcp" ];
+      env = {
+        DEVENV_ROOT = config.devenv.root;
+      };
+    };
+    promptfoo = {
+      type = "stdio";
+      command = "promptfoo";
+      args = [
+        "mcp"
+        "--transport"
+        "stdio"
+      ];
+
+    };
+  };
 
   # Merge settings.nix into the devenv-generated .claude/settings.json.
   # Must use the same key as the claude module (absolute path) so the
@@ -193,8 +233,8 @@ in
 
     # 13. promptfoo config is valid YAML.
     echo "-- test 13/14: promptfoo config valid"
-    [ -f evals/promptfooconfig.yaml ] || fail "missing evals/promptfooconfig.yaml"
-    yq '.' evals/promptfooconfig.yaml > /dev/null || fail "promptfooconfig.yaml invalid"
+    [ -f promptfooconfig.yaml ] || fail "missing promptfooconfig.yaml"
+    yq '.' promptfooconfig.yaml > /dev/null || fail "promptfooconfig.yaml invalid"
     pass "promptfooconfig.yaml valid"
 
     # 14. module.nix evaluates cleanly under HM, NixOS, and nix-darwin
