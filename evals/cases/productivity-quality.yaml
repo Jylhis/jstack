@@ -1,0 +1,18 @@
+- description: "session-log skill produces correct log format"
+  vars:
+    prompt: "Log a session spanning 2026-04-08 and 2026-04-09. Topics: analysis of competitor pricing strategies, decision to pivot positioning from 'cheaper' to 'faster', creation of a 1-page positioning framework, draft email to the sales team. Include CHUNK markers for the framework and email. Show how to append if there were pre-existing bullets on 2026-04-09."
+  metadata:
+    tags: ["@quality", "@productivity"]
+  assert:
+    - type: llm-rubric
+      threshold: 0.67
+      value: |
+        The response must:
+        1. Use ## YYYY-MM-DD format for date headers (not ### or other levels)
+        2. Topics are bullet points (- Topic), NOT subheadings (### Topic)
+        3. Nested bullets for details, each one sentence max
+        4. Include CHUNK: markers for the positioning framework and email draft
+        5. Separate entries correctly between 2026-04-08 and 2026-04-09
+        6. Show appending to existing 2026-04-09 bullets without replacing them
+        7. No explanatory intro or meta-commentary like 'In this session we discussed...'
+        8. Dates in reverse chronological order (newest first) preferred; if chronological, the ordering must be consistent

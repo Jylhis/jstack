@@ -1,0 +1,36 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+description: "jstack routing comparison: Claude vs GPT-4o"
+
+prompts:
+  - "{{prompt}}"
+
+providers:
+  - id: anthropic:messages:claude-sonnet-4-6
+    label: claude-sonnet
+    config:
+      max_tokens: 2048
+  - id: openai:chat:gpt-4o
+    label: gpt-4o
+    config:
+      max_tokens: 2048
+
+defaultTest:
+  options:
+    provider:
+      id: openai:chat:gpt-4o
+
+evaluateOptions:
+  maxConcurrency: 2
+  delay: 1000
+
+tests:
+  # routing + discovery only (cheap, deterministic assertions)
+  - file://evals/cases/claude-ecosystem-routing.yaml
+  - file://evals/cases/gitlab-dev-routing.yaml
+  - file://evals/cases/golang-dev-routing.yaml
+  - file://evals/cases/nix-dev-routing.yaml
+  - file://evals/cases/obsidian-routing.yaml
+  - file://evals/cases/productivity-routing.yaml
+  - file://evals/cases/rust-dev-routing.yaml
+  - file://evals/cases/skill-creator-routing.yaml
+  - file://evals/cases/discovery-tests.yaml

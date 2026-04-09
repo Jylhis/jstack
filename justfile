@@ -72,6 +72,22 @@ eval *args:
 eval-fast *args:
     bash scripts/eval.bash --fast {{args}}
 
+# Run quality evals only (llm-rubric assertions)
+eval-quality *args:
+    bash scripts/eval.bash --quality {{args}}
+
+# Run evals for a specific skill (matches test description)
+eval-skill skill *args:
+    bash scripts/eval.bash --skill {{skill}} {{args}}
+
 # Run evals for a specific plugin
 eval-plugin plugin *args:
     bash scripts/eval.bash --plugin {{plugin}} {{args}}
+
+# Compare routing results across Claude and GPT-4o
+eval-compare *args:
+    bash scripts/eval.bash --compare {{args}}
+
+# Run adversarial/redteam tests
+eval-redteam *args:
+    bash scripts/eval.bash --redteam {{args}}

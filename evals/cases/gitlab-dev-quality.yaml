@@ -1,0 +1,34 @@
+- description: "glab skill produces correct MR workflow commands"
+  vars:
+    prompt: "Write a bash script that: creates a GitLab issue 'Bug: Login timeout' with description from a file, assigns to alice with labels 'bug' and 'priority::P1' and milestone 'Sprint 5', creates a related MR 'Fix: Session keepalive', checks pipeline status, and if passing requests bob as reviewer."
+  metadata:
+    tags: ["@quality", "@gitlab-dev"]
+  assert:
+    - type: llm-rubric
+      threshold: 0.67
+      value: |
+        The response must:
+        1. Use Quick Actions (glab issue note with /assign, /label, /milestone) to batch metadata changes, not separate update commands
+        2. MR creation must include --push flag (otherwise branch not on remote)
+        3. MR creation should use --related-issue to link the MR to the issue
+        4. Use scoped label syntax for priority (priority::P1)
+        5. Check CI status with glab ci status or glab pipeline view
+        6. Use --reviewer flag for MR review request (not --assignee)
+
+- description: "gitlab-cicd skill produces correct pipeline with no common traps"
+  vars:
+    prompt: "Write a .gitlab-ci.yml for a monorepo with Rust backend and Node.js frontend. Lint both (clippy + eslint), build backend artifact that frontend tests should NOT auto-download, prevent duplicate branch+MR pipelines, cache by lockfile, deploy to production only on main with manual confirmation."
+  metadata:
+    tags: ["@quality", "@gitlab-dev"]
+  assert:
+    - type: llm-rubric
+      threshold: 0.67
+      value: |
+        The response must:
+        1. Include workflow:rules to prevent duplicate pipelines (branch AND MR running simultaneously)
+        2. Use dependencies: [] on frontend test to skip backend artifact download
+        3. Use !reference or extends: to reuse configuration across jobs (not copy-paste)
+        4. Cache key based on lockfiles (key: files: [Cargo.lock] or similar)
+        5. Deploy job has when: manual for production
+        6. NOT mix rules: with only:/except: in the same job
+        7. Rules lists should handle the default case explicitly (e.g., when: never fallthrough or clear exclusion logic)
