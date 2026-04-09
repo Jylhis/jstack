@@ -1,0 +1,44 @@
+- description: "obsidian-markdown triggers on wikilinks question"
+  vars:
+    prompt: "How do I use wikilinks and callouts in Obsidian notes?"
+  metadata:
+    tags: ["@routing", "@obsidian"]
+  assert:
+    - type: contains-any
+      value: ["wikilink", "callout", "Obsidian", "embed"]
+
+- description: "json-canvas triggers on canvas file creation"
+  vars:
+    prompt: "Create a .canvas flowchart with connected nodes in Obsidian"
+  metadata:
+    tags: ["@routing", "@obsidian"]
+  assert:
+    - type: contains-any
+      value: ["canvas", "node", "edge", "flowchart"]
+
+- description: "obsidian-bases triggers on base file question"
+  vars:
+    prompt: "How do I create an Obsidian Base with filters and formulas?"
+  metadata:
+    tags: ["@routing", "@obsidian"]
+  assert:
+    - type: contains-any
+      value: ["base", "filter", "formula", "view"]
+
+- description: "obsidian-cli triggers on vault operations"
+  vars:
+    prompt: "Search my Obsidian vault for notes tagged with project using the CLI"
+  metadata:
+    tags: ["@routing", "@obsidian"]
+  assert:
+    - type: contains-any
+      value: ["vault", "CLI", "search", "Obsidian"]
+
+- description: "defuddle triggers on web page extraction"
+  vars:
+    prompt: "Extract clean markdown from this web page URL using defuddle"
+  metadata:
+    tags: ["@routing", "@obsidian"]
+  assert:
+    - type: contains-any
+      value: ["defuddle", "extract", "markdown", "web page"]

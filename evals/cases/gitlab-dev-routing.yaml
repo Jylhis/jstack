@@ -1,0 +1,35 @@
+- description: "gitlab-cicd triggers on pipeline configuration"
+  vars:
+    prompt: "How do I set up a .gitlab-ci.yml with Docker builds and caching?"
+  metadata:
+    tags: ["@routing", "@gitlab-dev"]
+  assert:
+    - type: contains-any
+      value: ["gitlab-ci", "pipeline", "Docker", "cache"]
+
+- description: "gitlab-cicd triggers on pipeline debugging"
+  vars:
+    prompt: "My GitLab CI pipeline is failing with duplicate jobs, how do I fix it?"
+  metadata:
+    tags: ["@routing", "@gitlab-dev"]
+  assert:
+    - type: contains-any
+      value: ["pipeline", "CI", "job", "duplicate"]
+
+- description: "glab triggers on merge request workflow"
+  vars:
+    prompt: "How do I create a merge request and add reviewers using glab CLI?"
+  metadata:
+    tags: ["@routing", "@gitlab-dev"]
+  assert:
+    - type: contains-any
+      value: ["merge request", "MR", "glab", "reviewer"]
+
+- description: "glab triggers on GitLab issue management"
+  vars:
+    prompt: "List all open GitLab issues with the bug label using glab"
+  metadata:
+    tags: ["@routing", "@gitlab-dev"]
+  assert:
+    - type: contains-any
+      value: ["issue", "glab", "label", "GitLab"]

@@ -1,0 +1,26 @@
+- description: "skill-creator triggers on create a skill request"
+  vars:
+    prompt: "Create a new skill for reviewing pull requests"
+  metadata:
+    tags: ["@routing", "@skill-creator"]
+  assert:
+    - type: contains-any
+      value: ["skill", "SKILL.md", "create"]
+
+- description: "skill-creator triggers on skill eval request"
+  vars:
+    prompt: "Run evals on my skill and benchmark the triggering"
+  metadata:
+    tags: ["@routing", "@skill-creator"]
+  assert:
+    - type: contains-any
+      value: ["eval", "benchmark", "trigger", "skill"]
+
+- description: "skill-creator triggers on turn this into a skill"
+  vars:
+    prompt: "Turn this workflow into a reusable skill"
+  metadata:
+    tags: ["@routing", "@skill-creator"]
+  assert:
+    - type: contains-any
+      value: ["skill", "workflow", "reusable"]

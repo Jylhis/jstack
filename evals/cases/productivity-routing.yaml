@@ -1,0 +1,17 @@
+- description: "session-log skill triggers on log this"
+  vars:
+    prompt: "Log this session to the agent log"
+  metadata:
+    tags: ["@routing", "@productivity"]
+  assert:
+    - type: contains-any
+      value: ["log", "session", "summary", "agent-log"]
+
+- description: "session-log skill triggers on summarize session"
+  vars:
+    prompt: "Summarize this session and append it to the weekly log"
+  metadata:
+    tags: ["@routing", "@productivity"]
+  assert:
+    - type: contains-any
+      value: ["summary", "summarize", "session", "weekly"]

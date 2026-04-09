@@ -1,0 +1,35 @@
+- description: "claude-api skill triggers on Anthropic SDK import"
+  vars:
+    prompt: "How do I use the Anthropic Python SDK to stream a response from Claude?"
+  metadata:
+    tags: ["@routing", "@claude-ecosystem"]
+  assert:
+    - type: contains-any
+      value: ["anthropic", "stream", "SDK", "messages"]
+
+- description: "claude-api skill triggers on Claude API tool use"
+  vars:
+    prompt: "Show me how to implement tool use with the Claude API"
+  metadata:
+    tags: ["@routing", "@claude-ecosystem"]
+  assert:
+    - type: contains-any
+      value: ["tool", "function", "claude", "API"]
+
+- description: "mcp-builder skill triggers on MCP server question"
+  vars:
+    prompt: "How do I build an MCP server with FastMCP in Python?"
+  metadata:
+    tags: ["@routing", "@claude-ecosystem"]
+  assert:
+    - type: contains-any
+      value: ["MCP", "FastMCP", "server", "tool"]
+
+- description: "mcp-builder skill triggers on Model Context Protocol"
+  vars:
+    prompt: "I want to create a Model Context Protocol integration for my REST API"
+  metadata:
+    tags: ["@routing", "@claude-ecosystem"]
+  assert:
+    - type: contains-any
+      value: ["MCP", "Model Context Protocol", "server", "integration"]
