@@ -1,5 +1,62 @@
-default:
-    @just --list --justfile {{justfile()}}
+default: check
+
+# Run all checks (lint + typecheck + eval)
+check:
+    nix-instantiate --eval default.nix > /dev/null
+    nix flake check --no-build
+    devenv test
+    statix check . --ignore 'npins/*' '.devenv/*' 'result/*'
+    deadnix --fail --exclude npins .devenv result .
+
+# Format all nix files
+fmt:
+    nixfmt .
+
+# Build the default package
+build:
+    nix-build -A packages.default
+
+# Update all pins in sync: npins -> devenv.lock -> flake.lock
+update:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    npins update
+    REV=$(jq -r '.pins.nixpkgs.revision' npins/sources.json)
+    echo "Syncing all locks to nixpkgs $REV"
+    sed -i '' "s|url: github:NixOS/nixpkgs/.*|url: github:NixOS/nixpkgs/$REV|" devenv.yaml
+    devenv update
+    nix flake lock --override-input nixpkgs "github:NixOS/nixpkgs/$REV"
+    echo "Done. All locks pinned to $REV"
+
+# Verify all build methods produce identical store paths and revs are in sync
+verify:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    echo "Checking nixpkgs rev sync..."
+    NPINS_REV=$(jq -r '.pins.nixpkgs.revision' npins/sources.json)
+    FLAKE_REV=$(jq -r '.nodes.nixpkgs.locked.rev' flake.lock)
+    DEVENV_REV=$(jq -r '.nodes.nixpkgs.locked.rev' devenv.lock)
+    if [ "$NPINS_REV" != "$FLAKE_REV" ] || [ "$NPINS_REV" != "$DEVENV_REV" ]; then
+        echo "FAIL: nixpkgs revs diverged"
+        echo "  npins:  $NPINS_REV"
+        echo "  flake:  $FLAKE_REV"
+        echo "  devenv: $DEVENV_REV"
+        exit 1
+    fi
+    echo "OK: all locks pinned to $NPINS_REV"
+
+    echo "Checking build hash parity..."
+    HASH_NIX_BUILD=$(nix-build -A packages.default --no-out-link)
+    HASH_NIX=$(nix build --impure .#packages.$(nix eval --impure --expr builtins.currentSystem --raw).default --no-link --print-out-paths)
+    HASH_DEVENV=$(devenv build packages.default | jq -r '."packages.default"')
+    if [ "$HASH_NIX_BUILD" != "$HASH_NIX" ] || [ "$HASH_NIX_BUILD" != "$HASH_DEVENV" ]; then
+        echo "FAIL: store paths differ"
+        echo "  nix-build: $HASH_NIX_BUILD"
+        echo "  nix build: $HASH_NIX"
+        echo "  devenv:    $HASH_DEVENV"
+        exit 1
+    fi
+    echo "OK: all three produce $HASH_NIX_BUILD"
 
 # Regenerate settings.json from settings.nix
 generate-settings:
@@ -47,14 +104,6 @@ list-skills:
 add-source owner repo:
     npins add github {{owner}} {{repo}}
     @echo "Pin added. Edit sources.nix to configure namespace and discovery."
-
-# Format all project files via treefmt
-fmt:
-    treefmt
-
-# Check formatting, lint, and run devenv test suite
-check:
-    devenv test
 
 lint:
     devenv shell -- lint

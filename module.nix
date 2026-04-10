@@ -39,7 +39,7 @@ let
       "/home/${effectiveUser}";
 
   # ── Build artifacts (shared across all contexts) ────────────────────
-  runtimePkg = import (/. + cfg.repoPath + "/runtime");
+  runtimePkg = import (/. + cfg.repoPath + "/runtime") { };
 
   pluginsDir = /. + cfg.repoPath + "/plugins";
   pluginBundles = lib.pipe (builtins.readDir pluginsDir) [

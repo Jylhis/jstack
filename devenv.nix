@@ -1,7 +1,7 @@
 { pkgs, config, ... }:
 let
   settings = import ./settings.nix;
-  runtimePkg = import ./runtime;
+  runtimePkg = import ./runtime { };
   pinnedSources = import ./npins;
 in
 {
@@ -19,6 +19,9 @@ in
     gnused
     shellcheck
     just
+    statix
+    deadnix
+    nixfmt-rfc-style
     runtimePkg
   ];
   env = {
@@ -138,48 +141,48 @@ in
     fail() { echo "FAIL: $*" >&2; exit 1; }
     pass() { echo "PASS: $*"; }
 
-    echo "==> devenv test suite (14 tests)"
+    echo "==> devenv test suite (15 tests)"
 
     # 1. Required CLI tools resolve on PATH.
-    echo "-- test 1/14: required tools on PATH"
+    echo "-- test 1/15: required tools on PATH"
     for bin in jq yq rg fd shellcheck markdownlint-cli2 treefmt git npins just; do
       command -v "$bin" >/dev/null || fail "missing $bin"
     done
     pass "required tools available"
 
     # 2. settings.json is valid JSON.
-    echo "-- test 2/14: settings.json parses as JSON"
+    echo "-- test 2/15: settings.json parses as JSON"
     jq empty settings.json || fail "settings.json invalid"
     pass "settings.json valid"
 
     # 3. Project nix files exist and are non-empty.
-    echo "-- test 3/14: project nix files present"
-    for f in devenv.nix default.nix runtime/default.nix npins/default.nix; do
+    echo "-- test 3/15: project nix files present"
+    for f in devenv.nix default.nix runtime/default.nix npins/default.nix overlay.nix; do
       [ -s "$f" ] || fail "missing or empty $f"
     done
     pass "nix files present"
 
     # 4. Project bash scripts pass `bash -n` syntax check.
-    echo "-- test 4/14: bash -n on scripts"
+    echo "-- test 4/15: bash -n on scripts"
     for f in scripts/install.bash scripts/eval.bash; do
       bash -n "$f" || fail "syntax error in $f"
     done
     pass "scripts parse"
 
     # 5. shellcheck on bundled scripts (errors only, not style/info).
-    echo "-- test 5/14: shellcheck --severity=error"
+    echo "-- test 5/15: shellcheck --severity=error"
     shellcheck --severity=error scripts/install.bash scripts/eval.bash \
       || fail "shellcheck reported errors"
     pass "shellcheck clean"
 
     # 6. treefmt is wired up and can resolve its generated config.
-    echo "-- test 6/14: treefmt loads config"
+    echo "-- test 6/15: treefmt loads config"
     treefmt --version >/dev/null || fail "treefmt not runnable"
     pass "treefmt available"
 
     # 7. Any plugin manifests that exist are valid JSON.
     # Zero plugins is allowed (e.g. base configuration / fresh setup).
-    echo "-- test 7/14: plugin .claude-plugin/plugin.json files valid"
+    echo "-- test 7/15: plugin .claude-plugin/plugin.json files valid"
     found=0
     for f in plugins/*/.claude-plugin/plugin.json; do
       [ -e "$f" ] || continue
@@ -189,14 +192,14 @@ in
     pass "$found plugin manifests valid"
 
     # 8. settings.json matches settings.nix (canonical source).
-    echo "-- test 8/14: settings.json in sync with settings.nix"
+    echo "-- test 8/15: settings.json in sync with settings.nix"
     expected=$(nix eval --impure --json --expr 'import ./settings.nix' | jq -S .)
     actual=$(jq -S . settings.json)
     [ "$expected" = "$actual" ] || fail "settings.json out of sync with settings.nix — run: just generate-settings"
     pass "settings.json in sync"
 
     # 9. lib/discover.nix can discover skills from plugins/.
-    echo "-- test 9/14: lib/discover.nix discovers skills"
+    echo "-- test 9/15: lib/discover.nix discovers skills"
     skill_count=$(nix eval --impure --json --expr '
       let d = import ./lib/discover.nix;
           c = d { path = ./plugins/nix-dev/skills; namespace = "nix-dev"; };
@@ -206,7 +209,7 @@ in
     pass "discover.nix found $skill_count skills in nix-dev"
 
     # 10. plugin.nix files exist for all plugin directories.
-    echo "-- test 10/14: plugin.nix files present"
+    echo "-- test 10/15: plugin.nix files present"
     plugin_count=0
     for d in plugins/*/; do
       d="''${d%/}"
@@ -217,7 +220,7 @@ in
     pass "$plugin_count plugin.nix files present"
 
     # 11. Generated manifests match plugin.nix data.
-    echo "-- test 11/14: manifest generation round-trip"
+    echo "-- test 11/15: manifest generation round-trip"
     nix_name=$(nix eval --impure --json --expr '
       let pkgs = import ./npins {}; p = import ./plugins/nix-dev/plugin.nix { inherit pkgs; };
       in p.name
@@ -226,13 +229,13 @@ in
     pass "manifest generation consistent"
 
     # 12. sources.nix parses without error.
-    echo "-- test 12/14: sources.nix parses"
+    echo "-- test 12/15: sources.nix parses"
     nix eval --impure --json --expr 'import ./sources.nix' > /dev/null \
       || fail "sources.nix failed to parse"
     pass "sources.nix valid"
 
     # 13. promptfoo config is valid YAML.
-    echo "-- test 13/14: promptfoo config valid"
+    echo "-- test 13/15: promptfoo config valid"
     [ -f promptfooconfig.yaml ] || fail "missing promptfooconfig.yaml"
     yq '.' promptfooconfig.yaml > /dev/null || fail "promptfooconfig.yaml invalid"
     pass "promptfooconfig.yaml valid"
@@ -241,13 +244,22 @@ in
     # stub contexts (and the negative-user assertion fires). The
     # driver throws on the first failed sub-check and prints "OK"
     # only when all 22 checks pass.
-    echo "-- test 14/14: module.nix valid for HM / NixOS / nix-darwin"
+    echo "-- test 14/15: module.nix valid for HM / NixOS / nix-darwin"
     module_eval_out=$(nix eval --impure --raw --file tests/module-eval.nix 2>&1) \
       || fail "tests/module-eval.nix failed:\n$module_eval_out"
     [ "$(printf '%s\n' "$module_eval_out" | tail -n1)" = "OK" ] \
       || fail "tests/module-eval.nix did not return OK:\n$module_eval_out"
     pass "module.nix valid across all targets"
 
-    echo "==> all 14 tests passed"
+    # 15. nixpkgs revision parity across npins, devenv.lock, and flake.lock
+    echo "-- test 15/15: nixpkgs revision parity"
+    npins_rev=$(jq -r '.pins.nixpkgs.revision' npins/sources.json)
+    devenv_rev=$(jq -r '.nodes.nixpkgs.locked.rev' devenv.lock)
+    flake_rev=$(jq -r '.nodes.nixpkgs.locked.rev' flake.lock)
+    [ "$npins_rev" = "$devenv_rev" ] || fail "nixpkgs rev mismatch: npins=$npins_rev devenv=$devenv_rev"
+    [ "$npins_rev" = "$flake_rev" ] || fail "nixpkgs rev mismatch: npins=$npins_rev flake=$flake_rev"
+    pass "nixpkgs revision $npins_rev matches across npins, devenv, and flake"
+
+    echo "==> all 15 tests passed"
   '';
 }

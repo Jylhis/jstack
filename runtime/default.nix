@@ -1,8 +1,7 @@
+{
+  pkgs ? import (import ../npins).nixpkgs { },
+}:
 let
-  sources = import ../npins;
-  pkgs = import sources.nixpkgs { };
-
-  # Auto-aggregate packages from all plugin.nix definitions
   pluginsDir = ../plugins;
   entries = builtins.readDir pluginsDir;
   pluginNames = builtins.filter (
@@ -19,7 +18,6 @@ let
   pluginPackages = builtins.concatLists (map loadPackages pluginNames);
 
   basePackages = with pkgs; [
-    # Always-included LSPs
     pyright
     typescript-language-server
   ];

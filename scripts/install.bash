@@ -285,7 +285,7 @@ migrate_plugins() {
 build_runtime() {
   phase "build runtime"
   local nix_out
-  if nix_out="$(nix-build "$REPO_ROOT/runtime/default.nix" --no-out-link 2>&1)"; then
+  if nix_out="$(nix-build -E "import $REPO_ROOT/runtime {}" --no-out-link 2>&1)"; then
     nix_out="$(printf '%s\n' "$nix_out" | tail -n1)"
     run ln -snf "$nix_out" "$STATE_DIR/runtime"
     log_action BUILD runtime "$nix_out"
