@@ -13,7 +13,7 @@ inputs:
 
 secretspec:
   enable: true
-  provider: env #onepassword  # keyring, dotenv, env, 1password, lastpass
+  provider: onepassword  #onepassword  # keyring, dotenv, env, 1password, lastpass
   profile: development   # profile from secretspec.toml
 # https://devenv.sh/binary-caching/
 cachix:
