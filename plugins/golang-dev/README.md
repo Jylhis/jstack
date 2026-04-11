@@ -2,11 +2,14 @@
 
 Go development intelligence for jstack: 36 skills covering idiomatic Go,
 concurrency, testing, performance, security, observability, and the
-`samber/*` library family.
+`samber/*` library family. Ships gopls as the LSP and wires gopls' built-in
+MCP server for Claude Code.
 
 ## Contents
 
 - `.claude-plugin/plugin.json` — plugin manifest
+- `.mcp.json` — `gopls` built-in MCP server (generated from `plugin.nix`)
+- `.lsp.json` — `gopls` LSP
 - `skills/` — 36 skill directories, many with `references/`, `evals/`, and `assets/` subdirs
 
 This plugin is part of [jstack](../../) and is installed into
@@ -32,12 +35,16 @@ There is no separate install step.
 See [`docs/plugins/golang-dev.mdx`](../../docs/plugins/golang-dev.mdx)
 for the per-skill description table.
 
-## LSP integration
+## LSP and MCP integration
 
-This plugin's documentation references `gopls` via
-`nix run nixpkgs#gopls`, but no `.mcp.json` exists and `gopls` is not
-currently in `runtime/default.nix`. To make `gopls` available to Claude
-Code, add it to the runtime.
+`gopls` is declared in `plugin.nix` and added to the runtime PATH via the
+plugin's `packages` list, so install picks it up automatically. The
+LSP is registered via `lspServers.go`, and the built-in MCP server
+(`gopls mcp`, available since gopls v0.20) is registered via `mcpServers.gopls`.
+
+The MCP server exposes `go_diagnostics`, `go_references`, `go_rename_symbol`,
+`go_search`, `go_vulncheck`, `go_workspace`, and `go_file_context`. No extra
+bridge is needed — gopls is the bridge. Minimum gopls version: **0.20**.
 
 ## Sources
 

@@ -16,4 +16,10 @@
       };
     };
   };
+
+  # mcpServers intentionally omitted.
+  # rust-mcp-server (Vaiz) and cargo-mcp (jbr) ship via `cargo install`, and
+  # crates-mcp / rust-analyzer-mcp are not in nixpkgs either. The jstack rule
+  # requires tools on PATH via devenv — no cargo-install bootstrap. Revisit
+  # once any rust cargo/crates MCP server lands in nixpkgs or ships a Nix flake.
 }
