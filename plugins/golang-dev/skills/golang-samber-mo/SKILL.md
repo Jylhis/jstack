@@ -30,8 +30,6 @@ Go 1.18+ library providing type-safe monadic types with zero dependencies. Inspi
 - [pkg.go.dev/github.com/samber/mo](https://pkg.go.dev/github.com/samber/mo)
 - [github.com/samber/mo](https://github.com/samber/mo)
 
-This skill is not exhaustive. Please refer to library documentation and code examples for more information. Context7 can help as a discoverability platform.
-
 ```bash
 go get github.com/samber/mo
 ```
@@ -262,7 +260,6 @@ str := mo.Fold[error, int, string](
 
 For advanced types (Future, IO, Task, State), see [Advanced Types Reference](./references/advanced-types.md).
 
-If you encounter a bug or unexpected behavior in samber/mo, open an issue at <https://github.com/samber/mo/issues>.
 
 ## Cross-References
 

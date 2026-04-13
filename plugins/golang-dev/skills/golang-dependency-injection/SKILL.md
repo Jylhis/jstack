@@ -24,15 +24,9 @@ allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(g
 - **Design mode** (new project, new service, or adding a service to an existing DI setup): assess the existing dependency graph and lifecycle needs; recommend manual injection or a library from the decision table; then generate the wiring code.
 - **Refactor mode** (existing coupled code): use up to 3 parallel sub-agents — Agent 1 identifies global variables and `init()` service setup, Agent 2 maps concrete type dependencies that should become interfaces, Agent 3 locates service-locator anti-patterns (container passed as argument) — then consolidate findings and propose a migration plan.
 
-> **Community default.** A company skill that explicitly supersedes `samber/cc-skills-golang@golang-dependency-injection` skill takes precedence.
-
 # Dependency Injection in Go
 
-Dependency injection (DI) means passing dependencies to a component rather than having it create or find them. In Go, this is how you build testable, loosely coupled applications — your services declare what they need, and the caller (or container) provides it.
-
-This skill is not exhaustive. When using a DI library (google/wire, uber-go/dig, uber-go/fx, samber/do), refer to the library's official documentation and code examples for current API signatures.
-
-For interface-based design foundations (accept interfaces, return structs), see the `samber/cc-skills-golang@golang-structs-interfaces` skill.
+For interface-based design foundations (accept interfaces, return structs), see `samber/cc-skills-golang@golang-structs-interfaces`.
 
 ## Best Practices Summary
 
@@ -46,19 +40,6 @@ For interface-based design foundations (accept interfaces, return structs), see 
 8. **Mock at the interface boundary** — DI makes this trivial
 9. **Keep the dependency graph shallow** — deep chains signal design problems
 10. **Choose the right DI library** for your project size and team — see the decision table below
-
-## Why Dependency Injection?
-
-| Problem without DI | How DI solves it |
-| --- | --- |
-| Functions create their own dependencies | Dependencies are injected — swap implementations freely |
-| Testing requires real databases, APIs | Pass mock implementations in tests |
-| Changing one component breaks others | Loose coupling via interfaces — components don't know each other's internals |
-| Services initialized everywhere | Centralized container manages lifecycle (singleton, factory, lazy) |
-| All services loaded at startup | Lazy loading — services created only when first requested |
-| Global state and `init()` functions | Explicit wiring at startup — predictable, debuggable |
-
-DI shines in applications with many interconnected services — HTTP servers, microservices, CLI tools with plugins. For a small script with 2-3 functions, manual wiring is fine. Don't over-engineer.
 
 ## Manual Constructor Injection (No Library)
 

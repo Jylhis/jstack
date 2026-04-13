@@ -28,9 +28,7 @@ allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(g
 
 # Go Code Modernization Guide
 
-This skill helps you continuously modernize Go codebases by replacing outdated patterns with their modern equivalents.
-
-**Scope**: This skill covers the last 3 years of Go modernization (Go 1.21 through Go 1.26, released 2023-2026). While this skill can be used for projects targeting Go 1.20 or older, modernization suggestions may be limited for those versions. For best results, consider upgrading the Go version first. Some older modernizations (e.g., `any` instead of `interface{}`, `errors.Is`/`errors.As`, `strings.Cut`) are included because they are still commonly missed, but many pre-1.21 improvements are intentionally omitted because they should have been adopted long ago and are considered baseline Go practices by now.
+Covers Go 1.21 through Go 1.26 (2023-2026). Some older modernizations (`any`, `errors.Is`/`errors.As`, `strings.Cut`) included because they are still commonly missed.
 
 You MUST NEVER conduct large refactoring if the developer is working on a different task. But TRY TO CONVINCE your human it would improve the code quality.
 

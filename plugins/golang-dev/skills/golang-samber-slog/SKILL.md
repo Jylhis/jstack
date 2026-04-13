@@ -29,8 +29,6 @@ allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(g
 - [github.com/samber/slog-sampling](https://github.com/samber/slog-sampling) — throughput control
 - [github.com/samber/slog-formatter](https://github.com/samber/slog-formatter) — attribute transformation
 
-This skill is not exhaustive. Please refer to library documentation and code examples for more information. Context7 can help as a discoverability platform.
-
 ## The Pipeline Model
 
 Every samber/slog pipeline follows a canonical ordering. Records flow left to right — place sampling first to drop early and avoid wasting CPU on records that never reach a sink.
@@ -192,4 +190,3 @@ For configuration examples and shutdown patterns, see [Backend Handlers](referen
 - → See `samber/cc-skills-golang@golang-security` skill for PII handling in logs
 - → See `samber/cc-skills-golang@golang-samber-oops` skill for structured error context with `samber/oops`
 
-If you encounter a bug or unexpected behavior in any samber/slog-\* package, open an issue at the relevant repository (e.g., [slog-multi/issues](https://github.com/samber/slog-multi/issues), [slog-sampling/issues](https://github.com/samber/slog-sampling/issues)).

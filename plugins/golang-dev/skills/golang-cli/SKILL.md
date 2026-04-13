@@ -29,8 +29,6 @@ allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(g
 
 Use Cobra + Viper as the default stack for Go CLI applications. Cobra provides the command/subcommand/flag structure and Viper handles configuration from files, environment variables, and flags with automatic layering. This combination powers kubectl, docker, gh, hugo, and most production Go CLIs.
 
-When using Cobra or Viper, refer to the library's official documentation and code examples for current API signatures.
-
 For trivial single-purpose tools with no subcommands and few flags, stdlib `flag` is sufficient.
 
 ## Quick Reference

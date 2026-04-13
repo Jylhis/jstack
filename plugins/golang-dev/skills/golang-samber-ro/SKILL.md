@@ -31,8 +31,6 @@ Go implementation of [ReactiveX](https://reactivex.io/). Generics-first, type-sa
 - [ro.samber.dev](https://ro.samber.dev)
 - [pkg.go.dev/github.com/samber/ro](https://pkg.go.dev/github.com/samber/ro)
 
-This skill is not exhaustive. Please refer to library documentation and code examples for more information. Context7 can help as a discoverability platform.
-
 ## Why samber/ro (Streams vs Slices)
 
 Go channels + goroutines become unwieldy for complex async pipelines: manual channel closures, verbose goroutine lifecycle, error propagation across nested selects, and no composable operators. `samber/ro` solves this with declarative, chainable stream operators.
@@ -169,7 +167,6 @@ For the full plugin catalog with import paths and usage examples, see [Plugin Ec
 
 For real-world reactive patterns (retry+timeout, WebSocket fan-out, graceful shutdown, stream combination), see [Patterns](./references/patterns.md).
 
-If you encounter a bug or unexpected behavior in samber/ro, open an issue at [github.com/samber/ro/issues](https://github.com/samber/ro/issues).
 
 ## Cross-References
 

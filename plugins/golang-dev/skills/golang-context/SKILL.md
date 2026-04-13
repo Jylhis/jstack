@@ -17,11 +17,7 @@ metadata:
 allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(git:*) Agent
 ---
 
-> **Community default.** A company skill that explicitly supersedes `samber/cc-skills-golang@golang-context` skill takes precedence.
-
 # Go context.Context Best Practices
-
-`context.Context` is Go's mechanism for propagating cancellation signals, deadlines, and request-scoped values across API boundaries and between goroutines. Think of it as the "session" of a request — it ties together every operation that belongs to the same unit of work.
 
 ## Best Practices Summary
 
@@ -65,11 +61,9 @@ func (s *OrderService) Create(ctx context.Context, order Order) error {
 
 ## Deep Dives
 
-- **[Cancellation, Timeouts & Deadlines](./references/cancellation.md)** — How cancellation propagates: `WithCancel` for manual cancellation, `WithTimeout` for automatic cancellation after a duration, `WithDeadline` for absolute time deadlines. Patterns for listening (`<-ctx.Done()`) in concurrent code, `AfterFunc` callbacks, and `WithoutCancel` for operations that must outlive their parent request (e.g., audit logs).
-
-- **[Context Values & Cross-Service Tracing](./references/values-tracing.md)** — Safe context value patterns: unexported key types to prevent namespace collisions, when to use context values (request ID, user ID) vs function parameters. Trace context propagation: OpenTelemetry trace headers, correlation IDs for log aggregation, and marshaling/unmarshaling context across service boundaries.
-
-- **[Context in HTTP Servers & Service Calls](./references/http-services.md)** — HTTP handler context: `r.Context()` for request-scoped cancellation, middleware integration, and propagating to services. HTTP client patterns: `NewRequestWithContext`, client timeouts, and retries with context awareness. Database operations: always use `*Context` variants (`QueryContext`, `ExecContext`) to respect deadlines.
+- **[Cancellation, Timeouts & Deadlines](./references/cancellation.md)** — `WithCancel`, `WithTimeout`, `WithDeadline`, `<-ctx.Done()` listening, `AfterFunc`, `WithoutCancel`
+- **[Context Values & Cross-Service Tracing](./references/values-tracing.md)** — Unexported key types, when values vs parameters, OpenTelemetry trace propagation, correlation IDs
+- **[Context in HTTP Servers & Service Calls](./references/http-services.md)** — `r.Context()`, middleware, `NewRequestWithContext`, `*Context` DB variants
 
 ## Cross-References
 

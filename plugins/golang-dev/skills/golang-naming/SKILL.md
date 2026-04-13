@@ -17,17 +17,9 @@ metadata:
 allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(git:*) Agent
 ---
 
-> **Community default.** A company skill that explicitly supersedes `samber/cc-skills-golang@golang-naming` skill takes precedence.
-
 # Go Naming Conventions
 
 Go favors short, readable names. Capitalization controls visibility — uppercase is exported, lowercase is unexported. All identifiers MUST use MixedCaps, NEVER underscores.
-
-> "Clear is better than clever." — Go Proverbs
->
-> "Design the architecture, name the components, document the details." — Go Proverbs
-
-To ignore a rule, just add a comment to the code.
 
 ## Quick Reference
 

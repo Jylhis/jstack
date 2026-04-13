@@ -21,8 +21,6 @@ allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(g
 
 # Stay Updated with Go
 
-A curated guide to keeping your finger on the pulse of the Go ecosystem.
-
 ## Official Go Resources
 
 | Resource            | URL                                          |
@@ -126,15 +124,3 @@ Follow these influential Go developers and contributors:
 | Applied Go | Go tutorials | <https://youtube.com/appliedgocode> |
 | Learn Go Programming | Beginner tutorials | <https://youtube.com/learn_goprogramming> |
 
-## Quick Tips for Staying Updated
-
-1. **Subscribe to 1-2 newsletters** - Don't overload yourself
-2. **Follow 10-20 key people** on X/Bluesky who post regularly
-3. **Check Go.dev/blog weekly** for official announcements
-4. **Join Go Slack** for real-time discussions
-5. **Bookmark pkg.go.dev** to discover new libraries
-6. **Attend a GopherCon** (virtual or in-person) yearly
-
----
-
-_Note: This guide is regularly updated. Suggest additions via GitHub issues._

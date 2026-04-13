@@ -120,17 +120,12 @@ The build constraint ensures this file is never compiled. The blank imports keep
 
 ## Deep Dives
 
-- **[Versioning & MVS](./references/versioning.md)** — Semantic versioning rules (major.minor.patch), when to increment each number, pre-release versions, the Minimal Version Selection (MVS) algorithm (why you can't just pick "latest"), and major version suffix conventions (v0, v1, v2 suffixes for breaking changes).
-
-- **[Auditing Dependencies](./references/auditing.md)** — Vulnerability scanning with `govulncheck`, tracking outdated dependencies, analyzing which dependencies make the binary large (`goweight`), and distinguishing test-only vs binary dependencies to keep `go.mod` clean.
-
-- **[Dependency Conflicts & Resolution](./references/conflicts.md)** — Diagnosing version conflicts (what `go get` does when you request incompatible versions), resolution strategies (`replace` directives for local development, `exclude` for broken versions, `retract` for published versions that should be skipped), and workflows for conflicts across your dependency tree.
-
-- **[Go Workspaces](./references/workspaces.md)** — `go.work` files for multi-module development (e.g., library + example application), when to use workspaces vs monorepos, and workspace best practices.
-
-- **[Automated Dependency Updates](./references/automated-updates.md)** — Setting up Dependabot or Renovate for automatic dependency update PRs, auto-merge strategies (when to merge automatically vs require review), and handling security updates.
-
-- **[Visualizing the Dependency Graph](./references/visualization.md)** — `go mod graph` to inspect the full dependency tree, `modgraphviz` to visualize it, and interactive tools to find which dependency chains cause bloat.
+- **[Versioning & MVS](./references/versioning.md)** — Semver rules, MVS algorithm, major version suffix conventions
+- **[Auditing Dependencies](./references/auditing.md)** — `govulncheck`, outdated tracking, binary size analysis with `goweight`
+- **[Dependency Conflicts & Resolution](./references/conflicts.md)** — `replace`, `exclude`, `retract` directives and conflict workflows
+- **[Go Workspaces](./references/workspaces.md)** — `go.work` for multi-module development
+- **[Automated Dependency Updates](./references/automated-updates.md)** — Dependabot/Renovate setup, auto-merge strategies
+- **[Visualizing the Dependency Graph](./references/visualization.md)** — `go mod graph`, `modgraphviz`, bloat analysis
 
 ## Cross-References
 

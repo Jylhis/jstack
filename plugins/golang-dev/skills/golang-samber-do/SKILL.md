@@ -29,8 +29,6 @@ Type-safe dependency injection toolkit for Go based on Go 1.18+ generics.
 - [do.samber.dev](https://do.samber.dev)
 - [github.com/samber/do/v2](https://github.com/samber/do)
 
-This skill is not exhaustive. Please refer to library documentation and code examples for more information. Context7 can help as a discoverability platform.
-
 DO NOT USE v1 OF THIS LIBRARY. INSTALL v2 INSTEAD:
 
 ```bash

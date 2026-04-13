@@ -24,13 +24,9 @@ allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(g
 - **Write mode** — generating new repository functions, query helpers, or transaction wrappers: follow the skill's sequential instructions; launch a background agent to grep for existing query patterns and naming conventions in the codebase before generating new code.
 - **Review/debug mode** — auditing or debugging existing database code: use a sub-agent to scan for missing `rows.Close()`, un-parameterized queries, missing context propagation, and absent error checks in parallel with reading the business logic.
 
-> **Community default.** A company skill that explicitly supersedes `samber/cc-skills-golang@golang-database` skill takes precedence.
-
 # Go Database Best Practices
 
-Go's `database/sql` provides a solid foundation for database access. Use `sqlx` or `pgx` on top of it for ergonomics — never an ORM.
-
-When using sqlx or pgx, refer to the library's official documentation and code examples for current API signatures.
+Use `sqlx` or `pgx` on top of `database/sql` for ergonomics — never an ORM.
 
 ## Best Practices Summary
 
@@ -59,12 +55,7 @@ When using sqlx or pgx, refer to the library's official documentation and code e
 | `pgx` | PostgreSQL (30-50% faster) | `pgx.RowToStructByName` | Yes (COPY, LISTEN, arrays) |
 | GORM/ent | **Avoid** | Magic | Abstracted away |
 
-**Why NOT ORMs:**
-
-- Unpredictable query generation — N+1 problems you cannot see in code
-- Magic hooks and callbacks (BeforeCreate, AfterUpdate) make debugging harder
-- Schema migrations coupled to application code
-- Learning the ORM API is harder than learning SQL, and the abstraction leaks
+**Why NOT ORMs:** Unpredictable query generation (hidden N+1), magic hooks that hinder debugging, schema migrations coupled to app code, and leaky abstractions harder to learn than SQL itself.
 
 ## Parameterized Queries
 
@@ -216,10 +207,6 @@ Migration SQL should be written and reviewed by humans, versioned in source cont
 ## Avoid Hidden SQL Features
 
 Do not rely on triggers, views, materialized views, stored procedures, or row-level security in application code — they create invisible side effects and make debugging impossible. Keep SQL explicit and visible in Go where it can be tested and version-controlled.
-
-## Schema Creation
-
-**This skill does NOT cover schema creation.** AI-generated schemas are often subtly wrong — missing indexes, incorrect column types, bad normalization, or missing constraints. Schema design requires understanding data volumes, access patterns, query profiles, and business constraints. Use dedicated database tooling and human review.
 
 ## Deep Dives
 

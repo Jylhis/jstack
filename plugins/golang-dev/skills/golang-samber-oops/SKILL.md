@@ -23,18 +23,6 @@ allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(g
 
 **samber/oops** is a drop-in replacement for Go's standard error handling that adds structured context, stack traces, error codes, public messages, and panic recovery. Variable data goes in `.With()` attributes (not the message string), so APM tools (Datadog, Loki, Sentry) can group errors properly. Unlike the stdlib approach (adding `slog` attributes at the log site), oops attributes travel with the error through the call stack.
 
-## Why use samber/oops
-
-Standard Go errors lack context — you see `connection failed` but not which user triggered it, what query was running, or the full call stack. `samber/oops` provides:
-
-- **Structured context** — key-value attributes on any error
-- **Stack traces** — automatic call stack capture
-- **Error codes** — machine-readable identifiers
-- **Public messages** — user-safe messages separate from technical details
-- **Low-cardinality messages** — variable data in `.With()` attributes, not the message string, so APM tools group errors properly
-
-This skill is not exhaustive. Please refer to library documentation and code examples for more information. Context7 can help as a discoverability platform.
-
 ## Core pattern: Error builder chain
 
 All `oops` errors use a fluent builder pattern:

@@ -24,11 +24,7 @@ allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(g
 - **Write mode** — generating or filling in missing documentation (doc comments, README, CONTRIBUTING, CHANGELOG, llms.txt). Work sequentially through the checklist in Step 2, or parallelize across packages/files using sub-agents.
 - **Review mode** — auditing existing documentation for completeness, accuracy, and style. Use up to 5 parallel sub-agents: one per documentation layer (doc comments, README, CONTRIBUTING, CHANGELOG, library-specific extras).
 
-> **Community default.** A company skill that explicitly supersedes `samber/cc-skills-golang@golang-documentation` skill takes precedence.
-
 # Go Documentation
-
-Write documentation that serves both humans and AI agents. Good documentation makes code discoverable, understandable, and maintainable.
 
 ## Cross-References
 
@@ -84,9 +80,7 @@ When documenting a large codebase with many packages, use up to 5 parallel sub-a
 
 ## Step 3: Function & Method Doc Comments
 
-Every exported function and method MUST have a doc comment. Document complex internal functions too. Skip test functions.
-
-The comment starts with the function name and a verb phrase. Focus on **why** and **when**, not restating what the code already shows. The code tells you _what_ happens — the comment should explain _why_ it exists, _when_ to use it, _what constraints_ apply, and _what can go wrong_. Include parameters, return values, error cases, and a usage example:
+Every exported function and method MUST have a doc comment. Document complex internal functions too. Skip test functions. Start with the function name and a verb phrase. Focus on **why**, **when**, constraints, and error cases — not restating code. Include parameters, return values, and a usage example:
 
 ```go
 // CalculateDiscount computes the final price after applying tiered discounts.
@@ -148,32 +142,19 @@ For the full README guidance and application-specific sections, see [Project Doc
 
 ## Step 5: CONTRIBUTING & Changelog
 
-**CONTRIBUTING.md** — Help contributors get started in under 10 minutes. Include: prerequisites, clone, build, test, PR process. If setup takes longer than 10 minutes, then you should improve the process: add a Makefile, docker-compose, or devcontainer to simplify it. See [Project Docs](./references/project-docs.md#contributingmd).
+**CONTRIBUTING.md** — Prerequisites, clone, build, test, PR process. Target under 10 minutes to first contribution. See [Project Docs](./references/project-docs.md#contributingmd).
 
-**Changelog** — Track changes using [Keep a Changelog](https://keepachangelog.com/) format or GitHub Releases. Copy the template from [templates/CHANGELOG.md](./assets/templates/CHANGELOG.md). See [Project Docs](./references/project-docs.md#changelog).
+**Changelog** — [Keep a Changelog](https://keepachangelog.com/) format or GitHub Releases. Template: [templates/CHANGELOG.md](./assets/templates/CHANGELOG.md). See [Project Docs](./references/project-docs.md#changelog).
 
 ## Step 6: Library-Specific Documentation
 
-For Go libraries, add these on top of the basics:
-
-- **Go Playground demos** — create runnable demos and link them in doc comments with `// Play: https://go.dev/play/p/xxx`. Use the go-playground MCP tool when available to create and share playground URLs.
-- **Example test functions** — write `func ExampleXxx()` in `_test.go` files. These are executable documentation verified by `go test`.
-- **Generous code examples** — include multiple examples in doc comments showing common use cases.
-- **godoc** — your doc comments render on [pkg.go.dev](https://pkg.go.dev). Use `go doc` locally to preview.
-- **Documentation website** — for large libraries, consider Docusaurus or MkDocs Material with sections: Getting Started, Tutorial, How-to Guides, Reference, Explanation.
-- **Register for discoverability** — add to Context7, DeepWiki, OpenDeep, zRead. Even for private libraries.
+For Go libraries, add on top of the basics: Go Playground demos (`// Play:` links), `func ExampleXxx()` test functions, generous code examples in doc comments, godoc rendering on [pkg.go.dev](https://pkg.go.dev), and for large libraries a doc site (Docusaurus/MkDocs Material). Register for discoverability (Context7, DeepWiki, OpenDeep, zRead).
 
 See [Library Documentation](./references/library.md) for details.
 
 ## Step 7: Application-Specific Documentation
 
-For Go applications/CLIs:
-
-- **Installation methods** — pre-built binaries (GoReleaser), `go install`, Docker images, Homebrew...
-- **CLI help text** — make `--help` comprehensive; it's the primary documentation
-- **Configuration docs** — document all env vars, config files, CLI flags
-
-See [Application Documentation](./references/application.md) for details.
+For Go applications/CLIs: installation methods, comprehensive `--help` text, and configuration docs (env vars, config files, CLI flags). See [Application Documentation](./references/application.md).
 
 ## Step 8: API Documentation
 

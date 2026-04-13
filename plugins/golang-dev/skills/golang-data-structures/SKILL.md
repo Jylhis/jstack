@@ -156,7 +156,7 @@ For advanced data structures (trees, sets, queues, stacks) beyond the standard l
 - **`deckarep/golang-set`** — thread-safe and non-thread-safe set implementations
 - **`gammazero/deque`** — fast double-ended queue
 
-When using third-party libraries, refer to their official documentation and code examples for current API signatures. Context7 can help as a discoverability platform.
+Refer to each library's official documentation for current API signatures.
 
 ## Cross-References
 

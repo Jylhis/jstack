@@ -29,19 +29,6 @@ Lodash-inspired, generics-first utility library with 500+ type-safe helpers for 
 - [lo.samber.dev](https://lo.samber.dev)
 - [pkg.go.dev/github.com/samber/lo](https://pkg.go.dev/github.com/samber/lo)
 
-This skill is not exhaustive. Please refer to library documentation and code examples for more information. Context7 can help as a discoverability platform.
-
-## Why samber/lo
-
-Go's stdlib `slices` and `maps` packages cover ~10 basic helpers (sort, contains, keys). Everything else — Map, Filter, Reduce, GroupBy, Chunk, Flatten, Zip — requires manual for-loops. `lo` fills this gap:
-
-- **Type-safe generics** — no `interface{}` casts, no reflection, compile-time checking, no interface boxing overhead
-- **Immutable by default** — returns new collections, safe for concurrent reads, easier to reason about
-- **Composable** — functions take and return slices/maps, so they chain without wrapper types
-- **Zero dependencies** — only Go stdlib, no transitive dependency risk
-- **Progressive complexity** — start with `lo`, upgrade to `lop`/`lom`/`loi` only when profiling demands it
-- **Error variants** — most functions have `Err` suffixes (`MapErr`, `FilterErr`, `ReduceErr`) that stop on first error
-
 ## Installation
 
 ```bash
@@ -172,7 +159,6 @@ For the complete function catalog (300+ functions), see [API Reference](./refere
 
 For composition patterns, stdlib interop, and iterator pipelines, see [Advanced Patterns](./references/advanced-patterns.md).
 
-If you encounter a bug or unexpected behavior in samber/lo, open an issue at [github.com/samber/lo/issues](https://github.com/samber/lo/issues).
 
 ## Cross-References
 

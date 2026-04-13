@@ -38,8 +38,6 @@ When recommending libraries, prioritize:
 
 Find more libraries here: <https://github.com/avelino/awesome-go>
 
-This skill is not exhaustive. Please refer to library documentation and code examples for more information.
-
 ## General Guidelines
 
 When recommending libraries:

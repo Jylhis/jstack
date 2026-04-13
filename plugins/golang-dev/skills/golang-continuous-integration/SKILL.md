@@ -34,8 +34,6 @@ allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(g
 
 # Go Continuous Integration
 
-Set up production-grade CI/CD pipelines for Go projects using GitHub Actions.
-
 ## Action Versions
 
 The versions shown in the examples below are reference versions that may be outdated. Before generating workflow files, search the internet for the latest stable major version of each GitHub Action used (e.g., `actions/checkout`, `actions/setup-go`, `golangci/golangci-lint-action`, `codecov/codecov-action`, `goreleaser/goreleaser-action`, etc.). Use the latest version you find, not the one hardcoded in the examples.
@@ -136,7 +134,7 @@ Minor/patch updates are grouped into a single PR. Major updates get individual P
 
 `.github/workflows/dependabot-auto-merge.yml` — see [dependabot-auto-merge.yml](./assets/dependabot-auto-merge.yml)
 
-> **Security warning:** This workflow requires `contents: write` and `pull-requests: write` — these are elevated permissions that allow merging PRs and modifying repository content. The `if: github.actor == 'dependabot[bot]'` guard restricts execution to Dependabot only. Do not remove this guard. Note that `github.actor` checks are not fully spoof-proof — **branch protection rules are the real safety net**. Ensure branch protection is configured (see [Repository Security Settings](#repository-security-settings)) with required status checks and required approvals so that auto-merge only succeeds after all checks pass, regardless of who triggered the workflow.
+> **Security warning:** Requires `contents: write` and `pull-requests: write`. The `if: github.actor == 'dependabot[bot]'` guard restricts execution — do not remove it. `github.actor` checks are not fully spoof-proof; **branch protection rules are the real safety net** (see [Repository Security Settings](#repository-security-settings)).
 
 ### Renovate (alternative)
 
@@ -190,7 +188,7 @@ For projects that produce Docker images. This workflow builds multi-platform ima
 
 `.github/workflows/docker.yml` — see [docker.yml](./assets/docker.yml)
 
-> **Security warning:** Permissions are scoped per job: the `container-scan` job only gets `contents: read` + `security-events: write`, while the `docker` job gets `packages: write` (to push to GHCR) and `attestations: write` + `id-token: write` (for provenance/SBOM signing). This ensures the scan job cannot push images even if compromised. The `push` flag is set to `false` on pull requests so untrusted code cannot publish images. The `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN` secrets must be configured in the repository secrets settings — never hardcode credentials.
+> **Security warning:** Permissions scoped per job: `container-scan` gets `contents: read` + `security-events: write`; `docker` gets `packages: write` + `attestations: write` + `id-token: write`. `push: false` on PRs prevents untrusted image publishing. `DOCKERHUB_USERNAME`/`DOCKERHUB_TOKEN` must be in repository secrets — never hardcode.
 
 Key details:
 

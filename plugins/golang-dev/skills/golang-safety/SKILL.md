@@ -21,8 +21,6 @@ allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(g
 
 # Go Safety: Correctness & Defensive Coding
 
-Prevents programmer mistakes — bugs, panics, and silent data corruption in normal (non-adversarial) code. Security handles attackers; safety handles ourselves.
-
 ## Best Practices Summary
 
 1. **Prefer generics over `any`** when the type set is known — compiler catches mismatches instead of runtime panics

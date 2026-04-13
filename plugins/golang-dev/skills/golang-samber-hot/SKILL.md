@@ -28,8 +28,6 @@ Generic, type-safe in-memory caching library for Go 1.22+ with 9 eviction algori
 - [pkg.go.dev/github.com/samber/hot](https://pkg.go.dev/github.com/samber/hot)
 - [github.com/samber/hot](https://github.com/samber/hot)
 
-This skill is not exhaustive. Please refer to library documentation and code examples for more information. Context7 can help as a discoverability platform.
-
 ```bash
 go get -u github.com/samber/hot
 ```
@@ -124,7 +122,6 @@ For advanced patterns (revalidation, sharding, missing cache, monitoring setup),
 
 For the complete API surface, see [API Reference](./references/api-reference.md).
 
-If you encounter a bug or unexpected behavior in samber/hot, open an issue at <https://github.com/samber/hot/issues>.
 
 ## Cross-References
 
