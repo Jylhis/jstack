@@ -12,11 +12,6 @@ user-invocable: false
 
 **Do we need compile-time or runtime polymorphism?**
 
-Before choosing between generics and trait objects:
-- Is the type known at compile time?
-- Is a heterogeneous collection needed?
-- What's the performance priority?
-
 ---
 
 ## Error → Design Question
@@ -31,8 +26,6 @@ Before choosing between generics and trait objects:
 ---
 
 ## Thinking Prompt
-
-Before adding trait bounds:
 
 1. **What abstraction is needed?**
    - Same behavior, different types → trait
@@ -53,13 +46,6 @@ Before adding trait bounds:
 ## Trace Up ↑
 
 When type system fights back:
-
-```
-E0277 (trait bound not satisfied)
-    ↑ Ask: Is the abstraction level correct?
-    ↑ Check: m09-domain (what behavior is being abstracted?)
-    ↑ Check: m05-type-driven (should use newtype?)
-```
 
 | Persistent Error | Trace To | Question |
 |-----------------|----------|----------|
@@ -153,13 +139,3 @@ A trait is object-safe if it:
 | Complex trait hierarchies | Hard to understand | Simpler design |
 | Ignore object safety | Limits flexibility | Plan for dyn if needed |
 
----
-
-## Related Skills
-
-| When | See |
-|------|-----|
-| Type-driven design | m05-type-driven |
-| Domain abstraction | m09-domain |
-| Performance concerns | m10-performance |
-| Send/Sync bounds | m07-concurrency |

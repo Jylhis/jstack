@@ -195,12 +195,3 @@ graph TD
     process_request --> authenticate
     process_request --> send_response
 ```
-
-## Related Skills
-
-| When | See |
-|------|-----|
-| Find definition | rust-code-navigator |
-| Project structure | rust-symbol-analyzer |
-| Trait implementations | rust-trait-explorer |
-| Safe refactoring | rust-refactor-helper |

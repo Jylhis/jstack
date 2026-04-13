@@ -6,8 +6,6 @@ user-invocable: false
 
 # FinTech Domain
 
-> **Layer 3: Domain Constraints**
-
 ## Domain Constraints → Design Implications
 
 | Domain Rule | Design Constraint | Rust Implication |
@@ -17,54 +15,6 @@ user-invocable: false
 | Consistency | Transaction boundaries | Clear ownership |
 | Compliance | Complete logging | Structured tracing |
 | Reproducibility | Deterministic execution | No race conditions |
-
----
-
-## Critical Constraints
-
-### Financial Precision
-
-```
-RULE: Never use f64 for money
-WHY: Floating point loses precision
-RUST: Use rust_decimal::Decimal
-```
-
-### Audit Requirements
-
-```
-RULE: All transactions must be immutable and traceable
-WHY: Regulatory compliance, dispute resolution
-RUST: Arc<T> for sharing, event sourcing pattern
-```
-
-### Consistency
-
-```
-RULE: Money can't disappear or appear
-WHY: Double-entry accounting principles
-RUST: Transaction types with validated totals
-```
-
----
-
-## Trace Down ↓
-
-From constraints to design (Layer 2):
-
-```
-"Need immutable transaction records"
-    ↓ m09-domain: Model as Value Objects
-    ↓ m01-ownership: Use Arc for shared immutable data
-
-"Need precise decimal math"
-    ↓ m05-type-driven: Newtype for Currency/Amount
-    ↓ rust_decimal: Use Decimal type
-
-"Need transaction boundaries"
-    ↓ m12-lifecycle: RAII for transaction scope
-    ↓ m09-domain: Aggregate boundaries
-```
 
 ---
 
@@ -123,24 +73,3 @@ impl Amount {
 | String for amount | No validation | Validated newtype |
 | Silent overflow | Money disappears | Checked arithmetic |
 
----
-
-## Trace to Layer 1
-
-| Constraint | Layer 2 Pattern | Layer 1 Implementation |
-|------------|-----------------|------------------------|
-| Immutable records | Event sourcing | Arc<T>, Clone |
-| Transaction scope | Aggregate | Owned children |
-| Precision | Value Object | rust_decimal newtype |
-| Thread-safe sharing | Shared immutable | Arc (not Rc) |
-
----
-
-## Related Skills
-
-| When | See |
-|------|-----|
-| Value Object design | m09-domain |
-| Ownership for immutable | m01-ownership |
-| Arc for sharing | m02-resource |
-| Error handling | m13-domain-error |

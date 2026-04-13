@@ -12,11 +12,6 @@ user-invocable: false
 
 **What ownership pattern does this resource need?**
 
-Before choosing a smart pointer, understand:
-- Is ownership single or shared?
-- Is access single-threaded or multi-threaded?
-- Are there potential cycles?
-
 ---
 
 ## Error → Design Question
@@ -31,8 +26,6 @@ Before choosing a smart pointer, understand:
 ---
 
 ## Thinking Prompt
-
-Before choosing a smart pointer:
 
 1. **What's the ownership model?**
    - Single owner → Box or owned value
@@ -52,13 +45,6 @@ Before choosing a smart pointer:
 ## Trace Up ↑
 
 When pointer choice is unclear, trace to design:
-
-```
-"Should I use Arc or Rc?"
-    ↑ Ask: Is this data shared across threads?
-    ↑ Check: m07-concurrency (thread model)
-    ↑ Check: domain-* (performance constraints)
-```
 
 | Situation | Trace To | Question |
 |-----------|----------|----------|
@@ -147,13 +133,3 @@ Need interior mutability?
 | Box for small types | Unnecessary allocation | Stack allocation |
 | Ignore Weak for cycles | Memory leaks | Design parent-child with Weak |
 
----
-
-## Related Skills
-
-| When | See |
-|------|-----|
-| Ownership errors | m01-ownership |
-| Interior mutability details | m03-mutability |
-| Multi-thread context | m07-concurrency |
-| Resource lifecycle | m12-lifecycle |

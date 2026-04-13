@@ -12,11 +12,6 @@ user-invocable: false
 
 **Is this pattern hiding a design problem?**
 
-When reviewing code:
-- Is this solving the symptom or the cause?
-- Is there a more idiomatic approach?
-- Does this fight or flow with Rust?
-
 ---
 
 ## Anti-Pattern → Better Pattern
@@ -36,8 +31,6 @@ When reviewing code:
 
 ## Thinking Prompt
 
-When seeing suspicious code:
-
 1. **Is this symptom or cause?**
    - Clone to avoid borrow? → Ownership design issue
    - Unwrap "because it won't fail"? → Unhandled case
@@ -56,13 +49,6 @@ When seeing suspicious code:
 ## Trace Up ↑
 
 To design understanding:
-
-```
-"Why does my code have so many clones?"
-    ↑ Ask: Is the ownership model correct?
-    ↑ Check: m09-domain (data flow design)
-    ↑ Check: m01-ownership (reference patterns)
-```
 
 | Anti-Pattern | Trace To | Question |
 |--------------|----------|----------|
@@ -112,18 +98,6 @@ To implementation (Layer 1):
 
 ---
 
-## Common Error Patterns
-
-| Error | Anti-Pattern Cause | Fix |
-|-------|-------------------|-----|
-| E0382 use after move | Cloning vs ownership | Proper references |
-| Panic in production | Unwrap everywhere | ?, matching |
-| Slow performance | String for all text | &str, Cow |
-| Borrow checker fights | Wrong structure | Restructure |
-| Memory bloat | Rc/Arc everywhere | Simple ownership |
-
----
-
 ## Deprecated → Better
 
 | Deprecated | Better |
@@ -148,13 +122,3 @@ To implementation (Layer 1):
 - [ ] No `unsafe` without SAFETY comment
 - [ ] No giant functions (>50 lines)
 
----
-
-## Related Skills
-
-| When | See |
-|------|-----|
-| Ownership patterns | m01-ownership |
-| Error handling | m06-error-handling |
-| Mental models | m14-mental-model |
-| Performance | m10-performance |

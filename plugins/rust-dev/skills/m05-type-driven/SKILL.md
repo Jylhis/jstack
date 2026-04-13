@@ -12,11 +12,6 @@ user-invocable: false
 
 **How can the type system prevent invalid states?**
 
-Before reaching for runtime checks:
-- Can the compiler catch this error?
-- Can invalid states be unrepresentable?
-- Can the type encode the invariant?
-
 ---
 
 ## Error → Design Question
@@ -31,8 +26,6 @@ Before reaching for runtime checks:
 ---
 
 ## Thinking Prompt
-
-Before adding runtime validation:
 
 1. **Can the type encode the constraint?**
    - Numeric range → bounded types or newtypes
@@ -54,13 +47,6 @@ Before adding runtime validation:
 ## Trace Up ↑
 
 When type design is unclear:
-
-```
-"Need to validate email format"
-    ↑ Ask: Is this a domain value object?
-    ↑ Check: m09-domain (Email as Value Object)
-    ↑ Check: domain-* (validation requirements)
-```
 
 | Situation | Trace To | Question |
 |-----------|----------|----------|
@@ -163,13 +149,3 @@ impl Connection<Connected> {
 | Option for uninitialized | Unclear invariant | Builder |
 | Public fields with invariants | Invariant violation | Private + validated new() |
 
----
-
-## Related Skills
-
-| When | See |
-|------|-----|
-| Domain modeling | m09-domain |
-| Trait design | m04-zero-cost |
-| Error handling in constructors | m06-error-handling |
-| Anti-patterns | m15-anti-pattern |

@@ -6,8 +6,6 @@ user-invocable: false
 
 # IoT Domain
 
-> **Layer 3: Domain Constraints**
-
 ## Domain Constraints → Design Implications
 
 | Domain Rule | Design Constraint | Rust Implication |
@@ -18,54 +16,6 @@ user-invocable: false
 | Security | Encrypted comms | TLS, signed firmware |
 | Reliability | Self-recovery | Watchdog, error handling |
 | OTA updates | Safe upgrades | Rollback capability |
-
----
-
-## Critical Constraints
-
-### Network Unreliability
-
-```
-RULE: Network can fail at any time
-WHY: Wireless, remote locations
-RUST: Local queue, retry with backoff
-```
-
-### Power Management
-
-```
-RULE: Minimize power consumption
-WHY: Battery life, energy costs
-RUST: Sleep modes, efficient algorithms
-```
-
-### Device Security
-
-```
-RULE: All communication encrypted
-WHY: Physical access possible
-RUST: TLS, signed messages
-```
-
----
-
-## Trace Down ↓
-
-From constraints to design (Layer 2):
-
-```
-"Need offline-first design"
-    ↓ m12-lifecycle: Local buffer with persistence
-    ↓ m13-domain-error: Retry with backoff
-
-"Need power efficiency"
-    ↓ domain-embedded: no_std patterns
-    ↓ m10-performance: Minimal allocations
-
-"Need reliable messaging"
-    ↓ m07-concurrency: Async with timeout
-    ↓ MQTT: QoS levels
-```
 
 ---
 
@@ -145,24 +95,3 @@ async fn run_mqtt() -> anyhow::Result<()> {
 | Unencrypted MQTT | Security risk | TLS |
 | No local buffer | Network outage = data loss | Persist locally |
 
----
-
-## Trace to Layer 1
-
-| Constraint | Layer 2 Pattern | Layer 1 Implementation |
-|------------|-----------------|------------------------|
-| Offline-first | Store & forward | Local queue + flush |
-| Power efficiency | Sleep patterns | Timer-based wake |
-| Network reliability | Retry | tokio-retry, backoff |
-| Security | TLS | rustls, native-tls |
-
----
-
-## Related Skills
-
-| When | See |
-|------|-----|
-| Embedded patterns | domain-embedded |
-| Async patterns | m07-concurrency |
-| Error recovery | m13-domain-error |
-| Performance | m10-performance |

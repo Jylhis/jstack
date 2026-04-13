@@ -91,5 +91,3 @@ Format: rustfmt (just use it)
 Docs: /// for public items, //! for module docs
 Lint: #![warn(clippy::all)]
 ```
-
-Claude knows Rust conventions well. These are the non-obvious Rust-specific rules.

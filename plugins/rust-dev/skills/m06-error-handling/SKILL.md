@@ -12,11 +12,6 @@ user-invocable: false
 
 **Is this failure expected or a bug?**
 
-Before choosing error handling strategy:
-- Can this fail in normal operation?
-- Who should handle this failure?
-- What context does the caller need?
-
 ---
 
 ## Error → Design Question
@@ -31,8 +26,6 @@ Before choosing error handling strategy:
 ---
 
 ## Thinking Prompt
-
-Before handling an error:
 
 1. **What kind of failure is this?**
    - Expected → Result<T, E>
@@ -56,13 +49,6 @@ Before handling an error:
 ## Trace Up ↑
 
 When error strategy is unclear:
-
-```
-"Should I return Result or Option?"
-    ↑ Ask: Is absence/failure normal or exceptional?
-    ↑ Check: m09-domain (what does domain say?)
-    ↑ Check: domain-* (error handling requirements)
-```
 
 | Situation | Trace To | Question |
 |-----------|----------|----------|
@@ -154,13 +140,3 @@ Use ? → Need context?
 | `panic!` for expected errors | Bad UX, no recovery | Result |
 | Box<dyn Error> everywhere | Lost type info | thiserror |
 
----
-
-## Related Skills
-
-| When | See |
-|------|-----|
-| Domain error strategy | m13-domain-error |
-| Crate boundaries | m11-ecosystem |
-| Type-safe errors | m05-type-driven |
-| Mental models | m14-mental-model |

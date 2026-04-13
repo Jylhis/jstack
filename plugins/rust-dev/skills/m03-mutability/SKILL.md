@@ -12,11 +12,6 @@ user-invocable: false
 
 **Why does this data need to change, and who can change it?**
 
-Before adding interior mutability, understand:
-- Is mutation essential or accidental complexity?
-- Who should control mutation?
-- Is the mutation pattern safe?
-
 ---
 
 ## Error → Design Question
@@ -31,8 +26,6 @@ Before adding interior mutability, understand:
 ---
 
 ## Thinking Prompt
-
-Before adding mutability:
 
 1. **Is mutation necessary?**
    - Maybe transform → return new value
@@ -52,13 +45,6 @@ Before adding mutability:
 ## Trace Up ↑
 
 When mutability conflicts persist:
-
-```
-E0499/E0502 (borrow conflicts)
-    ↑ Ask: Is the data structure designed correctly?
-    ↑ Check: m09-domain (should data be split?)
-    ↑ Check: m07-concurrency (is async involved?)
-```
 
 | Persistent Error | Trace To | Question |
 |-----------------|----------|----------|
@@ -141,13 +127,3 @@ Never both simultaneously.
 | Ignore RefCell panic | Hard to debug | Handle or restructure |
 | Lock inside hot loop | Performance killer | Batch operations |
 
----
-
-## Related Skills
-
-| When | See |
-|------|-----|
-| Smart pointer choice | m02-resource |
-| Thread safety | m07-concurrency |
-| Data structure design | m09-domain |
-| Anti-patterns | m15-anti-pattern |

@@ -6,8 +6,6 @@ user-invocable: false
 
 # Machine Learning Domain
 
-> **Layer 3: Domain Constraints**
-
 ## Domain Constraints → Design Implications
 
 | Domain Rule | Design Constraint | Rust Implication |
@@ -18,54 +16,6 @@ user-invocable: false
 | Batch processing | Throughput over latency | Batched inference |
 | Numerical precision | Float handling | ndarray, careful f32/f64 |
 | Reproducibility | Deterministic | Seeded random, versioning |
-
----
-
-## Critical Constraints
-
-### Memory Efficiency
-
-```
-RULE: Avoid copying large tensors
-WHY: Memory bandwidth is bottleneck
-RUST: References, views, in-place ops
-```
-
-### GPU Utilization
-
-```
-RULE: Batch operations for GPU efficiency
-WHY: GPU overhead per kernel launch
-RUST: Batch sizes, async data loading
-```
-
-### Model Portability
-
-```
-RULE: Use standard model formats
-WHY: Train in Python, deploy in Rust
-RUST: ONNX via tract or candle
-```
-
----
-
-## Trace Down ↓
-
-From constraints to design (Layer 2):
-
-```
-"Need efficient data pipelines"
-    ↓ m10-performance: Streaming, batching
-    ↓ polars: Lazy evaluation
-
-"Need GPU inference"
-    ↓ m07-concurrency: Async data loading
-    ↓ candle/tch-rs: CUDA backend
-
-"Need model loading"
-    ↓ m12-lifecycle: Lazy init, caching
-    ↓ tract: ONNX runtime
-```
 
 ---
 
@@ -158,24 +108,3 @@ async fn batch_predict(inputs: Vec<Vec<f32>>, batch_size: usize) -> Vec<Vec<f32>
 | Load model per request | Slow | Singleton pattern |
 | Sync data loading | GPU idle | Async pipeline |
 
----
-
-## Trace to Layer 1
-
-| Constraint | Layer 2 Pattern | Layer 1 Implementation |
-|------------|-----------------|------------------------|
-| Memory efficiency | Zero-copy | ndarray views |
-| Model singleton | Lazy init | OnceLock<Model> |
-| Batch processing | Chunked iteration | chunks() + parallel |
-| GPU async | Concurrent loading | tokio::spawn + GPU |
-
----
-
-## Related Skills
-
-| When | See |
-|------|-----|
-| Performance | m10-performance |
-| Lazy initialization | m12-lifecycle |
-| Async patterns | m07-concurrency |
-| Memory efficiency | m01-ownership |

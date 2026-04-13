@@ -12,11 +12,6 @@ user-invocable: false
 
 **When should this resource be created, used, and cleaned up?**
 
-Before implementing lifecycle:
-- What's the resource's scope?
-- Who owns the cleanup responsibility?
-- What happens on error?
-
 ---
 
 ## Lifecycle Pattern → Implementation
@@ -32,8 +27,6 @@ Before implementing lifecycle:
 ---
 
 ## Thinking Prompt
-
-Before designing lifecycle:
 
 1. **What's the resource cost?**
    - Cheap → create per use
@@ -55,13 +48,6 @@ Before designing lifecycle:
 ## Trace Up ↑
 
 To domain constraints (Layer 3):
-
-```
-"How should I manage database connections?"
-    ↑ Ask: What's the connection cost?
-    ↑ Check: domain-* (latency requirements)
-    ↑ Check: Infrastructure (connection limits)
-```
 
 | Question | Trace To | Ask |
 |----------|----------|-----|
@@ -165,13 +151,3 @@ fn get_config() -> &'static Config {
 | Global mutable state | Thread unsafety | `OnceLock` or proper sync |
 | Forget to close | Resource leak | Drop impl |
 
----
-
-## Related Skills
-
-| When | See |
-|------|-----|
-| Smart pointers | m02-resource |
-| Thread-safe init | m07-concurrency |
-| Domain scopes | m09-domain |
-| Error in cleanup | m06-error-handling |

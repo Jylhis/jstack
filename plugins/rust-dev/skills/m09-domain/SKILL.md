@@ -12,11 +12,6 @@ user-invocable: false
 
 **What is this concept's role in the domain?**
 
-Before modeling in code, understand:
-- Is it an Entity (identity matters) or Value Object (interchangeable)?
-- What invariants must be maintained?
-- Where are the aggregate boundaries?
-
 ---
 
 ## Domain Concept → Rust Pattern
@@ -33,8 +28,6 @@ Before modeling in code, understand:
 ---
 
 ## Thinking Prompt
-
-Before creating a domain type:
 
 1. **What's the concept's identity?**
    - Needs unique identity → Entity (Id field)
@@ -54,13 +47,6 @@ Before creating a domain type:
 ## Trace Up ↑
 
 To domain constraints (Layer 3):
-
-```
-"How should I model a Transaction?"
-    ↑ Ask: What domain rules govern transactions?
-    ↑ Check: domain-fintech (audit, precision requirements)
-    ↑ Check: Business stakeholders (what invariants?)
-```
 
 | Design Question | Trace To | Ask |
 |-----------------|----------|-----|
@@ -162,13 +148,3 @@ mod order {
 | Leaked aggregate internals | Broken encapsulation | Methods on root |
 | String for semantic types | No validation | Validated newtype |
 
----
-
-## Related Skills
-
-| When | See |
-|------|-----|
-| Type-driven implementation | m05-type-driven |
-| Ownership for aggregates | m01-ownership |
-| Domain error handling | m13-domain-error |
-| Specific domain rules | domain-* |

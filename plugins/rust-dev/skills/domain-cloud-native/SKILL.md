@@ -6,8 +6,6 @@ user-invocable: false
 
 # Cloud-Native Domain
 
-> **Layer 3: Domain Constraints**
-
 ## Domain Constraints → Design Implications
 
 | Domain Rule | Design Constraint | Rust Implication |
@@ -18,54 +16,6 @@ user-invocable: false
 | Graceful shutdown | Clean termination | Signal handling |
 | Horizontal scale | Stateless design | No local state |
 | Container-friendly | Small binaries | Release optimization |
-
----
-
-## Critical Constraints
-
-### Stateless Design
-
-```
-RULE: No local persistent state
-WHY: Pods can be killed/rescheduled anytime
-RUST: External state (Redis, DB), no static mut
-```
-
-### Graceful Shutdown
-
-```
-RULE: Handle SIGTERM, drain connections
-WHY: Zero-downtime deployments
-RUST: tokio::signal + graceful shutdown
-```
-
-### Observability
-
-```
-RULE: Every request must be traceable
-WHY: Debugging distributed systems
-RUST: tracing spans, opentelemetry export
-```
-
----
-
-## Trace Down ↓
-
-From constraints to design (Layer 2):
-
-```
-"Need distributed tracing"
-    ↓ m12-lifecycle: Span lifecycle
-    ↓ tracing + opentelemetry
-
-"Need graceful shutdown"
-    ↓ m07-concurrency: Signal handling
-    ↓ m12-lifecycle: Connection draining
-
-"Need health checks"
-    ↓ domain-web: HTTP endpoints
-    ↓ m06-error-handling: Health status
-```
 
 ---
 
@@ -143,24 +93,3 @@ async fn ready(State(db): State<Arc<DbPool>>) -> StatusCode {
 | No tracing | Can't debug | tracing spans |
 | Static config | Not 12-factor | Env vars |
 
----
-
-## Trace to Layer 1
-
-| Constraint | Layer 2 Pattern | Layer 1 Implementation |
-|------------|-----------------|------------------------|
-| Stateless | External state | Arc<Client> for external |
-| Graceful shutdown | Signal handling | tokio::signal |
-| Tracing | Span lifecycle | tracing + OTEL |
-| Health checks | HTTP endpoints | Dedicated routes |
-
----
-
-## Related Skills
-
-| When | See |
-|------|-----|
-| Async patterns | m07-concurrency |
-| HTTP endpoints | domain-web |
-| Error handling | m13-domain-error |
-| Resource lifecycle | m12-lifecycle |

@@ -12,11 +12,6 @@ user-invocable: false
 
 **What's the right way to think about this Rust concept?**
 
-When learning or explaining Rust:
-- What's the correct mental model?
-- What misconceptions should be avoided?
-- What analogies help understanding?
-
 ---
 
 ## Key Mental Models
@@ -48,8 +43,6 @@ When learning or explaining Rust:
 
 ## Thinking Prompt
 
-When confused about Rust:
-
 1. **What's the ownership model?**
    - Who owns this data?
    - How long does it live?
@@ -66,46 +59,15 @@ When confused about Rust:
 
 ---
 
-## Trace Up ↑
-
-To design understanding (Layer 2):
-
-```
-"Why can't I do X in Rust?"
-    ↑ Ask: What safety guarantee would be violated?
-    ↑ Check: m01-m07 for the rule being enforced
-    ↑ Ask: What's the intended design pattern?
-```
-
----
-
-## Trace Down ↓
-
-To implementation (Layer 1):
-
-```
-"I understand the concept, now how do I implement?"
-    ↓ m01-ownership: Ownership patterns
-    ↓ m02-resource: Smart pointer choice
-    ↓ m07-concurrency: Thread safety
-```
-
----
-
 ## Common Misconceptions
 
-| Error | Wrong Model | Correct Model |
-|-------|-------------|---------------|
-| E0382 use after move | GC cleans up | Ownership = unique key transfer |
-| E0502 borrow conflict | Multiple writers OK | Only one writer at a time |
-| E0499 multiple mut borrows | Aliased mutation | Exclusive access for mutation |
-| E0106 missing lifetime | Ignoring scope | References have validity scope |
-| E0507 cannot move from `&T` | Implicit clone | References don't own data |
-
-## Deprecated Thinking
-
-| Deprecated | Better |
-|------------|--------|
+| Misconception | Correct Model |
+|---------------|---------------|
+| E0382: GC cleans up | Ownership = unique key transfer |
+| E0502: Multiple writers OK | Only one writer at a time |
+| E0499: Aliased mutation | Exclusive access for mutation |
+| E0106: Ignoring scope | References have compile-time validity scope |
+| E0507: Implicit clone | References don't own data |
 | "Rust is like C++" | Different ownership model |
 | "Lifetimes are GC" | Compile-time validity scope |
 | "Clone solves everything" | Restructure ownership |
@@ -165,13 +127,3 @@ After move: s1 is no longer valid
 | Advanced | Concurrency, unsafe | m07, unsafe-checker |
 | Expert | Design patterns | m09-m15, domain-* |
 
----
-
-## Related Skills
-
-| When | See |
-|------|-----|
-| Ownership errors | m01-ownership |
-| Smart pointers | m02-resource |
-| Concurrency | m07-concurrency |
-| Anti-patterns | m15-anti-pattern |

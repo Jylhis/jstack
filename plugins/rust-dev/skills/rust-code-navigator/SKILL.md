@@ -148,12 +148,3 @@ pub struct Config {
 | "No LSP server" | rust-analyzer not running | Suggest: `rustup component add rust-analyzer` |
 | "Symbol not found" | Typo or not in scope | Search with workspaceSymbol first |
 | "Multiple definitions" | Generics or macros | Show all and let user choose |
-
-## Related Skills
-
-| When | See |
-|------|-----|
-| Call relationships | rust-call-graph |
-| Project structure | rust-symbol-analyzer |
-| Trait implementations | rust-trait-explorer |
-| Safe refactoring | rust-refactor-helper |

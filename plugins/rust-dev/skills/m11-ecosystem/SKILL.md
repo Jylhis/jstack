@@ -18,11 +18,6 @@ user-invocable: false
 
 **What's the right crate for this job, and how should it integrate?**
 
-Before adding dependencies:
-- Is there a standard solution?
-- What's the maintenance status?
-- What's the API stability?
-
 ---
 
 ## Integration Decision → Implementation
@@ -41,8 +36,6 @@ Before adding dependencies:
 ---
 
 ## Thinking Prompt
-
-Before adding a dependency:
 
 1. **Is it well-maintained?**
    - Recent commits?
@@ -63,13 +56,6 @@ Before adding a dependency:
 ## Trace Up ↑
 
 To domain constraints (Layer 3):
-
-```
-"Which HTTP framework should I use?"
-    ↑ Ask: What are the performance requirements?
-    ↑ Check: domain-web (latency, throughput needs)
-    ↑ Check: Team expertise (familiarity with framework)
-```
 
 | Question | Trace To | Ask |
 |----------|----------|-----|
@@ -150,13 +136,3 @@ To implementation (Layer 1):
 | Too many deps | Supply chain risk | Evaluate necessity |
 | Vendoring everything | Maintenance burden | Trust crates.io |
 
----
-
-## Related Skills
-
-| When | See |
-|------|-----|
-| Error type design | m06-error-handling |
-| Trait integration | m04-zero-cost |
-| FFI safety | unsafe-checker |
-| Resource management | m12-lifecycle |

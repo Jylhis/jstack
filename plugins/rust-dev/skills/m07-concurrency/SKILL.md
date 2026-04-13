@@ -12,11 +12,6 @@ user-invocable: false
 
 **Is this CPU-bound or I/O-bound, and what's the sharing model?**
 
-Before choosing concurrency primitives:
-- What's the workload type?
-- What data needs to be shared?
-- What's the thread safety requirement?
-
 ---
 
 ## Error → Design Question
@@ -31,8 +26,6 @@ Before choosing concurrency primitives:
 ---
 
 ## Thinking Prompt
-
-Before adding concurrency:
 
 1. **What's the workload?**
    - CPU-bound → threads (std::thread, rayon)
@@ -63,26 +56,6 @@ Before adding concurrency:
 | 交易, 支付, trading, payment | **domain-fintech** | Audit + thread safety |
 | gRPC, kubernetes, microservice | **domain-cloud-native** | Distributed tracing |
 | CLI, terminal, clap | **domain-cli** | Usually single-thread OK |
-
-### Example: Web API + Rc Error
-
-```
-"Rc cannot be sent between threads" in Web API context
-    ↑ DETECT: "Web API" → Load domain-web
-    ↑ FIND: domain-web says "Shared state must be thread-safe"
-    ↑ FIND: domain-web says "Rc in state" is Common Mistake
-    ↓ DESIGN: Use Arc<T> with State extractor
-    ↓ IMPL: axum::extract::State<Arc<AppConfig>>
-```
-
-### Generic Trace
-
-```
-"Send not satisfied for my type"
-    ↑ Ask: What domain is this? Load domain-* skill
-    ↑ Ask: Does this type need to cross thread boundaries?
-    ↑ Check: m09-domain (is the data model correct?)
-```
 
 | Situation | Trace To | Question |
 |-----------|----------|----------|
@@ -201,22 +174,3 @@ do_async().await;  // guard still held!
 do_async().await;
 ```
 
-### Non-Send Types in Async
-
-```rust
-// Rc is !Send, can't cross await in spawned task
-// Option 1: use Arc instead
-// Option 2: use spawn_local (single-thread runtime)
-// Option 3: ensure Rc is dropped before .await
-```
-
----
-
-## Related Skills
-
-| When | See |
-|------|-----|
-| Smart pointer choice | m02-resource |
-| Interior mutability | m03-mutability |
-| Performance tuning | m10-performance |
-| Domain concurrency needs | domain-* |

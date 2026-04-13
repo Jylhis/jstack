@@ -82,5 +82,3 @@ pub unsafe fn dangerous() { ... }
 | Rust → C | cbindgen |
 | Python | PyO3 |
 | Node.js | napi-rs |
-
-Claude knows unsafe Rust. Focus on SAFETY comments and soundness.

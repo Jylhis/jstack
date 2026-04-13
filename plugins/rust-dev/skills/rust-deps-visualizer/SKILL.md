@@ -104,11 +104,3 @@ my-project v0.1.0
 2. Run `cargo tree` with specified options
 3. Parse output and generate ASCII visualization
 4. Optionally categorize by purpose (runtime, dev, build)
-
-## Related Skills
-
-| When | See |
-|------|-----|
-| Crate selection advice | m11-ecosystem |
-| Workspace management | m11-ecosystem |
-| Feature flag decisions | m11-ecosystem |

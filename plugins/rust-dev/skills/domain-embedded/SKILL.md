@@ -14,8 +14,6 @@ user-invocable: false
 
 # Embedded Domain
 
-> **Layer 3: Domain Constraints**
-
 ## Domain Constraints → Design Implications
 
 | Domain Rule | Design Constraint | Rust Implication |
@@ -26,54 +24,6 @@ user-invocable: false
 | Resource limited | Minimal memory | Static buffers |
 | Hardware safety | Safe peripheral access | HAL + ownership |
 | Interrupt safe | No blocking in ISR | Atomic, critical sections |
-
----
-
-## Critical Constraints
-
-### No Dynamic Allocation
-
-```
-RULE: Cannot use heap (no allocator)
-WHY: Deterministic memory, no OOM
-RUST: heapless::Vec<T, N>, arrays
-```
-
-### Interrupt Safety
-
-```
-RULE: Shared state must be interrupt-safe
-WHY: ISR can preempt at any time
-RUST: Mutex<RefCell<T>> + critical section
-```
-
-### Hardware Ownership
-
-```
-RULE: Peripherals must have clear ownership
-WHY: Prevent conflicting access
-RUST: HAL takes ownership, singletons
-```
-
----
-
-## Trace Down ↓
-
-From constraints to design (Layer 2):
-
-```
-"Need no_std compatible data structures"
-    ↓ m02-resource: heapless collections
-    ↓ Static sizing: heapless::Vec<T, N>
-
-"Need interrupt-safe state"
-    ↓ m03-mutability: Mutex<RefCell<Option<T>>>
-    ↓ m07-concurrency: Critical sections
-
-"Need peripheral ownership"
-    ↓ m01-ownership: Singleton pattern
-    ↓ m12-lifecycle: RAII for hardware
-```
 
 ---
 
@@ -155,24 +105,3 @@ fn main() -> ! {
 | Blocking in ISR | Missed interrupts | Defer to main loop |
 | Unsafe peripheral | Hardware conflict | HAL ownership |
 
----
-
-## Trace to Layer 1
-
-| Constraint | Layer 2 Pattern | Layer 1 Implementation |
-|------------|-----------------|------------------------|
-| No heap | Static collections | heapless::Vec<T, N> |
-| ISR safety | Critical sections | Mutex<RefCell<T>> |
-| Hardware ownership | Singleton | take().unwrap() |
-| no_std | Core-only | #![no_std], #![no_main] |
-
----
-
-## Related Skills
-
-| When | See |
-|------|-----|
-| Static memory | m02-resource |
-| Interior mutability | m03-mutability |
-| Interrupt patterns | m07-concurrency |
-| Unsafe for hardware | unsafe-checker |

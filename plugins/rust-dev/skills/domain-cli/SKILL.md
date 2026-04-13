@@ -7,8 +7,6 @@ user-invocable: false
 
 # CLI Domain
 
-> **Layer 3: Domain Constraints**
-
 ## Domain Constraints → Design Implications
 
 | Domain Rule | Design Constraint | Rust Implication |
@@ -18,56 +16,6 @@ user-invocable: false
 | Exit codes | Non-zero on error | Proper Result handling |
 | Stdout/stderr | Data vs errors | eprintln! for errors |
 | Interruptible | Handle Ctrl+C | Signal handling |
-
----
-
-## Critical Constraints
-
-### User Communication
-
-```
-RULE: Errors to stderr, data to stdout
-WHY: Pipeable output, scriptability
-RUST: eprintln! for errors, println! for data
-```
-
-### Configuration Priority
-
-```
-RULE: CLI args > env vars > config file > defaults
-WHY: User expectation, override capability
-RUST: Layered config with clap + figment/config
-```
-
-### Exit Codes
-
-```
-RULE: Return non-zero on any error
-WHY: Script integration, automation
-RUST: main() -> Result<(), Error> or explicit exit()
-```
-
----
-
-## Trace Down ↓
-
-From constraints to design (Layer 2):
-
-```
-"Need argument parsing"
-    ↓ m05-type-driven: Derive structs for args
-    ↓ clap: #[derive(Parser)]
-
-"Need config layering"
-    ↓ m09-domain: Config as domain object
-    ↓ figment/config: Layer sources
-
-"Need progress display"
-    ↓ m12-lifecycle: Progress bar as RAII
-    ↓ indicatif: ProgressBar
-```
-
----
 
 ## Key Crates
 
@@ -138,24 +86,3 @@ fn main() -> anyhow::Result<()> {
 | Panic on error | Bad exit code | Result + proper handling |
 | No progress for long ops | User uncertainty | indicatif |
 
----
-
-## Trace to Layer 1
-
-| Constraint | Layer 2 Pattern | Layer 1 Implementation |
-|------------|-----------------|------------------------|
-| Type-safe args | Derive macros | clap Parser |
-| Error handling | Result propagation | anyhow + exit codes |
-| User feedback | Progress RAII | indicatif ProgressBar |
-| Config precedence | Builder pattern | Layered sources |
-
----
-
-## Related Skills
-
-| When | See |
-|------|-----|
-| Error handling | m06-error-handling |
-| Type-driven args | m05-type-driven |
-| Progress lifecycle | m12-lifecycle |
-| Async CLI | m07-concurrency |

@@ -262,12 +262,3 @@ Always use `--dry-run` first to preview changes:
 ```
 
 This shows all changes without applying them.
-
-## Related Skills
-
-| When | See |
-|------|-----|
-| Navigate to symbol | rust-code-navigator |
-| Understand call flow | rust-call-graph |
-| Project structure | rust-symbol-analyzer |
-| Trait implementations | rust-trait-explorer |

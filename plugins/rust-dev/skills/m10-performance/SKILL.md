@@ -12,11 +12,6 @@ user-invocable: false
 
 **What's the bottleneck, and is optimization worth it?**
 
-Before optimizing:
-- Have you measured? (Don't guess)
-- What's the acceptable performance?
-- Will optimization add complexity?
-
 ---
 
 ## Performance Decision → Implementation
@@ -32,8 +27,6 @@ Before optimizing:
 ---
 
 ## Thinking Prompt
-
-Before optimizing:
 
 1. **Have you measured?**
    - Profile first → flamegraph, perf
@@ -56,13 +49,6 @@ Before optimizing:
 ## Trace Up ↑
 
 To domain constraints (Layer 3):
-
-```
-"How fast does this need to be?"
-    ↑ Ask: What's the performance SLA?
-    ↑ Check: domain-* (latency requirements)
-    ↑ Check: Business requirements (acceptable response time)
-```
 
 | Question | Trace To | Ask |
 |----------|----------|-----|
@@ -102,16 +88,6 @@ To implementation (Layer 1):
 | `heaptrack` | Allocation tracking |
 | `valgrind` / `cachegrind` | Cache analysis |
 
-## Optimization Priority
-
-```
-1. Algorithm choice     (10x - 1000x)
-2. Data structure       (2x - 10x)
-3. Allocation reduction (2x - 5x)
-4. Cache optimization   (1.5x - 3x)
-5. SIMD/Parallelism     (2x - 8x)
-```
-
 ## Common Techniques
 
 | Technique | When | How |
@@ -145,13 +121,3 @@ To implementation (Layer 1):
 | HashMap for small sets | Overhead | Vec with linear search |
 | String concat in loop | O(n^2) | `String::with_capacity` or `format!` |
 
----
-
-## Related Skills
-
-| When | See |
-|------|-----|
-| Reducing clones | m01-ownership |
-| Concurrency options | m07-concurrency |
-| Smart pointer choice | m02-resource |
-| Domain requirements | domain-* |

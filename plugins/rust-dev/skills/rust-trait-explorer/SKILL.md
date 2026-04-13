@@ -237,12 +237,3 @@ The following blanket impls may apply to your types:
 | "What traits does Y impl?" | Grep for `impl * for Y` |
 | "Show trait hierarchy" | Find super-traits recursively |
 | "Is X: Send + Sync?" | Check std trait impls |
-
-## Related Skills
-
-| When | See |
-|------|-----|
-| Navigate to impl | rust-code-navigator |
-| Call relationships | rust-call-graph |
-| Project structure | rust-symbol-analyzer |
-| Safe refactoring | rust-refactor-helper |

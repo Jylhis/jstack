@@ -211,12 +211,3 @@ user.rs
 | "Show me src/lib.rs structure" | documentSymbol |
 | "Find all async functions" | workspaceSymbol + async filter |
 | "List public API" | documentSymbol + pub filter |
-
-## Related Skills
-
-| When | See |
-|------|-----|
-| Navigate to symbol | rust-code-navigator |
-| Call relationships | rust-call-graph |
-| Trait implementations | rust-trait-explorer |
-| Safe refactoring | rust-refactor-helper |

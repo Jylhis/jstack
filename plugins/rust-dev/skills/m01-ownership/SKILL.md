@@ -12,11 +12,6 @@ user-invocable: false
 
 **Who should own this data, and for how long?**
 
-Before fixing ownership errors, understand the data's role:
-- Is it shared or exclusive?
-- Is it short-lived or long-lived?
-- Is it transformed or just read?
-
 ---
 
 ## Error → Design Question
@@ -35,8 +30,6 @@ Before fixing ownership errors, understand the data's role:
 
 ## Thinking Prompt
 
-Before fixing an ownership error, ask:
-
 1. **What is this data's domain role?**
    - Entity (unique identity) → owned
    - Value Object (interchangeable) → clone/copy OK
@@ -54,13 +47,6 @@ Before fixing an ownership error, ask:
 ## Trace Up ↑
 
 When errors persist, trace to design layer:
-
-```
-E0382 (moved value)
-    ↑ Ask: What design choice led to this ownership pattern?
-    ↑ Check: m09-domain (is this Entity or Value Object?)
-    ↑ Check: domain-* (what constraints apply?)
-```
 
 | Persistent Error | Trace To | Question |
 |-----------------|----------|----------|
@@ -122,13 +108,3 @@ From design decisions to implementation:
 | `'static` for everything | Restricts flexibility | Use appropriate lifetimes |
 | Leak with `Box::leak` | Memory leak | Proper lifetime design |
 
----
-
-## Related Skills
-
-| When | See |
-|------|-----|
-| Need smart pointers | m02-resource |
-| Need interior mutability | m03-mutability |
-| Data is domain entity | m09-domain |
-| Learning ownership concepts | m14-mental-model |

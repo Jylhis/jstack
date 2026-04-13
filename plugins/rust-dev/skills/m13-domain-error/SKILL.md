@@ -12,11 +12,6 @@ user-invocable: false
 
 **Who needs to handle this error, and how should they recover?**
 
-Before designing error types:
-- Is this user-facing or internal?
-- Is recovery possible?
-- What context is needed for debugging?
-
 ---
 
 ## Error Categorization
@@ -32,8 +27,6 @@ Before designing error types:
 ---
 
 ## Thinking Prompt
-
-Before designing error types:
 
 1. **Who sees this error?**
    - End user → friendly message, actionable
@@ -55,13 +48,6 @@ Before designing error types:
 ## Trace Up ↑
 
 To domain constraints (Layer 3):
-
-```
-"How should I handle payment failures?"
-    ↑ Ask: What are the business rules for retries?
-    ↑ Check: domain-fintech (transaction requirements)
-    ↑ Check: SLA (availability requirements)
-```
 
 | Question | Trace To | Ask |
 |----------|----------|-----|
@@ -168,13 +154,3 @@ where
 | Box<dyn Error> everywhere | Lost type info | thiserror |
 | Error in happy path | Performance | Early validation |
 
----
-
-## Related Skills
-
-| When | See |
-|------|-----|
-| Error handling basics | m06-error-handling |
-| Retry implementation | m07-concurrency |
-| Domain modeling | m09-domain |
-| User-facing APIs | domain-* |
