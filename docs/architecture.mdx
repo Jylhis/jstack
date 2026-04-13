@@ -28,26 +28,9 @@ exist in the repo), **install** (how they reach `~/.claude/`), and
 
 ## Install model
 
-`scripts/install.bash` is a symlink installer. For each tracked top-level
-file or directory, it:
-
-1. Refuses to run as root.
-2. Verifies the repo looks like a jstack checkout (`settings.json` and
-   `skills/` must exist).
-3. Symlinks `settings.json` and `CLAUDE.md` into `~/.claude/`.
-4. Symlinks `skills/`, `agents/`, `commands/`, `hooks/`, and `plugins/`
-   into `~/.claude/`.
-5. Builds the runtime via `nix-build runtime/default.nix` and links the
-   result under `~/.local/state/jstack/runtime`.
-6. Updates the shell `rc` so `~/.local/state/jstack/runtime/bin` is
-   on `PATH`.
-
-Anything the installer would displace is moved into a timestamped backup
-under `~/.claude/.jstack-backups/<timestamp>/`. A `RESTORE.md` is
-dropped alongside.
-
-The installer is **idempotent**: re-running on a clean tree reports zero
-actions.
+`scripts/install.bash` symlinks tracked files and directories into
+`~/.claude/`, builds the runtime, and updates the shell `rc`. See
+[Install](/install) for flags, phases, and prerequisites.
 
 ## Runtime model
 
@@ -87,10 +70,3 @@ install a plugin via Claude Code's marketplace UI (`/plugin install foo`),
 it writes a new directory under `plugins/` and shows up in `git status`.
 Either commit the new plugin to the repo or revert it.
 
-## Why no submodules
-
-An earlier iteration of jstack vendored upstream plugin sources via git
-submodules under `vendor/`, with symlinks into `plugins/jstack-vendored/`.
-That layer was removed: every plugin currently shipped is owned content
-that lives directly under `plugins/<name>/`. There is no `vendor/` and no
-`bump-vendor.bash`.

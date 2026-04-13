@@ -1,25 +1,19 @@
 # jstack
 
-My vibecoding setup. Heavily inprogress. Do not expect stability or even working setup.
+Vibecoding setup. Fully managed with Nix. Bundles skills, agents, commands, hooks, settings, development environment, and promptfoo evals.
 
-Fully managed with Nix. Bundles skills, agents, commands, hooks, settings, tools, devenlopemnt environment for testing and evaluating performance with promptfoo.
+Currently only supports Claude Code, but Codex and Gemini support is in progress.
 
-Currently only support claude code, but codex and gemini support is in progress (kind of).
+Installation with home-manager module or `scripts/install.bash`.
 
-Installation with home-manager module.
-
-<!-- TODO: Remove install.bash installer -->
-
-Docs lives in docs/ folder and is published to https://docs.jylhis.com/jstack
-
+Docs: https://docs.jylhis.com/jstack
 
 ## Categories
 
-All things are generally categorised under following  categories:
+All things are generally categorised under following categories:
 
-- **supporting** - These are generally not called by user directly, but instead automatically loaded by models when needed e.g. rust-dev
-- **workflow** - These are the main thing you call e.g. /review , /debug , /troubleshoot
-
+- **supporting** - Not called by user directly, automatically loaded by models when needed e.g. rust-dev
+- **workflow** - The main thing you call e.g. /review, /debug, /troubleshoot
 
 ## Layout
 
@@ -59,7 +53,6 @@ All things are generally categorised under following  categories:
     └── eval.bash              # run promptfoo (--fast, --plugin)
 ```
 
-
 ## Plugin definition
 
 Each plugin is defined by a `plugin.nix` file (source of truth). Manifests
@@ -98,53 +91,3 @@ npins add github anthropics skills     # pin the repo
 ```
 
 List all discovered skills: `just list-skills`
-
-## Install
-
-<!-- TODO: Remove script installed, instead document home-manager installation -->
-
-Run inside a devenv shell (or anywhere `nix` and standard tools are on
-`PATH`):
-
-```bash
-bash scripts/install.bash --dry-run          # preview (Claude Code, default)
-bash scripts/install.bash                    # apply
-bash scripts/install.bash --target codex     # deploy to Codex CLI
-bash scripts/install.bash --target gemini    # deploy to Gemini CLI
-bash scripts/install.bash --target all       # deploy to all agents
-exec zsh                                     # pick up the PATH change
-```
-
-The install is idempotent — re-running reports zero actions if nothing
-changed. A timestamped backup of any displaced files lands in
-`~/.claude/.jstack-backups/<timestamp>/`.
-
-### First-run prerequisites
-
-If `~/.claude/settings.json` or `~/.claude/CLAUDE.md` is currently a
-symlink into the nix store (managed by an existing home-manager module),
-`install.bash` will replace it but the home-manager module will recreate
-the link on the next `home-manager switch`. Disable the module
-out-of-band first:
-
-1. Remove `programs.jstack.enable = true;` (or equivalent) from
-   your home-manager configuration
-2. Run `home-manager switch`
-3. Then run `bash scripts/install.bash`
-
-## Develop
-
-```bash
-direnv allow                   # enter the devenv shell
-lint                           # markdownlint + jq settings.json
-install                        # alias for scripts/install.bash
-eval                           # full promptfoo run
-eval-fast                      # routing tests only
-eval-plugin nix-dev            # evals for a specific plugin
-just generate-settings         # regenerate settings.json from settings.nix
-just generate-manifests        # regenerate all plugin.json/.mcp.json/.lsp.json
-just list-skills               # list all discovered skills
-just add-source owner repo     # pin a third-party skill source
-just install-target codex      # install for a specific agent
-```
-
