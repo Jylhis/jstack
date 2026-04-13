@@ -8,15 +8,9 @@ description: >
 
 # Java code style (Java 21 LTS)
 
-Java 21 is the current LTS (2026). Use its features — records, sealed
-types, pattern matching, switch expressions, text blocks, virtual
-threads. Legacy Java-8-style code should be modernized when touched,
-not held sacred.
-
 ## Baseline: Google Java Style
 
-The Google Java Style Guide is the closest thing to a community
-standard. Differences from Oracle's old conventions:
+Differences from Oracle's old conventions:
 
 - **2-space indent** (not 4).
 - **100-column line length** (not 80).
@@ -72,10 +66,9 @@ double area(Shape shape) {
 }
 ```
 
-- Sealed + records + pattern-matching switch is the modern Java take
-  on discriminated unions. Use it.
-- **Exhaustive** switch expressions require all permitted subtypes —
-  the compiler enforces this.
+- Sealed + records + pattern-matching switch = discriminated unions.
+- **Exhaustive** switch expressions — the compiler enforces all
+  permitted subtypes.
 - Use `case X x when cond ->` for guards.
 
 ## `var` for local variables (Java 10+)
@@ -86,7 +79,7 @@ var config = new HashMap<String, Object>();
 ```
 
 - Use `var` when the type is obvious from the right-hand side.
-- Do **not** use `var` for primitives or when the type is non-obvious
+- Do **not** use `var` when the type is non-obvious
   (`var result = compute()` — what does `compute()` return?).
 - `var` is not allowed on fields — only local variables.
 
@@ -100,9 +93,8 @@ String sql = """
     """;
 ```
 
-Three `"""` fences. Indentation is relative to the closing fence —
-everything left of it is stripped. Use for SQL, JSON, HTML, and any
-multi-line literal.
+Three `"""` fences. Indentation is relative to the closing fence.
+Use for SQL, JSON, HTML, and any multi-line literal.
 
 ## Streams vs loops
 
@@ -110,24 +102,19 @@ multi-line literal.
   hot paths.
 - **Streams** for transformations, filtering, and aggregation where
   the result is a new collection.
-- Avoid mixing `forEach` with side effects — streams are meant for
-  functional transformations.
-- `Collectors.toList()` → `.toList()` (Java 16+) for unmodifiable
+- Avoid mixing `forEach` with side effects.
+- `Collectors.toList()` -> `.toList()` (Java 16+) for unmodifiable
   results.
 
 ## Null handling
 
 - Use `Optional<T>` for return values that may be absent. Do not use
   `Optional` as a field or parameter.
-- Use `@Nullable` / `@NonNull` annotations from JSpecify for null
-  analysis — the upcoming standard.
+- Use `@Nullable` / `@NonNull` annotations from JSpecify.
 - Never return `null` for collections — return an empty collection.
 - Use `Objects.requireNonNull(x, "x")` for constructor args.
 
 ## Modern classes: records, sealed, immutable by default
-
-The Java ethos is shifting toward immutability and value-oriented
-types. Prefer:
 
 1. **Records** over `@Data` POJOs.
 2. **Sealed interfaces** over abstract classes with package-private
@@ -143,8 +130,8 @@ types. Prefer:
   after the component (`user.name()`, not `user.getName()`).
 - **`public class ...` with just fields + getters + setters** — use
   a record.
-- **Checked exceptions in modern code** — annoying, propagate up as
-  unchecked (`RuntimeException` subclass).
+- **Checked exceptions in modern code** — propagate up as unchecked
+  (`RuntimeException` subclass).
 - **`@SuppressWarnings` without a comment** explaining why.
 - **`System.out.println` for logging** — use SLF4J.
 - **`new Date()` / `SimpleDateFormat`** — use `java.time` (`Instant`,

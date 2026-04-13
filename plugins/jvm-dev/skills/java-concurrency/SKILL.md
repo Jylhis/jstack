@@ -8,16 +8,11 @@ description: >
 
 # Java concurrency (Java 21)
 
-Java 21 introduces **virtual threads** as a stable feature (JEP 444),
-changing how you structure concurrent Java code. Structured
-concurrency is still in preview but usable. Most guidance from the
-pre-21 era is obsolete for new code.
-
 ## Virtual threads
 
-Virtual threads are lightweight JVM-managed threads — millions fit in
-a process, and blocking calls (I/O, file, DB) park the virtual thread
-without blocking the underlying OS thread.
+Lightweight JVM-managed threads (JEP 444) — millions fit in a process,
+and blocking calls park the virtual thread without blocking the OS
+thread.
 
 ```java
 // Run a task on a virtual thread
@@ -38,8 +33,8 @@ try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
   queries, file reads, inter-service calls.
 - Use **platform threads** (the classic `ForkJoinPool`,
   `Executors.newFixedThreadPool`) for **CPU-bound** work.
-- `synchronized` blocks still pin virtual threads to carriers — avoid
-  them in hot paths; use `ReentrantLock` instead.
+- `synchronized` blocks still pin virtual threads to carriers — use
+  `ReentrantLock` instead in hot paths.
 - Don't pool virtual threads — they are cheap to create.
 
 ## Structured concurrency (preview in 21, stabilizing)
@@ -60,9 +55,6 @@ try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
   the rest.
 - Scope close blocks until all children complete — no leaked tasks.
 
-This mirrors Kotlin coroutines' structured concurrency. Use it when
-available.
-
 ## CompletableFuture (pre-21 idiom, still used)
 
 ```java
@@ -80,14 +72,9 @@ String result = future.get();
 - **Chain** with `.thenApply`, `.thenCompose`, `.thenCombine`.
 - **Compose** multiple futures with `CompletableFuture.allOf` or
   `anyOf`.
-- Always pass an **explicit executor** — the common pool has limited
-  capacity and is shared with the JVM.
-- **`.get()`** blocks. Use it sparingly in application code. Virtual
-  threads make this less painful than before.
-
-Prefer structured concurrency for new code, but
-`CompletableFuture` remains relevant for libraries that expose
-async APIs.
+- Always pass an **explicit executor** — the common pool is shared
+  with the JVM.
+- **`.get()`** blocks. Virtual threads make this less painful.
 
 ## Executors
 
@@ -170,8 +157,8 @@ config.updateAndGet(old -> merge(old, overrides));
   `Phaser`, or `await` primitives.
 - **`new Thread()` scattered throughout the code** — use an
   executor.
-- **`synchronized` on a mutable public field** (e.g. the list itself)
-  — clients can bypass the lock.
+- **`synchronized` on a mutable public field** — clients can bypass
+  the lock.
 - **Double-checked locking with plain fields** — use `volatile` or
   `AtomicReference`.
 - **Catching `InterruptedException` and swallowing it** — always

@@ -8,13 +8,9 @@ description: >
 
 # Gradle with Kotlin DSL
 
-Gradle is the JVM default build tool. Use the **Kotlin DSL**
-(`build.gradle.kts`) in all new projects — it gives you IDE
-autocompletion, type-safe accessors, and better error messages than
-the Groovy DSL. Maven is fine for legacy projects; do not start new
-projects with it.
-
-Target **Gradle 8.10+** and **Java 21 LTS**.
+Use the **Kotlin DSL** (`build.gradle.kts`) — type-safe accessors,
+IDE autocompletion, better error messages. Target **Gradle 8.10+**
+and **Java 21 LTS**.
 
 ## Single-project layout
 
@@ -108,7 +104,7 @@ tasks.test {
 Key points:
 
 - **`java.toolchain`** — Gradle downloads the specified JDK if not
-  present. Don't rely on `JAVA_HOME`.
+  present.
 - **`allWarningsAsErrors = true`** — catches deprecations early.
 - **`useJUnitPlatform()`** is required on `tasks.test` for JUnit 5.
 - **`libs.*`** accessors come from the version catalog (below).
@@ -138,9 +134,7 @@ kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 
 - **One source of truth** for versions.
 - **Type-safe accessors** in `build.gradle.kts` (`libs.junit.jupiter`).
-- **Grouping versions** under one key — bumping `kotlin` updates the
-  plugin too.
-- Commit `libs.versions.toml` with the rest of the repo.
+- Bumping `kotlin` updates the plugin too.
 
 ## Multi-project build
 
@@ -165,10 +159,9 @@ my-mono/
     └── build.gradle.kts
 ```
 
-For large multi-project builds, use **convention plugins** in
-`buildSrc/` or a composite build in `build-logic/`. Shared config in a
-top-level `build.gradle.kts` via `subprojects { ... }` is a legacy
-pattern and harder to test.
+Use **convention plugins** in `buildSrc/` or a composite build in
+`build-logic/`. Shared config via `subprojects { ... }` is a legacy
+pattern.
 
 ## Common tasks
 
@@ -184,9 +177,6 @@ pattern and harder to test.
 ./gradlew --scan build           # build scan with Develocity
 ```
 
-Always use the wrapper (`./gradlew`), never the global `gradle`
-binary. The wrapper ensures everyone in the repo uses the same version.
-
 ## Build cache and scans
 
 ```bash
@@ -196,12 +186,10 @@ org.gradle.parallel=true
 org.gradle.configuration-cache=true
 ```
 
-- **Configuration cache** — skips the configuration phase on subsequent
-  builds. Some plugins don't support it yet; turn off if you hit issues.
+- **Configuration cache** — skips the configuration phase on repeat builds.
 - **Parallel** — runs independent tasks in parallel across modules.
 - **Build cache** — shares outputs between projects and CI.
-- **Build scans** (`./gradlew build --scan`) upload a detailed report
-  to scans.gradle.com — invaluable for debugging slow builds.
+- **Build scans** (`./gradlew build --scan`) — detailed report to scans.gradle.com.
 
 ## Incremental + up-to-date checks
 
@@ -221,7 +209,7 @@ Gradle skips unchanged tasks. Make tasks incremental-friendly:
 - Pinning plugin versions in each module instead of the version
   catalog.
 - `gradle clean build` as the standard command — `clean` defeats the
-  cache. Only use when debugging.
+  cache.
 - `compile` configuration — deprecated, use `implementation` or `api`.
 - Mixing `implementation` and `api` randomly — `api` for transitive
   exposure (libraries), `implementation` for internal (most things).

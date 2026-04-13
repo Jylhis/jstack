@@ -8,12 +8,6 @@ description: >
 
 # JVM testing: JUnit 5 (Java) + kotest (Kotlin)
 
-For Java use **JUnit Jupiter** (JUnit 5) with **AssertJ** assertions.
-For Kotlin use **kotest** with its own assertion library and specs.
-For cross-language tests, JUnit 5 with kotest assertions is fine.
-
-Do not use JUnit 4 in new projects.
-
 ## Gradle dependencies
 
 ```kotlin
@@ -68,19 +62,14 @@ class UserServiceTest {
 }
 ```
 
-- **`@BeforeEach`** sets up fresh state per test — no shared mutable
-  fixtures.
-- **AssertJ** (`assertThat`) is the assertion library; it has
-  fluent, targeted matchers far beyond JUnit's built-in asserts.
+- **`@BeforeEach`** sets up fresh state per test.
+- **AssertJ** (`assertThat`) — fluent, targeted matchers.
 - **Nested tests** with `@Nested` group related cases.
-- **Test lifecycle**: JUnit 5 creates a new instance per test method
-  by default. Annotate the class with `@TestInstance(Lifecycle.PER_CLASS)`
-  to share state if needed.
+- JUnit 5 creates a new instance per test method by default.
 
 ## kotest basics (Kotlin)
 
-kotest ships multiple spec styles. Pick one per project and stay
-consistent. `StringSpec` is the most compact:
+Pick one spec style per project. `StringSpec` is the most compact:
 
 ```kotlin
 import io.kotest.core.spec.style.StringSpec
@@ -105,12 +94,8 @@ class UserServiceTest : StringSpec({
 })
 ```
 
-Alternative spec styles:
-
-- `FunSpec` — `test("...")` syntax, similar to JUnit.
-- `DescribeSpec` — `describe(...) { it(...) }` RSpec-style.
-- `BehaviorSpec` — `given { when { then } }` BDD-style.
-- `FreeSpec` — arbitrary nesting with `-` separators.
+Alternative spec styles: `FunSpec`, `DescribeSpec`, `BehaviorSpec`,
+`FreeSpec`.
 
 ## Parametrized tests
 
@@ -174,8 +159,6 @@ fake implementation keeps tests fast and honest.
 
 ## Integration tests with Testcontainers
 
-For tests that need a real database, Kafka broker, or Redis:
-
 ```java
 @Testcontainers
 class UserRepositoryIT {
@@ -193,12 +176,9 @@ class UserRepositoryIT {
 }
 ```
 
-Testcontainers spins up Docker containers and shuts them down after
-the test class. Adds real-dependency confidence without mock drift.
-
 ## Coverage
 
-Use **JaCoCo** for coverage. Gradle:
+Use **JaCoCo** for coverage:
 
 ```kotlin
 plugins {
@@ -214,9 +194,6 @@ tasks.jacocoTestReport {
 }
 ```
 
-Upload XML to Codecov / Coveralls. Aim for 80%+ on non-trivial code
-but don't chase 100%.
-
 ## Running
 
 ```bash
@@ -231,8 +208,7 @@ but don't chase 100%.
 ## Anti-patterns
 
 - JUnit 4 in new projects.
-- **Static mocks** (PowerMock) — means the code is hard to test;
-  refactor to inject the dependency.
+- **Static mocks** (PowerMock) — refactor to inject the dependency.
 - **Testing implementation details** (private methods, internal
   state) — test observable behaviour.
 - **Shared mutable state** between tests (`static` fields without

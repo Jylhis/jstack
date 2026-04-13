@@ -9,10 +9,6 @@ description: >
 
 # JVM security
 
-Java and Kotlin share the JVM's security landscape. Some of these
-footguns are famous (Log4Shell), others less so but still common in
-real codebases.
-
 ## JNDI / Log4Shell class
 
 **Never pass user input to JNDI lookups.** Log4j 2's `${jndi:...}`
@@ -28,11 +24,10 @@ was enough to trigger RCE on vulnerable versions.
 
 Mitigations:
 
-- **Upgrade Log4j to 2.17.1 or later** (or switch to Logback, the
-  default SLF4J implementation).
+- **Upgrade Log4j to 2.17.1 or later** (or switch to Logback).
 - **Never enable JNDI lookups** in log patterns, LDAP resolvers, or
   any library that accepts user input as a "resource name."
-- Set `log4j2.formatMsgNoLookups=true` as a fallback defence in depth.
+- Set `log4j2.formatMsgNoLookups=true` as defence in depth.
 
 ## Java serialization (ObjectInputStream)
 
@@ -52,19 +47,12 @@ Safe alternatives:
   polymorphic deserialization config.
 - **Protobuf** for structured binary data.
 - **`ObjectInputFilter`** (Java 9+) whitelists allowed classes if you
-  absolutely must use Java serialization.
-- **Kryo** with class registration — safer than Java's default but
-  still needs audit.
-
-Disable Java serialization in new projects. Records (Java 16+) are
-not auto-serializable unless you `implements Serializable` — take
-advantage of that.
+  must use Java serialization.
+- **Kryo** with class registration — safer but still needs audit.
 
 ## XXE (XML External Entity)
 
-Default Java XML parsers enable external entity resolution, which
-allows attackers to read local files and perform SSRF via crafted
-XML:
+Default Java XML parsers enable external entity resolution:
 
 ```java
 // DANGEROUS — default parser, XXE enabled
@@ -84,9 +72,8 @@ dbf.setXIncludeAware(false);
 dbf.setExpandEntityReferences(false);
 ```
 
-Or use a safer library: **Jackson's `XmlMapper`** has saner defaults
-for deserialization, **jsoup** for HTML, **StAX with security feature
-set**.
+Or use Jackson's `XmlMapper`, **jsoup** for HTML, **StAX with
+security feature set**.
 
 ## SQL injection
 
@@ -103,8 +90,7 @@ ResultSet rs = ps.executeQuery();
 ```
 
 - **JDBC `PreparedStatement`** with `?` placeholders.
-- **JPA `@Query`** with named parameters — never string concatenation
-  inside `@Query`.
+- **JPA `@Query`** with named parameters — never string concatenation.
 - **jOOQ / Exposed** — use the type-safe DSL, not `execute` with a
   string.
 - **Spring Data JDBC `NamedParameterJdbcTemplate`** — parameterizes
@@ -129,16 +115,13 @@ if (addr.isAnyLocalAddress() || addr.isLoopbackAddress()
 
 - Block private ranges, metadata endpoints (169.254.169.254).
 - Resolve once and fetch by IP to prevent DNS rebinding.
-- Use a dedicated library like `guava-ext`'s URL validators when
-  available.
 
 ## Secrets
 
 - **Never commit secrets.** Use environment variables, secret
   managers (Vault, AWS Secrets Manager, Doppler), or `.env.local`
   with `.gitignore`.
-- **Never log secrets.** Use Logback's `%mask` or Spring's
-  `SanitizingMatcher`. Redact `Authorization`, `Cookie`, password
+- **Never log secrets.** Redact `Authorization`, `Cookie`, password
   fields.
 - **`javax.crypto` password-based encryption** needs
   `PBKDF2WithHmacSHA256` with a **random salt**, **100k+ iterations**,
@@ -152,9 +135,6 @@ Never SHA-256 a password. Use:
 - **bcrypt** via Spring Security's `BCryptPasswordEncoder`.
 - **PBKDF2** via `SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256")`.
 
-All three are tuneable (work factor, iterations). Use the library's
-default parameters unless you benchmarked a different value.
-
 ## Crypto: avoid the footguns
 
 - **Never roll your own crypto.**
@@ -164,15 +144,11 @@ default parameters unless you benchmarked a different value.
 - **`Cipher.getInstance("AES")`** — defaults to ECB. Use
   `"AES/GCM/NoPadding"`.
 - **`SecureRandom.getInstance("SHA1PRNG")`** — don't specify,
-  use `new SecureRandom()` which picks a good default.
+  use `new SecureRandom()`.
 - **RSA padding** — never `NoPadding` or `PKCS1`; use `OAEPWithSHA-256`.
 
-Prefer higher-level libraries:
-
-- **Tink** (Google) — a safe, easy-to-use crypto API.
-- **Bouncy Castle** — extensive but requires care.
-- **JWT:** `nimbus-jose-jwt` or `jjwt` — explicit algorithm choice,
-  validation built in.
+Prefer higher-level libraries: **Tink** (Google), **Bouncy Castle**,
+**nimbus-jose-jwt** or **jjwt** for JWT.
 
 ## Dependency audit
 
@@ -181,18 +157,15 @@ Prefer higher-level libraries:
 ```
 
 For supply-chain scanning, use Snyk, Socket.dev, or GitHub's
-Dependabot + CodeQL. Track vulnerabilities in your Gradle dependency
-graph on every merge to main.
+Dependabot + CodeQL.
 
 ## Reflection and SecurityManager
 
 - Java 17+ **deprecates the SecurityManager** (JEP 411). Do not rely
-  on it for new code.
-- **Reflection** can bypass access modifiers and is how many gadget
-  chains exploit applications. Avoid in user-facing code; if you must
-  reflect, validate class names against an allowlist.
-- **`Unsafe` APIs** — internal, prone to breakage, and a red flag in
-  code review.
+  on it.
+- **Reflection** can bypass access modifiers — avoid in user-facing
+  code; validate class names against an allowlist.
+- **`Unsafe` APIs** — internal, prone to breakage, red flag in review.
 
 ## Anti-patterns
 

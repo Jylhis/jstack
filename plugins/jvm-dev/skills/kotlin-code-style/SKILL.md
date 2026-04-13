@@ -8,9 +8,6 @@ description: >
 
 # Kotlin code style (2.0+)
 
-Kotlin 2.0 uses the K2 compiler by default — faster compilation and
-more consistent diagnostics. Write idiomatic Kotlin, not Java-in-Kotlin.
-
 ## Baseline
 
 - **Formatter:** `ktlint` or IntelliJ's built-in formatter (they
@@ -39,7 +36,7 @@ var count = 0                      // reassignable
 ```
 
 Prefer `List<T>` (read-only interface) over `MutableList<T>` in
-public APIs. Convert internally as needed.
+public APIs.
 
 ## Data classes
 
@@ -59,10 +56,8 @@ data class User(
   `componentN` destructuring accessors.
 - **Use for value types.** Not for entities with identity-based
   equality.
-- **`copy(...)`** gives you convenient immutable updates:
-  `user.copy(name = "Bob")`.
-- **Trailing comma** on the last parameter — allowed since Kotlin 1.4
-  and makes diffs cleaner.
+- **`copy(...)`** for immutable updates: `user.copy(name = "Bob")`.
+- **Trailing comma** — makes diffs cleaner.
 
 ## Sealed hierarchies
 
@@ -99,7 +94,7 @@ fun String.toSlug(): String =
 
 ## Scope functions (`let`, `apply`, `also`, `run`, `with`)
 
-Only five functions but they confuse newcomers. Rule of thumb:
+Rule of thumb:
 
 | Function | Receiver | Returns | Use for |
 |---|---|---|---|
@@ -139,8 +134,7 @@ in a row, pull out intermediate variables instead.
 
 - **Top-level functions** are fine — no need to wrap utilities in a
   class.
-- **`object` declarations** for singletons — replaces Java's
-  `enum Singleton { INSTANCE }` pattern.
+- **`object` declarations** for singletons.
 - **Companion objects** for factory methods and type-scoped constants:
   ```kotlin
   class User private constructor(val id: String) {
@@ -186,8 +180,7 @@ indentation, use `trimMargin("|")`.
   or a sealed hierarchy.
 - **`lateinit var` everywhere** — usually means the DI or lifecycle
   isn't right. Use `by lazy` or constructor injection.
-- **Forgetting `override` keyword** — not required in Kotlin but
-  always include for clarity.
+- **Missing `override` keyword** — always include for clarity.
 
 ## Tool detection
 

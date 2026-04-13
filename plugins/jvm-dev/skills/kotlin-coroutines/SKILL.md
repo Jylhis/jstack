@@ -8,11 +8,6 @@ description: >
 
 # Kotlin coroutines
 
-Coroutines are Kotlin's answer to async code: suspending functions,
-structured concurrency scopes, and channels/flows. Use
-`kotlinx.coroutines` — it's not in the stdlib but is maintained by
-JetBrains and is the standard.
-
 Target `kotlinx.coroutines` 1.9+.
 
 ## Dependencies
@@ -23,8 +18,8 @@ dependencies {
 }
 ```
 
-For Android/JVM-specific integrations add `-android` or
-`-javafx` as needed. For tests: `kotlinx-coroutines-test`.
+For tests: `kotlinx-coroutines-test`. For platform integrations:
+`-android` or `-javafx`.
 
 ## Suspending functions
 
@@ -34,10 +29,7 @@ suspend fun fetchUser(id: String): User {
 }
 ```
 
-- `suspend` means "this function may suspend the coroutine while it
-  waits."
 - Only callable from other suspend functions or coroutine builders.
-- Regular functions call suspend functions by launching a coroutine.
 
 ## Coroutine builders
 
@@ -63,8 +55,7 @@ fun main() = runBlocking {
 ## Structured concurrency
 
 Every coroutine is a child of a `CoroutineScope`. When the scope is
-cancelled (e.g. a UI element is destroyed, an HTTP request completes,
-a CLI command returns), all children are cancelled.
+cancelled, all children are cancelled.
 
 ```kotlin
 coroutineScope {
@@ -73,11 +64,9 @@ coroutineScope {
 }  // returns after both tasks finish; cancels both if either fails
 ```
 
-- **`coroutineScope`** — fails fast: cancelling any child cancels the
+- **`coroutineScope`** — fails fast: any child failure cancels
   siblings and the scope.
 - **`supervisorScope`** — child failures do **not** cancel siblings.
-  Use when you want independent tasks where one failure shouldn't
-  bring down the rest.
 
 ```kotlin
 suspend fun loadDashboard(userId: String): Dashboard = coroutineScope {
@@ -88,21 +77,16 @@ suspend fun loadDashboard(userId: String): Dashboard = coroutineScope {
 }
 ```
 
-If any of the three async calls fails, the other two are cancelled —
-exactly the behaviour you want for a page load.
-
 ## Dispatchers
-
-Control which thread pool coroutines run on:
 
 - **`Dispatchers.Default`** — CPU-bound work. Fork-join pool sized to
   CPU count.
 - **`Dispatchers.IO`** — I/O-bound work. Expandable pool up to 64
-  threads (or limited by `kotlinx.coroutines.io.parallelism`).
+  threads.
 - **`Dispatchers.Main`** — UI thread (Android, JavaFX). Requires the
   platform-specific dependency.
 - **`Dispatchers.Unconfined`** — caller's thread; don't use in
-  production code.
+  production.
 
 ```kotlin
 suspend fun readFile(path: Path): ByteArray = withContext(Dispatchers.IO) {
@@ -111,17 +95,11 @@ suspend fun readFile(path: Path): ByteArray = withContext(Dispatchers.IO) {
 ```
 
 - **`withContext`** switches dispatcher for a block and switches back.
-- **Do not block threads** in `Default` — it's small and shared.
 - **Always wrap blocking JVM APIs** in `withContext(Dispatchers.IO)`.
-  Even better: on Java 21+, use virtual thread dispatcher
-  (`newFixedThreadPoolContext` with virtual threads) and let
-  blocking work happen freely.
 
 ## Cancellation
 
-Coroutines are **cooperative** — cancellation only takes effect at
-suspension points. A tight CPU loop without suspensions ignores
-cancellation.
+Cancellation is **cooperative** — only takes effect at suspension points.
 
 ```kotlin
 suspend fun process(items: List<Item>) {
@@ -133,8 +111,7 @@ suspend fun process(items: List<Item>) {
 ```
 
 - Call `yield()` inside long loops.
-- `ensureActive()` throws `CancellationException` if the scope is
-  cancelled — use when `yield()` isn't appropriate.
+- `ensureActive()` throws `CancellationException` if cancelled.
 - Catch `CancellationException` **only to clean up**, then re-throw:
   ```kotlin
   try {
@@ -147,8 +124,7 @@ suspend fun process(items: List<Item>) {
 
 ## Flow
 
-`Flow<T>` is cold, async sequences — the coroutine equivalent of
-`Stream<T>` or `Observable<T>`:
+`Flow<T>` is cold, async sequences:
 
 ```kotlin
 fun readLines(path: Path): Flow<String> = flow {
@@ -166,8 +142,7 @@ readLines(path)
 
 - **Cold** — nothing runs until a terminal operator (`.collect`,
   `.toList`, `.first`, etc.).
-- **`flowOn(dispatcher)`** changes the dispatcher upstream — apply
-  once near the source.
+- **`flowOn(dispatcher)`** changes the dispatcher upstream.
 - **`StateFlow`** and **`SharedFlow`** are hot variants for state
   management and event buses.
 
@@ -189,9 +164,9 @@ supervisorScope {
 }
 ```
 
-- **`try`/`catch`** inside `async` blocks — by default `async`
-  rethrows on `.await()`, but with `supervisorScope` it doesn't
-  propagate to siblings.
+- **`try`/`catch`** inside `async` blocks — `async` rethrows on
+  `.await()`, but with `supervisorScope` it doesn't propagate to
+  siblings.
 - **`CoroutineExceptionHandler`** for uncaught top-level errors:
   ```kotlin
   val handler = CoroutineExceptionHandler { _, ex ->
@@ -216,23 +191,17 @@ fun fetchesUsers() = runTest {
 - **`runTest`** provides a test dispatcher that controls virtual time.
 - **`advanceTimeBy(ms)`** skips ahead for delay-based tests.
 - **`StandardTestDispatcher`** vs **`UnconfinedTestDispatcher`** —
-  choose based on whether you want eager or deferred execution.
+  eager vs deferred execution.
 
 ## Anti-patterns
 
-- **`GlobalScope.launch`** — creates a top-level coroutine with no
-  structure. Use a specific scope.
-- **`runBlocking` in production code** — blocks a platform thread;
-  use only in main() entry points and tests.
-- **Calling blocking JVM code without `withContext(Dispatchers.IO)`**
-  — blocks the default dispatcher threads.
-- **Ignoring `CancellationException`** — it's how cancellation works;
-  catching and swallowing it breaks everything.
+- **`GlobalScope.launch`** — no structure. Use a specific scope.
+- **`runBlocking` in production code** — blocks a platform thread.
+- **Calling blocking JVM code without `withContext(Dispatchers.IO)`**.
+- **Ignoring `CancellationException`** — swallowing it breaks
+  cancellation.
 - **Launching children but not waiting** — they may be cancelled
-  when the outer scope ends. Use structured builders.
-- **Nested `suspend fun` calls that look synchronous but span
-  multiple dispatcher switches** — readable code, but beware of the
-  cost.
+  when the outer scope ends.
 - **Using `Dispatchers.Default` for I/O** — use `IO`, which has a
   much larger pool.
 

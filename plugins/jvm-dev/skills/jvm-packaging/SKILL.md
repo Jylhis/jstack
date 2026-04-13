@@ -9,12 +9,7 @@ description: >
 
 # JVM packaging and publishing
 
-Publishing a JVM library to Maven Central is fiddly. Since the 2024
-Central migration to `central.sonatype.com`, the old `ossrh` staging
-API is being replaced by a new portal API. Use a modern Gradle plugin
-that supports it.
-
-## Plugins to use
+## Plugins
 
 - **`maven-publish`** (built-in) — generates a local Maven
   repository and handles POM metadata.
@@ -23,8 +18,8 @@ that supports it.
 - **`org.jreleaser`** (JReleaser) — more features (multiple targets,
   GitHub releases, changelogs) at the cost of more config.
 
-For simple libraries use nmcp. For multi-target releases with
-GitHub Releases integration, use JReleaser.
+Use nmcp for simple libraries. Use JReleaser for multi-target releases
+with GitHub Releases integration.
 
 ## Gradle build config
 
@@ -102,7 +97,7 @@ Key points:
 - **Signing** — every artifact must be GPG-signed. Use
   `useInMemoryPgpKeys` in CI with env vars, never commit keys.
 - **`publishingType = "AUTOMATIC"`** — auto-promotes to Central after
-  validation. Use `USER_MANAGED` if you want a manual review step.
+  validation. Use `USER_MANAGED` for a manual review step.
 
 ## POM requirements (Maven Central)
 
@@ -128,14 +123,11 @@ Plus:
 
 - **Semantic versioning**: `MAJOR.MINOR.PATCH` with optional
   `-alpha.N`, `-beta.N`, `-rc.N` pre-release suffixes.
-- **No `-SNAPSHOT` on Maven Central** — snapshots go to a separate
-  repo if needed.
+- **No `-SNAPSHOT` on Maven Central**.
 - **Tag the release** in git as `vX.Y.Z` and publish from the tagged
   commit.
 
 ## JPMS modules (`module-info.java`)
-
-If your library wants to support the Java Platform Module System:
 
 ```java
 // src/main/java/module-info.java
@@ -148,12 +140,10 @@ module com.example.mylib {
 }
 ```
 
-- **`requires`** — modules you use.
-- **`requires transitive`** — modules that leak into your public API
-  (consumers need them too).
+- **`requires transitive`** — modules that leak into your public API.
 - **`exports`** — packages visible to consumers.
-- `module-info.java` adds cost and complexity. For libraries not
-  targeting modular apps, an auto-module (no `module-info`) is fine.
+- For libraries not targeting modular apps, an auto-module (no
+  `module-info`) is fine.
 
 ## Publishing workflow
 
@@ -183,8 +173,6 @@ jobs:
 
 ## Pre-release checklist
 
-Before tagging a release:
-
 1. All tests pass (`./gradlew test`).
 2. No deprecation warnings (`allWarningsAsErrors = true`).
 3. `CHANGELOG.md` updated.
@@ -199,10 +187,10 @@ Before tagging a release:
 - **Hardcoded credentials** in `build.gradle.kts`.
 - **No GPG signing** — Central rejects.
 - **Missing Javadoc/sources JAR**.
-- **Publishing from a dirty working tree** (uncommitted changes).
+- **Publishing from a dirty working tree**.
 - **`groupId` on a domain you don't own** — Sonatype rejects.
 - **Using the old `ossrh` staging** in 2026 — use the new portal.
-- **Releasing without a changelog** — users can't tell what changed.
+- **Releasing without a changelog**.
 
 ## Tool detection
 
