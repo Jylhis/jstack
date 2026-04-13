@@ -6,8 +6,6 @@ user-invocable: false
 
 # Home Manager
 
-Home Manager manages user-level configuration and dotfiles declaratively with Nix.
-
 ## Setup Modes
 
 | Mode | Entry point | Command |
@@ -42,8 +40,6 @@ Home Manager manages user-level configuration and dotfiles declaratively with Ni
 ```
 
 ## Programs Module
-
-Most programs have dedicated modules with typed options:
 
 ```nix
 {

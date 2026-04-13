@@ -16,8 +16,6 @@ If the mcp-nixos MCP server is available, use it for richer search with version 
 
 ## callPackage Pattern
 
-The standard way packages are defined in nixpkgs. A package file is a function taking its dependencies, and `callPackage` auto-supplies them from the package set:
-
 ```nix
 # pkgs/tools/misc/hello/default.nix
 { lib, stdenv, fetchurl }:
@@ -42,7 +40,7 @@ hello = callPackage ./pkgs/tools/misc/hello { };
 
 ## stdenv.mkDerivation
 
-The main builder. Key phases in order:
+Phases in order:
 
 1. **unpackPhase** — extracts `src`
 2. **patchPhase** — applies `patches` list
@@ -154,8 +152,6 @@ pkgs.hello.override {
 
 ## Overlays
 
-An overlay is a function `final: prev:` that modifies the package set:
-
 ```nix
 # In flake.nix or ~/.config/nixpkgs/overlays/
 final: prev: {
@@ -176,22 +172,12 @@ Rule: use `prev.foo` for the package you're overriding, `final.bar` for its depe
 
 ### Composing Upstream Overlays
 
-When consuming another project's overlay and extending it with custom
-packages:
-
 ```nix
 final: prev:
 (upstream.overlays.default final prev) // {
   my-extra = final.callPackage ./my-extra.nix { };
 }
 ```
-
-This works because `final` is the shared fixpoint — the upstream overlay
-is applied first, then custom attributes are merged on top. Both the
-upstream packages and custom packages see the same `final` package set.
-
-Use this pattern when a dependency exposes an overlay that you want to
-extend rather than replace.
 
 ## Cross-Platform
 

@@ -102,8 +102,6 @@ deadnix --no-underscore       # Don't report unused _-prefixed names
 
 ## nixfmt
 
-The standard Nix formatter. Uses `nixfmt-rfc-style` conventions.
-
 ```bash
 # Format all Nix files in place
 nixfmt .
@@ -114,12 +112,6 @@ nixfmt --check .
 # Format specific files
 nixfmt flake.nix default.nix
 ```
-
-### Formatting Before Migration
-
-When doing large refactors, run `nixfmt .` and commit separately
-(message: `style: nixfmt`) to keep cosmetic changes out of the
-functional commit.
 
 ## nix-instantiate
 

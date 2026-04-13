@@ -22,8 +22,6 @@ user-invocable: false
 
 ## Functions
 
-Nix functions take exactly one argument. Multi-argument is done via currying or attrset patterns:
-
 ```nix
 # Curried
 add = a: b: a + b;
@@ -41,8 +39,6 @@ The `@` pattern captures the full attrset: `{ pname, ... } @ args:`.
 
 ### let-in
 
-Introduces local bindings. Bindings can reference each other (order doesn't matter due to laziness):
-
 ```nix
 let
   x = 1;
@@ -52,16 +48,12 @@ in x + y
 
 ### with
 
-Brings attrset attributes into scope. Doesn't shadow existing bindings:
-
 ```nix
 with pkgs; [ git curl wget ]
 # equivalent to: [ pkgs.git pkgs.curl pkgs.wget ]
 ```
 
 ### inherit
-
-Shorthand for `x = x;` in attrsets:
 
 ```nix
 { inherit src version; }
@@ -72,8 +64,6 @@ Shorthand for `x = x;` in attrsets:
 ```
 
 ### rec (recursive attrsets)
-
-Allows self-reference within attrsets. Avoid when possible — prefer `let-in`:
 
 ```nix
 rec {
@@ -87,8 +77,6 @@ rec {
 ```nix
 if condition then valueA else valueB
 ```
-
-No `if` without `else` — it's an expression, not a statement.
 
 ## String Patterns
 
@@ -109,8 +97,6 @@ No `if` without `else` — it's an expression, not a statement.
 ```
 
 ## Derivations
-
-A derivation is a build instruction. `builtins.derivation` is low-level; use `stdenv.mkDerivation` in practice:
 
 ```nix
 stdenv.mkDerivation {
@@ -164,7 +150,6 @@ lib.recursiveUpdate a b         # Deep merge attrsets
 
 ## Laziness
 
-Nix is lazy — values are only computed when needed. This allows:
 - Infinite data structures (nixpkgs is a giant attrset, only needed packages are evaluated)
 - Self-referencing configurations (NixOS modules reference each other)
 - `throw` in unused branches doesn't error

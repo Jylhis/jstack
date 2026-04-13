@@ -119,13 +119,9 @@ nix log /nix/store/...-hello   # Log for specific store path
 
 ### nix why-depends
 
-Trace why one package depends on another:
-
 ```bash
 nix why-depends nixpkgs#myapp nixpkgs#gcc
 ```
-
-Useful for understanding closure size and unexpected dependencies.
 
 ### nix path-info
 

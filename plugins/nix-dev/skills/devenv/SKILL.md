@@ -6,8 +6,6 @@ user-invocable: false
 
 # devenv
 
-[devenv](https://devenv.sh) provides declarative developer environments using Nix without requiring deep Nix knowledge.
-
 ## File Structure
 
 ```
@@ -25,20 +23,17 @@ project/
 { pkgs, lib, config, ... }:
 
 {
-  # Packages available in the shell
   packages = with pkgs; [
     git
     curl
     jq
   ];
 
-  # Environment variables
   env = {
     DATABASE_URL = "postgresql://localhost/dev";
     RUST_LOG = "debug";
   };
 
-  # Shell startup hook
   enterShell = ''
     echo "Welcome to the dev environment"
     git status
@@ -47,8 +42,6 @@ project/
 ```
 
 ## Languages
-
-devenv has built-in support for many languages:
 
 ```nix
 {
@@ -73,13 +66,11 @@ devenv has built-in support for many languages:
 
   languages.typescript.enable = true;
 
-  languages.nix.enable = true;  # Adds nil LSP, nixfmt, statix
+  languages.nix.enable = true;
 }
 ```
 
 ## Services
-
-Run infrastructure locally:
 
 ```nix
 {
@@ -206,15 +197,11 @@ devenv -O packages:pkgs "ripgrep fd" shell -- rg --version
 
 ## direnv Integration
 
-Add `.envrc` for automatic shell activation:
-
 ```bash
 # .envrc
 source_url "https://raw.githubusercontent.com/cachix/devenv/main/direnv-support.sh" ""
 use devenv
 ```
-
-Then `direnv allow`.
 
 ## Caching with Cachix
 

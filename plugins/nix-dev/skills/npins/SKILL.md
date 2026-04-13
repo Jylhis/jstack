@@ -6,10 +6,6 @@ user-invocable: false
 
 # npins
 
-[npins](https://github.com/andir/npins) pins external Nix dependencies
-(nixpkgs, third-party repos) without requiring flakes or experimental
-features. It is the non-flake equivalent of `flake.lock`.
-
 ## File Structure
 
 ```
@@ -18,9 +14,6 @@ project/
 │   ├── default.nix     # Auto-generated import helper
 │   └── sources.json    # Pin definitions and locked revisions
 ```
-
-Initialize with `npins init`. The `npins/` directory is committed to
-version control.
 
 ## Pin Types
 
@@ -76,26 +69,13 @@ first — see "Migrating Channel to GitHub" below.
 ## CLI Commands
 
 ```bash
-# Initialize npins in a project
-npins init
-
-# Add a GitHub repository pin
-npins add github NixOS nixpkgs --branch nixos-unstable
+npins init                                                  # Initialize
+npins add github NixOS nixpkgs --branch nixos-unstable      # Add GitHub pin
 npins add github nix-community home-manager --branch master
-
-# Add a NixOS channel pin
-npins add channel nixos-unstable
-
-# Remove a pin
+npins add channel nixos-unstable                            # Add channel pin
 npins remove nixpkgs
-
-# Update all pins to latest
-npins update
-
-# Update a single pin
-npins update nixpkgs
-
-# Show current pins
+npins update                                                # Update all
+npins update nixpkgs                                        # Update one
 npins show
 ```
 
@@ -188,17 +168,6 @@ other lock files (devenv.lock, flake.lock) — see the `nix-hybrid` skill.
   `builtins.fetchTarball` at evaluation time, which requires network
   access and fails under `nix flake check`'s pure evaluation. Do not
   expose npins-derived outputs as `packages.<system>.*` in a flake.
-
-## npins vs Flake Inputs
-
-| Aspect | npins | Flake inputs |
-|--------|-------|-------------|
-| Experimental features | None required | `nix-command`, `flakes` |
-| Lock file | `npins/sources.json` | `flake.lock` |
-| Pin granularity | Per-source | Per-input |
-| Pure evaluation | No (uses `builtins.fetchTarball`) | Yes |
-| Works with non-flake projects | Yes | Via `flake = false` |
-| Works with flake-only projects | Fetch only (cannot import) | Full support |
 
 In hybrid setups, npins pins nixpkgs (for dev and as the source of
 truth), while flake inputs handle flake-only upstream dependencies.

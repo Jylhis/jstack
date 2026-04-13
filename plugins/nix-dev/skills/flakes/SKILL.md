@@ -169,10 +169,6 @@ nix flake metadata       # Show input versions
 nix fmt                  # Run configured formatter
 ```
 
-## Lock File
-
-`flake.lock` pins exact versions of all inputs. Commit it to version control. Update with `nix flake update`.
-
 ## Pure Evaluation Constraints
 
 `nix flake check` evaluates different outputs to different depths. This
@@ -199,8 +195,8 @@ synchronization, not for building.
 
 ## flake-utils vs flake-parts
 
-- **flake-utils**: Simple helper, `eachDefaultSystem` iterates over systems
-- **flake-parts**: More powerful module system for flakes, better for complex setups
+- **flake-utils**: `eachDefaultSystem` iterates over systems
+- **flake-parts**: Module system for flakes, better for complex setups
 
 ```nix
 # flake-parts example
