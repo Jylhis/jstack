@@ -207,12 +207,3 @@ apiKey: '{{env.OPENAI_API_KEY}}'
     Only states facts from: "{{article}}"
 ```
 
-## Output contract
-
-When done, state:
-
-- What the suite evaluates (1-3 bullets)
-- Files created/modified (paths)
-- How to run (copy-pastable commands)
-- Required env vars
-- TODOs left behind (only if unavoidable)
