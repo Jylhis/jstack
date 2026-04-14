@@ -10,7 +10,9 @@
 #
 # Also executed by `nix flake check` (pure mode) and `just check`.
 
-{ system ? builtins.currentSystem }:
+{
+  system ? builtins.currentSystem,
+}:
 
 let
   jstackRepo = ../.;
