@@ -9,6 +9,10 @@ check:
     statix check . --ignore '.devenv/*' 'result/*'
     deadnix --fail --exclude .devenv result .
 
+# Run v2 module tests
+check-v2:
+    nix eval --impure --raw --apply 'f: f {}' --file tests/module-eval-v2.nix
+
 # Format all nix files
 fmt:
     nixfmt .
@@ -143,4 +147,8 @@ eval-redteam *args:
 
 
 research:
-    cat research/PROMPT.md | claude --effort max --name jstack-research --print --allowedTools "Read Write Edit Bash Glob Grep Agent WebFetch WebSearch mcp__devenv__search_options mcp__claude_ai_Context7__resolve-library-id mcp__claude_ai_Context7__query-docs"
+    cat research/PROMPT.md | claude --effort max --name jstack-research --print --verbose --allowedTools "Read Write Edit Bash Glob Grep Agent WebFetch WebSearch mcp__devenv__search_options mcp__claude_ai_Context7__resolve-library-id mcp__claude_ai_Context7__query-docs"
+
+# Resume research session interactively (see thinking + tool calls)
+research-resume:
+    claude --resume --name jstack-research

@@ -25,9 +25,23 @@
     in
     {
       overlays.default = import ./overlay.nix;
-      nixosModules.default = import ./module.nix;
-      darwinModules.default = import ./module.nix;
-      homeModules.default = import ./module.nix;
+
+      # v2 modules (multi-tool, per-tool config generation)
+      nixosModules.default = import ./modules;
+      darwinModules.default = import ./modules;
+      homeModules.default = import ./modules;
+
+      # v1 legacy modules (plugin-based, repoPath symlinks)
+      nixosModules.legacy = import ./module.nix;
+      darwinModules.legacy = import ./module.nix;
+      homeModules.legacy = import ./module.nix;
+
+      # Lib exports for consumers
+      lib = {
+        defaultSkills = import ./lib/default-skills.nix;
+        toolDefs = import ./lib/tool-defs.nix;
+        toolMappings = import ./lib/tool-mappings.nix;
+      };
 
       packages = forAllSystems (
         system:
@@ -43,11 +57,15 @@
         system:
         let
           pkgs = nixpkgs.legacyPackages.${system};
-          moduleEvalResult = import ./tests/module-eval.nix { inherit system; };
+          moduleEvalV1 = import ./tests/module-eval.nix { inherit system; };
+          moduleEvalV2 = import ./tests/module-eval-v2.nix { inherit system; };
         in
         {
           module-eval = pkgs.runCommand "jstack-module-eval" { } ''
-            echo ${moduleEvalResult} > $out
+            echo ${moduleEvalV1} > $out
+          '';
+          module-eval-v2 = pkgs.runCommand "jstack-module-eval-v2" { } ''
+            echo ${moduleEvalV2} > $out
           '';
         }
       );

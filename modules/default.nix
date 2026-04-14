@@ -15,5 +15,9 @@
     ./tools/gemini.nix
     ./tools/pi.nix
     ./tools/windsurf.nix
+    ./tools/cursor.nix
+    ./tools/opencode.nix
+    ./tools/cline.nix
+    ./tools/aider.nix
   ];
 }
