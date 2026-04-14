@@ -145,6 +145,49 @@ Tools that scan it: Claude Code, Codex, Gemini CLI, Cursor, Windsurf, OpenCode, 
 | OpenCode | `opencode.json`, `AGENTS.md`, skills dirs |
 | Pi | `settings.json`, `mcp.json`, `AGENTS.md`, skills dirs |
 
+## Documentation Access
+
+| Tool | llms.txt | llms-full.txt | Docs MCP |
+|------|----------|---------------|----------|
+| Claude Code | code.claude.com/docs/llms.txt | Yes | No |
+| Codex CLI | developers.openai.com/codex/llms.txt | Yes | developers.openai.com/mcp |
+| Gemini CLI | geminicli.com/llms.txt | No | No |
+| Cursor | cursor.com/llms.txt | No | No |
+| Windsurf | docs.windsurf.com/llms.txt | Yes | No |
+| Cline | docs.cline.bot/llms.txt | Yes | No |
+| Aider | None | None | No |
+| OpenCode | None | None | No |
+| Pi | None | None | No |
+| OpenClaw | docs.openclaw.ai/llms.txt | Yes | No |
+| NanoClaw | docs.nanoclaw.dev/llms.txt | Yes | No |
+| Agent Skills | agentskills.io/llms.txt | Yes | No |
+| devenv | devenv.sh/llms.txt | No | mcp.devenv.sh |
+
+Context7 MCP covers: Claude Code, Codex, Gemini CLI, Cursor, Windsurf, Cline, Aider, OpenCode.
+
+## Tool Name Mapping
+
+Exact built-in tool names per agent (for generating `allowed-tools` in SKILL.md):
+
+| Operation | Claude Code | Codex CLI | Gemini CLI | OpenCode | Pi |
+|-----------|------------|-----------|------------|----------|-----|
+| Read file | `Read` | `read_file` | `read_file` | `read` | `read` |
+| Write file | `Write` | `write_file` | `write_file` | `write` | `write` |
+| Edit file | `Edit` | `apply_patch` | `replace` | `edit` | `edit` |
+| Run shell | `Bash` | `shell` | `run_shell_command` | `bash` | `bash` |
+| Search files | `Glob` | `search` | `glob` | `glob` | N/A |
+| Search content | `Grep` | `search` | `grep_search` | `grep` | N/A |
+| Ask user | `AskUserQuestion` | N/A | `ask_user` | `question` | N/A |
+| Web fetch | `WebFetch` | `web_search` | `web_fetch` | `webfetch` | N/A |
+| Web search | `WebSearch` | `web_search` | `google_web_search` | `websearch` | N/A |
+| Plan mode | `EnterPlanMode` | N/A | `enter_plan_mode` | N/A | N/A |
+| Task create | `TaskCreate` | N/A | `tracker_create_task` | `todowrite` | N/A |
+| Activate skill | `Skill` | N/A | `activate_skill` | `skill` | N/A |
+
+Note: Cursor and Windsurf tool names are not directly addressable in the same way
+(they use internal tool routing). Cline uses `execute_command`, `read_file`,
+`write_to_file`, `replace_in_file`, `search_files`, `ask_followup_question`.
+
 ### Common abstractions across tools
 
 1. **Skills** -- SKILL.md is near-universal (Claude, Codex, Gemini, Cursor, Windsurf, OpenCode, Pi)
