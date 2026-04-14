@@ -245,7 +245,7 @@ in
     # driver throws on the first failed sub-check and prints "OK"
     # only when all 22 checks pass.
     echo "-- test 14/15: module.nix valid for HM / NixOS / nix-darwin"
-    module_eval_out=$(nix eval --impure --raw --file tests/module-eval.nix 2>&1) \
+    module_eval_out=$(nix eval --impure --raw --apply 'f: f {}' --file tests/module-eval.nix 2>&1) \
       || fail "tests/module-eval.nix failed:\n$module_eval_out"
     [ "$(printf '%s\n' "$module_eval_out" | tail -n1)" = "OK" ] \
       || fail "tests/module-eval.nix did not return OK:\n$module_eval_out"

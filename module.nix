@@ -39,9 +39,9 @@ let
       "/home/${effectiveUser}";
 
   # ── Build artifacts (shared across all contexts) ────────────────────
-  runtimePkg = import (/. + cfg.repoPath + "/runtime") { };
+  runtimePkg = import ./runtime { inherit pkgs; };
 
-  pluginsDir = /. + cfg.repoPath + "/plugins";
+  pluginsDir = ./plugins;
   pluginBundles = lib.pipe (builtins.readDir pluginsDir) [
     (lib.filterAttrs (_: type: type == "directory"))
     (lib.filterAttrs (name: _: builtins.pathExists (pluginsDir + "/${name}/plugin.nix")))
@@ -49,7 +49,7 @@ let
   ];
 
   # Discovery library
-  discoverSkills = import (/. + cfg.repoPath + "/lib/discover.nix");
+  discoverSkills = import ./lib/discover.nix;
 
   # Discover local plugin skills
   localPluginNames = lib.pipe (builtins.readDir pluginsDir) [
@@ -69,8 +69,8 @@ let
   localCatalog = builtins.foldl' (a: b: a // b) { } localCatalogs;
 
   # Discover third-party skills from npins
-  thirdPartySources = import (/. + cfg.repoPath + "/sources.nix");
-  npins = import (/. + cfg.repoPath + "/npins");
+  thirdPartySources = import ./sources.nix;
+  npins = import ./npins;
   thirdPartyCatalogs = lib.mapAttrsToList (
     pinName: opts:
     discoverSkills {
@@ -225,7 +225,7 @@ in
 
         # ── Claude Code target ──
         (lib.mkIf cfg.targets.claude.enable {
-          programs.claude-code.settings = import ((/. + cfg.repoPath) + "/settings.nix");
+          programs.claude-code.settings = import ./settings.nix;
           programs.claude-code.memory.source = mkHmLink "CLAUDE.md";
           programs.claude-code.plugins = pluginBundles;
 

@@ -6,15 +6,17 @@
 # failure; evaluates to the string "OK" when every check passes.
 #
 # Run via:  nix eval --impure --raw --file tests/module-eval.nix
+#           nix eval --raw --apply 'f: f { system = "x86_64-linux"; }' --file tests/module-eval.nix
 #
-# Used by `just check` (devenv test) to keep the multi-target module
-# contract honest.
+# Also executed by `nix flake check` (pure mode) and `just check`.
+
+{ system ? builtins.currentSystem }:
 
 let
   jstackRepo = ../.;
 
   pkgsPath = (import (jstackRepo + "/npins")).nixpkgs;
-  basePkgs = import pkgsPath { };
+  basePkgs = import pkgsPath { inherit system; };
   lib = basePkgs.lib;
 
   jstack = import (jstackRepo + "/module.nix");
@@ -162,6 +164,17 @@ let
     pkgs' = linuxPkgs;
   };
 
+  # Pure-eval regression: repoPath must NOT be used for eval-time imports.
+  # Setting it to a non-existent path proves the module resolves everything
+  # from its own source tree (relative paths) rather than cfg.repoPath.
+  pureEval = evalCtx {
+    contextModules = [ hmStubModule ];
+    pkgs' = linuxPkgs;
+    extraConfig = {
+      programs.jstack.repoPath = lib.mkForce "/DOES-NOT-EXIST/jstack";
+    };
+  };
+
   # ── Assertions over each context ────────────────────────────────
   assertionsPass = ctx: lib.all (a: a.assertion) ctx.config.assertions;
   assertionsFail = ctx: !(assertionsPass ctx);
@@ -221,6 +234,13 @@ let
 
     # ── Negative case: system context, no user → assertion fires ──
     (check "nixosNoUser.assertion.fires" (assertionsFail nixosNoUserEval))
+
+    # ── Pure-eval regression: eval must not depend on repoPath ──
+    (check "pure.eval.assertions.pass" (assertionsPass pureEval))
+    (check "pure.eval.runtime.installed" (builtins.length pureEval.config.home.packages == 1))
+    (check "pure.eval.session.JSTACK_RUNTIME" (pureEval.config.home.sessionVariables ? JSTACK_RUNTIME))
+    (check "pure.eval.claude.skills.linked" (pureEval.config.home.file ? ".claude/skills"))
+    (check "pure.eval.claude.settings.imported" (pureEval.config.programs.claude-code.settings ? model))
   ];
 in
 builtins.deepSeq results "OK"
