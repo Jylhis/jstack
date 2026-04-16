@@ -1,8 +1,8 @@
 ---
-date: 2026-04-14
+date: 2026-04-16
 researcher: Claude Code (Opus 4.6)
 method: web fetch of GitHub repo google-gemini/gemini-cli, web search for docs
-version: v0.39.0-nightly.20260414
+version: v0.38.1 (2026-04-15)
 ---
 
 # Gemini CLI
@@ -44,14 +44,23 @@ Schema: `https://raw.githubusercontent.com/google-gemini/gemini-cli/main/schemas
 
 | Category | Notable fields |
 |----------|---------------|
-| `general` | `defaultApprovalMode`, `plan.enabled`, `checkpointing.enabled`, `sessionRetention` |
+| `general` | `defaultApprovalMode`, `plan.enabled`, `checkpointing.enabled`, `sessionRetention` (age/count cleanup) |
 | `model` | `name`, `compressionThreshold` (default 0.5), `maxSessionTurns` |
+| `modelConfigs` | Pro/Flash model routing for plan mode |
 | `tools` | `sandbox` (docker/podman/sandbox-exec/runsc/lxc), `sandboxAllowedPaths`, `useRipgrep` |
 | `security` | `toolSandboxing`, `disableYoloMode`, `enableConseca`, `folderTrust` |
 | `context` | `fileName` (array, default `["GEMINI.md"]`), `discoveryMaxDirs` |
 | `mcpServers` | Server definitions |
 | `hooks` | Event-keyed hook definitions |
 | `skills` | `enabled` (boolean) |
+| `output` | Output formatting settings |
+| `ui` | UI preferences |
+| `ide` | IDE integration settings |
+| `privacy` | Privacy settings |
+| `telemetry` | Telemetry settings |
+| `billing` | Billing settings |
+| `policyPaths` | User policy file paths |
+| `adminPolicyPaths` | Admin policy file paths |
 | `experimental` | `worktrees`, `memoryManager`, `contextManagement` |
 
 Env var expansion: `$VAR`, `${VAR}`, `${VAR:-default}`
@@ -94,7 +103,7 @@ Three transports: stdio (`command`, `args`, `env`), SSE (`url`, `headers`), Stre
 
 Per-server `includeTools`/`excludeTools` filtering. OAuth/IAP auth support.
 
-## Built-in Tools
+## Built-in Tools (34 total)
 
 | Tool | Description |
 |------|-------------|
@@ -106,11 +115,16 @@ Per-server `includeTools`/`excludeTools` filtering. OAuth/IAP auth support.
 | `read_many_files` | Read multiple files |
 | `replace` | Text replacement |
 | `write_file` | Create/overwrite |
+| `write_todos` | Create/update TODO list |
 | `ask_user` | Request clarification |
 | `activate_skill` | Load skill |
 | `save_memory` | Persist to GEMINI.md |
 | `enter_plan_mode` / `exit_plan_mode` | Planning |
-| `tracker_*` | Task tracking (create/get/list/update/dependency/visualize) |
+| `tracker_create_task` / `tracker_get_task` / `tracker_list_tasks` / `tracker_update_task` / `tracker_add_dependency` / `tracker_visualize` | Task tracking |
+| `complete_task` | Mark task complete |
+| `update_topic` | Update session topic |
+| `list_mcp_resources` / `read_mcp_resource` | MCP resource access |
+| `get_internal_docs` | Retrieve internal documentation |
 | `google_web_search` | Google Search |
 | `web_fetch` | URL retrieval |
 

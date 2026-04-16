@@ -1,13 +1,13 @@
 ---
-date: 2026-04-14
+date: 2026-04-16
 researcher: Claude Code (Opus 4.6)
 method: web fetch of GitHub repos (rigup.nix, agent-skills-nix, openskills, llm-agents.nix) + devenv.sh docs
 versions:
-  rigup.nix: unversioned (commit 9af98e3, 2026-04-14)
-  agent-skills-nix: unversioned (commit e29bef0, 2026-03-27)
-  openskills: v1.5.0
-  llm-agents.nix: unversioned (commit b15c717, 2026-04-14)
-  devenv-claude-code: docs fetched 2026-04-14
+  rigup.nix: unversioned (commit 17d9079, 2026-04-16)
+  agent-skills-nix: unversioned (commit e29bef0, 2026-03-27, unchanged)
+  openskills: v1.5.0 (2026-01-17, unchanged)
+  llm-agents.nix: unversioned (commit 1fb51db, 2026-04-16)
+  devenv-claude-code: docs fetched 2026-04-16
 ---
 
 # Nix Repos Audit
@@ -30,7 +30,7 @@ versions:
 
 **Progressive disclosure:** 5 levels (none/lazy/shallow-toc/deep-toc/eager) controlling how much skill content appears in manifest.
 
-**Tools supported:** Claude Code (primary), OpenCode, Cursor, Copilot CLI.
+**Tools supported:** Claude Code (primary), OpenCode, Cursor/cursor-agent, VSCode+Copilot, copilot-cli.
 
 **Uses:** numtide/llm-agents.nix for packages.
 
@@ -52,14 +52,14 @@ versions:
 - `skills.enable` -- list of skill IDs
 - `skills.enableAll` -- boolean or source list
 - `skills.explicit.<name>.from/path/rename/packages/transform`
-- `targets.<name>.enable/dest/structure/systems`
+- `targets.<name>.enable/dest/structure/systems` (structure: link/symlink-tree/copy-tree)
 - `excludePatterns` -- rsync exclusions
 
 **Config generation:** `mkBundle` materializes skills into store derivation. Home Manager `home.file` entries or `rsync` activation scripts.
 
-**8 targets:** Claude, Codex, Copilot, Cursor, Windsurf, Gemini, Antigravity, generic Agents.
+**8 targets:** claude, codex, copilot, cursor, windsurf, gemini, antigravity, agents (generic).
 
-**Unique features:** Package embedding (symlink binaries into skill dirs). Transform system (`{ original, dependencies } -> string`). Child flake pattern. 7 test files.
+**Unique features:** Package embedding (symlink binaries into skill dirs via local `./jq` or `./pkg/` refs to reduce agent context consumption). Transform system (receives original content + markdown dependency table). Child flake pattern (parent flake + `./skills/flake.nix` for skill inputs). 7 test files.
 
 **Gaps:** No NixOS/nix-darwin. No tool packaging. No MCP/LSP/hooks/settings generation.
 
@@ -67,7 +67,7 @@ versions:
 
 ## 3. openskills (github.com/numman-ali/openskills)
 
-**What it is:** Node.js CLI (npm) for installing/managing SKILL.md files. NOT a Nix project.
+**What it is:** Node.js CLI (npm) for installing/managing SKILL.md files. NOT a Nix project. Still at v1.5.0 (last release 2026-01-17).
 
 **How it works:** `openskills install <repo>`, `openskills sync` (updates AGENTS.md with XML skill catalog), `openskills read <name>` (progressive loading).
 
@@ -81,37 +81,38 @@ versions:
 
 ## 4. devenv Claude Code Integration (devenv.sh/integrations/claude-code/)
 
-**What it is:** devenv module for declarative Claude Code configuration.
+**What it is:** devenv module for declarative Claude Code configuration. Module has grown since last audit — now includes skill management and significantly expanded hook types.
 
 **Module options (`claude.code`):**
 - `enable`, `model`, `forceLoginMethod`, `apiKeyHelper`, `cleanupPeriodDays`, `env`
 - `commands.<name>` -- slash commands (string pairs)
-- `hooks.<name>` -- `enable`, `hookType` (PreToolUse/PostToolUse/Notification/Stop/SubagentStop), `matcher`, `command`, `name`
+- `hooks.<name>` -- `enable`, `hookType`, `matcher`, `command`, `name`. Hook types expanded to: PreToolUse, PostToolUse, PostToolUseFailure, Notification, UserPromptSubmit, SessionStart, SessionEnd, Stop, SubagentStart, SubagentStop, PreCompact, PermissionRequest, WorktreeCreate, WorktreeRemove, TeammateIdle, TaskCompleted, ConfigChange
 - `hooks.git-hooks-run` -- pre-configured auto-format hook
 - `agents.<name>` -- `description`, `model`, `permissionMode`, `proactive`, `prompt`, `tools`
-- `mcpServers.<name>` -- `type` (stdio/sse/http), `command`, `args`, `env`, `url`, `headers`
+- `mcpServers.<name>` -- `type` (stdio/sse/http), `command`, `args`, `env`, `url`, `headers`. Default includes `mcp.devenv.sh` HTTP server.
 - `permissions.defaultMode`, `disableBypassPermissionsMode`, `additionalDirectories`
-- `permissions.rules.<name>.allow/ask/deny`
+- `permissions.rules.<name>.allow/ask/deny` (plus backward-compat `permissions.<name>.allow/ask/deny`)
+- **NEW:** `skills.<name>.source/namespace/skillsRoot/maxDepth` -- third-party skill sources auto-discovered via `lib/discover.nix` and symlinked into `.claude/skills/`
 
-**Config generation:** `.mcp.json`, settings, hook scripts, command files.
+**Config generation:** `.mcp.json`, settings, hook scripts, command files, skill symlinks.
 
-**Strengths:** Most complete Claude Code config coverage. Permissions system. Agent config. Auto-format via git-hooks.
+**Strengths:** Most complete Claude Code config coverage. Permissions system. Agent config. Auto-format via git-hooks. Now has skill management (parity with jstack's discovery model).
 
-**Gaps:** Claude Code only. No skill management. No tool packaging. Tied to devenv.
+**Gaps:** Claude Code only. No tool packaging. Tied to devenv.
 
 ---
 
 ## 5. llm-agents.nix (github.com/numtide/llm-agents.nix)
 
-**What it is:** Package collection providing ~95 AI tool binaries. Daily automated updates.
+**What it is:** Package collection providing 95 AI tool binaries (verified via `packages/` directory count on 2026-04-16). Daily automated updates.
 
-**What it packages:** Claude Code, Codex, Gemini CLI, Copilot, OpenCode, Goose, Amp, openskills, claudebox, and ~80+ more.
+**What it packages:** Claude Code, Codex, Gemini CLI, Copilot, OpenCode, Goose, Amp, openskills, claudebox, and ~85 more.
 
 **How:** Per-package `default.nix` + `package.nix`. Fetches pre-built binaries or builds from source. `makeWrapper` for env vars. Platform support: x86_64/aarch64 Linux/Darwin.
 
 **Used by:** rigup.nix (as input).
 
-**Strengths:** Largest AI tool package collection in Nix. Daily updates. Proper platform handling.
+**Strengths:** Largest AI tool package collection in Nix. Daily updates (latest commit 2026-04-16). Proper platform handling.
 
 **Gaps:** Zero configuration. Packages only.
 
@@ -124,15 +125,15 @@ versions:
 | NixOS module | Yes | No | No | No | No | No |
 | nix-darwin module | Yes | No | No | No | No | No |
 | Home Manager module | Yes | No | Yes | No | No | No |
-| Skill management | Yes | Yes (riglets) | Yes | Yes | No | No |
+| Skill management | Yes | Yes (riglets) | Yes | Yes | Yes (new) | No |
 | Progressive disclosure | No | Yes (5 levels) | No | Yes | No | No |
 | MCP config | Yes | Yes | No | No | Yes | No |
 | LSP config | Yes | Yes | No | No | No | No |
-| Hooks/commands | No | Yes | No | No | Yes | No |
+| Hooks/commands | No | Yes | No | No | Yes (17 hook types) | No |
 | Permissions config | No | Yes (denyRules) | No | No | Yes | No |
 | Tool packaging | Yes (buildEnv) | Yes | No | No | Via devenv | Yes (95 pkgs) |
-| Multi-tool targets | 3 | 4+ | 8 | 6 | 1 | N/A |
-| Third-party sources | Yes | Yes | Yes | Yes | No | N/A |
+| Multi-tool targets | 3 | 5 | 8 | 6 | 1 | N/A |
+| Third-party sources | Yes | Yes | Yes | Yes | Yes (new) | N/A |
 | Eval/testing | Yes | No | Yes | Yes | No | No |
 | Package in skills | No | No | Yes | No | No | No |
 
@@ -142,7 +143,7 @@ versions:
 
 **Adopt from agent-skills-nix:** 8 target agents. Package embedding in skills. Transform system for SKILL.md modification. Child flake pattern.
 
-**Adopt from devenv integration:** Hooks, commands, agents, permissions options. Auto-format via git-hooks.
+**Adopt from devenv integration:** Expanded hook taxonomy (17 types including SessionStart/End, WorktreeCreate, PermissionRequest, TaskCompleted). Commands, agents, permissions options. Auto-format via git-hooks. Their new `skills.<name>` option tree mirrors jstack's `sources.nix` — convergent design.
 
 **Adopt from llm-agents.nix:** Use as package source (rigup.nix already does this).
 

@@ -1,10 +1,10 @@
 ---
-date: 2026-04-14
+date: 2026-04-16
 researcher: Claude Code (Opus 4.6)
 method: web search + web fetch of Cursor and Windsurf docs
 versions:
-  cursor: "2.5+"
-  windsurf: unknown (docs fetched 2026-04-14)
+  cursor: "3.1 (2026-04-13)"
+  windsurf: unknown (docs fetched 2026-04-16)
 ---
 
 # Cursor
@@ -25,7 +25,7 @@ User Rules: via Settings UI only. Team Rules: via Cursor dashboard.
 
 ## Rules Format
 
-`.cursor/rules/*.md` with YAML frontmatter:
+`.cursor/rules/*.md` or `.mdc` (recommended when frontmatter is needed). YAML frontmatter:
 
 ```yaml
 ---
@@ -37,12 +37,14 @@ alwaysApply: false
 
 | alwaysApply | globs | description | Type |
 |-------------|-------|-------------|------|
-| `true` | -- | -- | Always |
-| `false` | defined | -- | Auto-Attach (on glob match) |
-| `false`/absent | absent | present | Agent-Requested |
-| absent | absent | absent | Manual (`@rule-name`) |
+| `true` | -- | -- | Always Apply |
+| `false` | defined | -- | Apply to Specific Files (on glob match) |
+| `false`/absent | absent | present | Apply Intelligently |
+| absent | absent | absent | Apply Manually (`@rule-name`) |
 
 Precedence: Team > Project > User.
+
+AGENTS.md nested in subdirs supported. Remote rule imports from GitHub now documented.
 
 ## MCP
 
@@ -70,8 +72,14 @@ Web Search, Browser (screenshots, navigation), Image Generation, Fetch Rules, As
 
 ## Hooks
 
-17+ events: `sessionStart`, `sessionEnd`, `preToolUse`, `postToolUse`, `beforeShellExecution`,
-`afterFileEdit`, `beforeSubmitPrompt`, `preCompact`, `subagentStart`, `subagentStop`, etc.
+21 events, split into Agent + Tab categories.
+
+**Agent hooks**: `sessionStart`, `sessionEnd`, `preToolUse`, `postToolUse`, `postToolUseFailure`,
+`subagentStart`, `subagentStop`, `beforeShellExecution`, `afterShellExecution`,
+`beforeMCPExecution`, `afterMCPExecution`, `beforeReadFile`, `afterFileEdit`,
+`beforeSubmitPrompt`, `preCompact`, `stop`, `afterAgentResponse`, `afterAgentThought`
+
+**Tab hooks**: `beforeTabFileRead`, `afterTabFileEdit`
 
 Types: command (shell) and prompt (LLM). Exit 0 = success, 2 = block.
 
@@ -161,6 +169,22 @@ Auto-generated memories stored locally in `~/.codeium/windsurf/memories/`.
 Machine-local only. Flow awareness tracks IDE actions.
 Codebase indexed as 768-dim vectors for semantic search.
 
+## Hooks
+
+12 events: `pre_read_code`, `post_read_code`, `pre_write_code`, `post_write_code`,
+`pre_run_command`, `post_run_command`, `pre_mcp_tool_use`, `post_mcp_tool_use`,
+`pre_user_prompt`, `post_cascade_response`, `post_cascade_response_with_transcript`,
+`post_setup_worktree`.
+
+Config: `hooks.json` with `command`/`powershell`/`show_output`/`working_directory` fields.
+
+Locations:
+- Project: `.windsurf/hooks.json`
+- IDE global: `~/.codeium/windsurf/hooks.json`
+- JetBrains: `~/.codeium/hooks.json`
+- System: `/Library/Application Support/Windsurf/hooks.json` (macOS),
+  `/etc/windsurf/hooks.json` (Linux), `C:\ProgramData\Windsurf\hooks.json` (Windows)
+
 ## Binary Provisioning
 
 Dedicated terminal always uses zsh (loads `.zshrc`). Tools from PATH.
@@ -180,7 +204,7 @@ No built-in package management.
 | Auto-memories | No | Yes |
 | Skills | Via Marketplace | Built-in SKILL.md |
 | Workflows | No | Yes (manual slash commands) |
-| Hooks | Yes (17+ events) | No |
+| Hooks | Yes (21 events) | Yes (12 events, added 2026) |
 | Marketplace | Yes | No |
 | Sandbox | OS-level | Allow/deny lists |
 | Shell | Fresh context | Dedicated zsh |

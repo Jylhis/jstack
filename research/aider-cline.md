@@ -1,10 +1,10 @@
 ---
-date: 2026-04-14
+date: 2026-04-16
 researcher: Claude Code (Opus 4.6)
 method: web search + web fetch of aider.chat docs and Cline VS Code extension docs
 versions:
-  aider: v0.86.0
-  cline: v3.78.0
+  aider: v0.86.0 (2025-08-09)
+  cline: v3.78.0 (2026-04-10)
 ---
 
 # Aider
@@ -13,7 +13,7 @@ versions:
 
 | File | Locations (searched in order) | Purpose |
 |------|-------------------------------|---------|
-| `.aider.conf.yml` | `~/`, `<git-root>/`, `./` | Main YAML config (100+ settings) |
+| `.aider.conf.yml` | `~/`, `<git-root>/`, `./` | Main YAML config (~150+ settings) |
 | `.env` | `~/`, `<git-root>/`, `./` | Environment vars + API keys |
 | `.aider.model.settings.yml` | Same 3 locations | Per-model behavioral settings |
 | `.aider.model.metadata.json` | Same 3 locations | Context windows + token costs |
@@ -37,8 +37,14 @@ No skill/plugin system. Monolithic CLI tool.
 
 ## Built-in Capabilities
 
-37+ in-chat commands: `/add`, `/drop`, `/ask`, `/code`, `/architect`, `/run`, `/git`,
-`/lint`, `/test`, `/commit`, `/undo`, `/diff`, `/web`, `/voice`, `/map`, `/model`, etc.
+47 in-chat commands: `/add`, `/drop`, `/ask`, `/code`, `/architect`, `/run`, `/git`,
+`/lint`, `/test`, `/commit`, `/undo`, `/diff`, `/web`, `/voice`, `/map`, `/map-refresh`,
+`/model`, `/models`, `/editor-model`, `/weak-model`, `/settings`, `/reasoning-effort`,
+`/think-tokens`, `/tokens`, `/context`, `/read-only`, `/ls`, `/chat-mode`, `/editor`,
+`/edit`, `/paste`, `/copy`, `/copy-context`, `/clear`, `/reset`, `/exit`, `/quit`,
+`/report`, `/multiline-mode`, `/ok`, etc.
+
+New config keys include `reasoning-effort` and `thinking-tokens`.
 
 **Repo map**: tree-sitter indexing of all files/classes/functions across 100+ languages.
 **Git integration**: auto-commits, attribution, `/undo`.
@@ -119,6 +125,30 @@ Slash commands: `/newtask`, `/smol` (compress), `/newrule`.
 **Checkpoints**: snapshots after each tool call, restorable.
 **`/smol`**: compresses conversation history (irreversible).
 **`/newtask`**: distills progress into fresh task.
+
+## Skills (added 2026)
+
+SKILL.md with `name`/`description` frontmatter + optional `docs/`, `templates/`, `scripts/`.
+Locations:
+- `.cline/skills/` (recommended project)
+- `.clinerules/skills/`
+- `.claude/skills/` (cross-tool compat)
+- `~/.cline/skills/` (global)
+
+Global skills precede project skills on name collision.
+
+## Hooks (added 2026)
+
+8 events: `TaskStart`, `TaskResume`, `TaskCancel`, `TaskComplete`, `PreToolUse`,
+`PostToolUse`, `UserPromptSubmit`, `PreCompact`.
+
+Executable scripts reading JSON stdin, writing `{cancel, contextModification, errorMessage}` to stdout.
+
+Locations:
+- Global: `~/Documents/Cline/Hooks/`
+- Project: `.clinerules/hooks/`
+
+Naming: `HookName.ps1` (Windows), extensionless executable `HookName` (macOS/Linux).
 
 ## Binary Provisioning
 

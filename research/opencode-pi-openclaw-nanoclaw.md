@@ -1,22 +1,26 @@
 ---
-date: 2026-04-14
+date: 2026-04-16
 researcher: Claude Code (Opus 4.6)
 method: web search + web fetch of GitHub repos and docs for OpenCode, Pi, OpenClaw, NanoClaw
 versions:
-  opencode: v0.0.55
-  pi: v0.67.1
-  openclaw: v2026.4.14
-  nanoclaw: unversioned (commit 934f063, 2026-04-07)
+  opencode: v1.4.6 (anomalyco/opencode, 2026-04-15)
+  pi: v0.67.5 (2026-04-16)
+  openclaw: v2026.4.16 (rolling)
+  nanoclaw: unversioned (commit eba94b7, 2026-04-16)
 ---
 
 # OpenCode
 
-Go-based terminal AI coding agent (SST/AnomalyCo). 100K+ GitHub stars.
-Originally `opencode-ai/opencode` (archived Sep 2025), continues as "Crush" at `anomalyco/opencode`.
+TypeScript-based terminal AI coding agent. 144k+ GitHub stars, 16.3k forks.
+Originally `opencode-ai/opencode` (archived Sep 2025, ~12k stars). Now active at
+`anomalyco/opencode`; `github.com/sst/opencode` 301-redirects to the same repo
+(SST transferred ownership to AnomalyCo). Not to be confused with
+`charmbracelet/crush` -- a distinct agent ("Glamourous agentic coding")
+with its own JSON config and skills discovery (`.crush/skills`, `.agents/skills`).
 
 ## Config Files
 
-`opencode.json` (or `.jsonc`), loaded with precedence:
+`opencode.json` or `opencode.jsonc` (JSONC supported), loaded with precedence:
 
 1. Remote org config (`.well-known/opencode`)
 2. Global: `~/.config/opencode/opencode.json`
@@ -40,18 +44,21 @@ Configs merged. Supports `{env:VAR}` and `{file:path}` substitution.
 ## MCP
 
 Full support in `mcp` field. Stdio + remote HTTP (auto-OAuth).
-Per-tool permissions: `allow`, `deny`, `ask`.
+Per-tool permissions: `allow`, `deny`, `ask`. Org-managed servers can ship
+disabled-by-default.
 
-## Built-in Tools
+## Built-in Tools (13)
 
-`bash`, `edit`, `write`, `read`, `grep`, `glob`, `list`, `lsp`, `apply_patch`,
+`bash`, `edit`, `write`, `read`, `grep`, `glob`, `lsp`, `apply_patch`,
 `skill`, `todowrite`, `webfetch`, `websearch` (Exa AI), `question`
 
 ## Skills
 
-Agent Skills spec format. Discovery:
+Agent Skills spec format. Six discovery paths (project walks up to git
+worktree, global from home):
+
 - `.opencode/skills/`, `.claude/skills/`, `.agents/skills/` (project)
-- `~/.config/opencode/skills/` (global)
+- `~/.config/opencode/skills/`, `~/.claude/skills/`, `~/.agents/skills/` (global)
 
 Plugins: `.opencode/` dirs for agents, commands, modes, tools, themes.
 
@@ -59,16 +66,20 @@ Plugins: `.opencode/` dirs for agents, commands, modes, tools, themes.
 
 SQLite for sessions. Auto-compaction at ~80% context window.
 
+Two built-in agents: `build` (full-access) and `plan` (read-only).
+
 ## Binary Provisioning
 
-npm, Homebrew, Arch, Chocolatey, Scoop, Docker.
+npm, Homebrew, Arch, Chocolatey, Scoop, Docker; desktop apps for macOS/Windows/Linux.
 
 ---
 
 # Pi
 
 Minimal TypeScript terminal agent by Mario Zechner. "Primitives, not features."
-Powers OpenClaw ecosystem. Integrated into Ollama (`ollama launch pi`).
+Powers OpenClaw ecosystem. 36.3k stars. Monorepo (`badlogic/pi-mono`) contains
+seven packages: `pi-ai`, `pi-agent-core`, `pi-coding-agent`, `pi-mom`,
+`pi-tui`, `pi-web-ui`, `pi-pods`.
 
 ## Config Files
 
@@ -112,6 +123,8 @@ Bash prefixes: `!command` (run + send to LLM), `!!command` (run only).
 
 **Pi Packages**: bundle extensions/skills/prompts/themes. Install from npm or git.
 
+Four run modes: interactive terminal, print/JSON output, RPC protocol, SDK embedding.
+
 ## Memory
 
 Compaction on overflow (lossy). Tree-structured sessions with branching.
@@ -126,18 +139,24 @@ npm: `npm install -g @mariozechner/pi-coding-agent`.
 # OpenClaw
 
 Life-automation platform (not just coding). Uses Pi as underlying engine.
-Connects to WhatsApp, Telegram, Slack, Discord, Signal, iMessage, Teams, etc.
-Created by Peter Steinberger. 5,705+ skills on ClawHub marketplace.
+Self-hosted gateway connecting Discord, Google Chat, iMessage, Matrix,
+Microsoft Teams, Signal, Slack, Telegram, WhatsApp, Zalo, and more to AI
+coding agents. Created by Peter Steinberger. ClawHub marketplace at
+https://clawhub.ai (skill count not published in docs).
 
 ## Config Files
 
-- `~/.openclaw/openclaw.json` (JSON5) -- main config, hot-reloaded
+- `~/.openclaw/openclaw.json` (JSON5 -- comments + trailing commas) -- main config
 - `~/.openclaw/.env` -- secrets
+- Reload modes: `hybrid` (default, auto-restart when needed), `hot`, `restart`
+- Strict schema: unknown keys or invalid types refuse to start the Gateway
+- Env: `OPENCLAW_HOME`, `OPENCLAW_STATE_DIR`, `OPENCLAW_CONFIG_PATH`
 - Interactive: `openclaw onboard`, `openclaw configure`
 - CLI: `openclaw config get/set/unset`
 - Web UI: `http://127.0.0.1:18789`
 
-Key sections: `agents`, `channels`, `session`, `gateway`, `mcp`, `cron`, `hooks`.
+Key sections: `channels`, `agents`, `session`, `gateway`, `mcp`, `cron`,
+`hooks`, `skills`, `security`.
 
 ## Instructions
 
@@ -157,10 +176,24 @@ Full host support. Stdio + SSE/HTTP + streamable-http.
 Browser (CDP), Canvas, Camera/screen/location/notifications,
 `system.run`, cron/webhooks, session management, multi-channel messaging.
 
+## Skills
+
+AgentSkills spec. Six-path precedence (highest to lowest):
+
+1. Workspace: `<workspace>/skills`
+2. Project agent: `<workspace>/.agents/skills`
+3. Personal agent: `~/.agents/skills`
+4. Managed/local: `~/.openclaw/skills`
+5. Bundled (ships with install)
+6. `skills.load.extraDirs` from config
+
+Per-skill config under `skills.entries`: `enabled`, `env`, `apiKey`, `config`.
+Parser requires single-line frontmatter keys.
+
 ## Memory
 
 Per-conversation isolation. Active Memory plugin. Persistent preference profile.
-Per-group `CLAUDE.md` isolation.
+Memory engines: builtin, Honcho, QMD. Per-group `CLAUDE.md` isolation.
 
 ## Binary Provisioning
 

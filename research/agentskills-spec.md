@@ -1,5 +1,5 @@
 ---
-date: 2026-04-14
+date: 2026-04-16
 researcher: Claude Code (Opus 4.6)
 method: web fetch of agentskills.io, GitHub repo analysis
 version: unversioned (commit 8d8fcbc, 2026-04-14)
@@ -16,7 +16,7 @@ File: `SKILL.md` (YAML frontmatter + Markdown body)
 
 | Field | Required | Constraints |
 |-------|----------|-------------|
-| `name` | Yes | Max 64 chars. Lowercase + hyphens. Must match parent dir name. |
+| `name` | Yes | 1-64 chars. Lowercase alphanumeric + hyphens. No leading/trailing hyphen, no consecutive `--`. Must match parent dir name. |
 | `description` | Yes | Max 1024 chars. What the skill does and when to use it. |
 | `license` | No | License name or reference. |
 | `compatibility` | No | Max 500 chars. Environment requirements. |
@@ -39,7 +39,7 @@ skill-name/
 
 Three-tier progressive disclosure:
 
-1. **Catalog** (~50-100 tokens/skill): name + description loaded at session start
+1. **Metadata** (~100 tokens): name + description loaded at startup for all skills
 2. **Instructions** (<5000 tokens): full SKILL.md body loaded on activation
 3. **Resources** (varies): scripts/references/assets loaded on demand
 
@@ -61,10 +61,13 @@ Scanning: look for subdirs containing `SKILL.md`. Skip `.git/`, `node_modules/`.
 - **Model-driven**: model reads catalog, decides relevance, calls `activate_skill` or reads file directly
 - **User-explicit**: `/skill-name` slash command
 
-## Compatible Tools (36+)
+## Compatible Tools (37)
 
 Claude Code, GitHub Copilot, OpenAI Codex, Cursor, Gemini CLI, Kiro, JetBrains Junie,
-Roo Code, OpenHands, Goose, Amp, OpenCode, Pi, Windsurf, TRAE, and many more.
+Roo Code, OpenHands, Goose, Amp, OpenCode, Pi, Windsurf, TRAE, Autohand Code CLI,
+Mux, Letta, Firebender, Piebald, Factory, Databricks Genie Code, Agentman, Spring AI,
+Mistral AI Vibe, Command Code, Ona, VT Code, Qodo, Laravel Boost, Emdash,
+Snowflake Cortex Code, Workshop, Google AI Edge Gallery, nanobot, and more.
 
 ## Versioning
 
