@@ -220,9 +220,9 @@ go func() {
 }()
 ```
 
-### Go 1.24+: wg.Go()
+### Go 1.25+: wg.Go()
 
-Go 1.24 introduced `wg.Go()` which eliminates the manual `Add`/`Done` bookkeeping:
+Go 1.25 introduced `wg.Go()` which eliminates the manual `Add`/`Done` bookkeeping:
 
 ```go
 func processAll(ctx context.Context, items []Item) error {
@@ -253,7 +253,7 @@ func processAll(ctx context.Context, items []Item) error {
 - Semantically clearer: "do this concurrently"
 - Automatically handles Add/Done internally
 
-**When to use**: Go 1.24+ projects where all concurrent work needs to complete and you want simpler code.
+**When to use**: Go 1.25+ projects where all concurrent work needs to complete and you want simpler code.
 
 ## golang.org/x/sync/singleflight
 

@@ -157,9 +157,9 @@ func TestWorkerPool(t *testing.T) {
 
 ## testing/synctest for Deterministic Goroutine Testing
 
-> **Experimental:** `testing/synctest` is not yet covered by Go's compatibility guarantee. Its API may change in future releases. For stable alternatives, use `clockwork` (see [Mocking](./references/mocking.md)).
+> **Stable since Go 1.25.** `testing/synctest` was experimental in Go 1.24 (using `synctest.Run`). In Go 1.25, it graduated to stable with `synctest.Test` replacing the deprecated `synctest.Run`.
 
-`testing/synctest` (Go 1.24+) provides deterministic time for concurrent code testing. Time advances only when all goroutines are blocked, making ordering predictable.
+`testing/synctest` (Go 1.25+, experimental in Go 1.24) provides deterministic time for concurrent code testing. Time advances only when all goroutines are blocked, making ordering predictable.
 
 When to use `synctest` instead of real time:
 
@@ -176,7 +176,7 @@ import (
 )
 
 func TestChannelTimeout(t *testing.T) {
-    synctest.Run(func(t *testing.T) {
+    synctest.Test(t, func(t *testing.T) {
         is := assert.New(t)
 
         ch := make(chan int, 1)
@@ -201,6 +201,34 @@ Key differences in `synctest`:
 - `time.After` fires when synthetic time reaches the duration
 - All goroutines run to blocking points before time advances
 - Test execution is deterministic and repeatable
+- Use `synctest.Wait()` to wait for all goroutines in the bubble to block
+
+## Test Artifacts and Structured Output (Go 1.25+/1.26+)
+
+### `T.Attr()` / `B.Attr()` — structured test attributes (Go 1.25+)
+
+Emit key-value attributes to the test log for machine-readable output:
+
+```go
+func TestProcess(t *testing.T) {
+    result := process(input)
+    t.Attr("items_processed", strconv.Itoa(result.Count))
+    t.Attr("duration_ms", strconv.FormatInt(result.Duration.Milliseconds(), 10))
+}
+```
+
+### `T.ArtifactDir()` — persistent test output (Go 1.26+)
+
+Store test artifacts (screenshots, generated files, debug dumps) in a directory that persists after the test run:
+
+```go
+func TestRender(t *testing.T) {
+    output := render(template)
+    os.WriteFile(filepath.Join(t.ArtifactDir(), "output.html"), output, 0644)
+}
+```
+
+Run with `-artifacts` flag to specify a persistent artifact storage location.
 
 ## Test Timeouts
 

@@ -1,8 +1,8 @@
 { pkgs }:
 {
   name = "golang-dev";
-  version = "0.2.0";
-  description = "Go development intelligence: 36 skills covering idioms, patterns, testing, performance, security, and modern syntax plus gopls LSP and built-in gopls MCP server";
+  version = "0.3.0";
+  description = "Go development intelligence: 36 skills covering idioms, patterns, testing, performance, security, and modern syntax (Go 1.21-1.26) plus gopls LSP and built-in gopls MCP server";
   author.name = "Markus Jylhänkangas";
 
   packages = [ pkgs.gopls ];

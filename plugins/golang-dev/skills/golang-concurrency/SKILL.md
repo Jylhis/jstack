@@ -71,7 +71,7 @@ For detailed channel/select code examples, see [Channels and Select Patterns](re
 | `sync.Map` | Concurrent map, read-heavy | No explicit locking; use `RWMutex`+map when writes dominate |
 | `sync.Pool` | Reuse temporary objects | Always `Reset()` before `Put()`; reduces GC pressure |
 | `sync.Once` | One-time initialization | Go 1.21+: `OnceFunc`, `OnceValue`, `OnceValues` |
-| `sync.WaitGroup` | Wait for goroutine completion | `Add` before `go`; Go 1.24+: `wg.Go()` simplifies usage |
+| `sync.WaitGroup` | Wait for goroutine completion | `Add` before `go`; Go 1.25+: `wg.Go()` simplifies usage |
 | `x/sync/singleflight` | Deduplicate concurrent calls | Cache stampede prevention |
 | `x/sync/errgroup` | Goroutine group + errors | `SetLimit(n)` replaces hand-rolled worker pools |
 
@@ -114,6 +114,10 @@ When auditing concurrency across a large codebase, use up to 5 parallel sub-agen
 | `wg.Add` inside goroutine | Call `Add` before `go` — `Wait` may return early otherwise |
 | Forgetting `-race` in CI | Always run `go test -race ./...` |
 | Mutex held across I/O | Keep critical sections short |
+
+## Container-Aware GOMAXPROCS (Go 1.25+)
+
+Go 1.25 automatically detects Linux cgroup CPU bandwidth limits and sets `GOMAXPROCS` to the lower of logical CPUs or cgroup limit — `uber-go/automaxprocs` is no longer needed for containerized services. The runtime periodically updates `GOMAXPROCS` if CPU availability changes. Disable with `GODEBUG=containermaxprocs=0`. Manually set values (via env or `runtime.GOMAXPROCS()`) take precedence. Use `runtime.SetDefaultGOMAXPROCS()` to reset.
 
 ## Cross-References
 

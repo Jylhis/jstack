@@ -104,6 +104,39 @@ histogram.WithLabelValues("POST", "/orders").
     Exemplar(prometheus.Labels{"trace_id": traceID}, duration)
 ```
 
+## Go 1.25+ / 1.26+ Observability Features
+
+### `log/slog.NewMultiHandler()` (Go 1.26+)
+
+Route log records to multiple handlers with aggregated `Enabled()` logic — replaces third-party multi-handler solutions like `samber/slog-multi` for simple fan-out:
+
+```go
+handler := slog.NewMultiHandler(
+    slog.NewJSONHandler(os.Stdout, nil),   // structured output
+    slog.NewTextHandler(logFile, nil),      // human-readable file
+)
+slog.SetDefault(slog.New(handler))
+```
+
+### `log/slog.GroupAttrs()` and `Record.Source()` (Go 1.25+)
+
+- `slog.GroupAttrs(key, attrs...)` — create a group from an `Attr` slice
+- `Record.Source()` — returns the source location of the log call, or nil if unavailable
+
+### `runtime/trace.FlightRecorder` (Go 1.25+)
+
+Lightweight continuous tracing into an in-memory ring buffer — capture only the traces that matter:
+
+```go
+fr := trace.NewFlightRecorder()
+fr.Start()
+// ... application runs ...
+// On significant event (error, latency spike):
+fr.WriteTo(file) // snapshot the last N seconds of trace data
+```
+
+See `samber/cc-skills-golang@golang-benchmark` skill for detailed FlightRecorder usage.
+
 ## Migrating Legacy Loggers
 
 If the project currently uses `zap`, `logrus`, or `zerolog`, migrate to `log/slog`. It is the standard library logger since Go 1.21, has a stable API, and the ecosystem has consolidated around it. Continuing with third-party loggers means maintaining an extra dependency for no benefit.

@@ -62,6 +62,25 @@ if errors.As(err, &ve) {
 }
 ```
 
+### `errors.AsType[T]()` — type-safe extraction (Go 1.26+)
+
+`errors.AsType` is a generic replacement for `errors.As` that is type-safe, faster, and easier to use — no need to pre-declare a variable:
+
+```go
+// Before (errors.As — requires pre-declared variable)
+var pathErr *os.PathError
+if errors.As(err, &pathErr) {
+    fmt.Println(pathErr.Path)
+}
+
+// After (errors.AsType — single-line, type-safe)
+if pathErr, ok := errors.AsType[*os.PathError](err); ok {
+    fmt.Println(pathErr.Path)
+}
+```
+
+**Prefer `errors.AsType`** in Go 1.26+ projects — it eliminates the mutable variable pattern and catches type mismatches at compile time.
+
 ## Combining Errors with `errors.Join`
 
 `errors.Join` (Go 1.20+) combines multiple independent errors into one. The combined error works with `errors.Is` and `errors.As` — each inner error is inspectable.

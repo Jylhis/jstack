@@ -363,6 +363,34 @@ func process(pool ConnPool) { ... }
 - → See `samber/cc-skills-golang@golang-dependency-injection` skill for DI patterns using interfaces
 - → See `samber/cc-skills-golang@golang-code-style` skill for value vs pointer function parameters (distinct from receivers)
 
+## Go 1.25+ / 1.26+ Reflection Features
+
+### `reflect.TypeAssert()` (Go 1.25+)
+
+Convert a `reflect.Value` directly to a Go value of a given type, avoiding the allocation of `Value.Interface()`:
+
+```go
+v := reflect.ValueOf(42)
+n := reflect.TypeAssert[int](v) // n is int(42), no allocation
+```
+
+### Iterator Methods on `reflect.Type` and `reflect.Value` (Go 1.26+)
+
+New iterator-based methods for ranging over struct fields, methods, and function parameters:
+
+```go
+for field := range reflect.TypeFor[MyStruct]().Fields() {
+    fmt.Println(field.Name, field.Type)
+}
+
+for method := range reflect.TypeFor[MyInterface]().Methods() {
+    fmt.Println(method.Name)
+}
+
+// Also: Type.Ins(), Type.Outs() for function parameter/return iterators
+// And: Value.Fields(), Value.Methods() for value-based iteration
+```
+
 ## Common Mistakes
 
 | Mistake | Fix |

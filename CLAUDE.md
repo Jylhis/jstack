@@ -8,7 +8,12 @@ jstack is a Nix-managed multi-agent AI developer workflow configuration. It bund
 
 ## Commands
 
-All development happens inside devenv (`devenv shell` or direnv). Key commands:
+All development happens inside devenv (`devenv shell` or direnv). To skip 1Password authentication (as done in CI), prefix commands with `SECRETSPEC_PROVIDER=env`:
+
+    SECRETSPEC_PROVIDER=env devenv shell -- <command>
+    SECRETSPEC_PROVIDER=env just lint
+
+Key commands:
 
     just check          # Full validation: nix-instantiate, flake check, devenv test, statix, deadnix
     just build          # nix-build -A packages.default (builds jstack-runtime)

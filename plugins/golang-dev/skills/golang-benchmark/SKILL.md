@@ -33,7 +33,7 @@ Full measurement workflow: write, run, profile, compare with statistical rigor, 
 
 ### `b.Loop()` (Go 1.24+) — preferred
 
-`b.Loop()` prevents the compiler from optimizing away the code under test — without it, the compiler can detect dead results and eliminate them, producing misleadingly fast numbers. It also excludes setup code before the loop from timing automatically.
+`b.Loop()` prevents the compiler from optimizing away the code under test — without it, the compiler can detect dead results and eliminate them, producing misleadingly fast numbers. It also excludes setup code before the loop from timing automatically. **Go 1.26+**: `b.Loop()` no longer prevents inlining of the benchmarked function, producing more accurate results that reflect real-world performance.
 
 ```go
 func BenchmarkParse(b *testing.B) {
