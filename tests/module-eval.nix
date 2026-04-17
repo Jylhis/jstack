@@ -194,7 +194,9 @@ let
     (check "hm.claude.agents.linked" (hmEval.config.home.file ? ".claude/agents"))
     (check "hm.codex.skills.linked" (hmEval.config.home.file ? ".codex/skills"))
     (check "hm.gemini.skills.linked" (hmEval.config.home.file ? ".gemini/skills"))
-    (check "hm.claude.settings.imported" (hmEval.config.programs.claude-code.settings ? model))
+    (check "hm.claude.settings.imported" (
+      hmEval.config.programs.claude-code.settings ? alwaysThinkingEnabled
+    ))
 
     # ── NixOS ──
     (check "nixos.assertions.pass" (assertionsPass nixosEval))
@@ -211,6 +213,10 @@ let
     ))
     (check "nixos.tmpfiles.points-at-linux-home" (
       hasInfix "/home/alice/" nixosEval.config.systemd.tmpfiles.rules
+    ))
+    (check "nixos.tmpfiles.settings-from-store" (
+      hasInfix ".claude/settings.json" nixosEval.config.systemd.tmpfiles.rules
+      && hasInfix "/nix/store/" nixosEval.config.systemd.tmpfiles.rules
     ))
 
     # ── nix-darwin ──
@@ -234,6 +240,10 @@ let
     (check "darwin.activation.chowns-symlinks" (
       lib.hasInfix "chown -h alice:staff" darwinEval.config.system.activationScripts.postActivation.text
     ))
+    (check "darwin.activation.settings-from-store" (
+      lib.hasInfix ".claude/settings.json" darwinEval.config.system.activationScripts.postActivation.text
+      && lib.hasInfix "/nix/store/" darwinEval.config.system.activationScripts.postActivation.text
+    ))
 
     # ── Negative case: system context, no user → assertion fires ──
     (check "nixosNoUser.assertion.fires" (assertionsFail nixosNoUserEval))
@@ -243,7 +253,9 @@ let
     (check "pure.eval.runtime.installed" (builtins.length pureEval.config.home.packages == 1))
     (check "pure.eval.session.JSTACK_RUNTIME" (pureEval.config.home.sessionVariables ? JSTACK_RUNTIME))
     (check "pure.eval.claude.skills.linked" (pureEval.config.home.file ? ".claude/skills"))
-    (check "pure.eval.claude.settings.imported" (pureEval.config.programs.claude-code.settings ? model))
+    (check "pure.eval.claude.settings.imported" (
+      pureEval.config.programs.claude-code.settings ? alwaysThinkingEnabled
+    ))
   ];
 in
 builtins.deepSeq results "OK"

@@ -41,6 +41,11 @@ let
   # ── Build artifacts (shared across all contexts) ────────────────────
   runtimePkg = import ./runtime { inherit pkgs; };
 
+  # settings.json built as a nix-store artifact from settings.nix.
+  # Consumed directly by NixOS / nix-darwin link maps; HM context uses
+  # `programs.claude-code.settings` instead.
+  settingsFile = (pkgs.formats.json { }).generate "claude-settings.json" (import ./settings.nix);
+
   # Discovery library
   discoverSkills = import ./lib/discover.nix;
 
@@ -83,9 +88,13 @@ let
     ".claude/skills" = "skills";
     ".claude/agents" = "agents";
     ".claude/commands" = "commands";
-    ".claude/hooks" = "hooks";
     ".claude/CLAUDE.md" = "CLAUDE.md";
-    ".claude/settings.json" = "settings.json";
+  };
+
+  # Absolute store paths (settings.json) keyed by the user-relative
+  # destination, fed into the NixOS / nix-darwin link helpers.
+  claudeStoreLinks = {
+    ".claude/settings.json" = "${settingsFile}";
   };
   codexLinks = {
     ".codex/skills" = "skills";
@@ -96,11 +105,19 @@ let
 
   # ── System-context symlink helpers ──────────────────────────────────
   # NixOS: declarative systemd-tmpfiles `L+` rules with explicit owner.
+  # Repo-relative variant resolves sources under cfg.repoPath; the
+  # store variant takes absolute /nix/store paths verbatim.
   mkTmpfilesRules =
     links:
     lib.mapAttrsToList (
       relPath: source:
       "L+ ${effectiveHome}/${relPath} - ${effectiveUser} ${effectiveUser} - ${cfg.repoPath}/${source}"
+    ) links;
+
+  mkTmpfilesRulesAbs =
+    links:
+    lib.mapAttrsToList (
+      relPath: source: "L+ ${effectiveHome}/${relPath} - ${effectiveUser} ${effectiveUser} - ${source}"
     ) links;
 
   # nix-darwin: shell snippet appended to `system.activationScripts.postActivation`
@@ -111,6 +128,16 @@ let
       lib.mapAttrsToList (relPath: source: ''
         mkdir -p "$(dirname "${effectiveHome}/${relPath}")"
         ln -sfn "${cfg.repoPath}/${source}" "${effectiveHome}/${relPath}"
+        chown -h ${effectiveUser}:staff "${effectiveHome}/${relPath}" 2>/dev/null || true
+      '') links
+    );
+
+  mkDarwinActivationLinesAbs =
+    links:
+    lib.concatStringsSep "\n" (
+      lib.mapAttrsToList (relPath: source: ''
+        mkdir -p "$(dirname "${effectiveHome}/${relPath}")"
+        ln -sfn "${source}" "${effectiveHome}/${relPath}"
         chown -h ${effectiveUser}:staff "${effectiveHome}/${relPath}" 2>/dev/null || true
       '') links
     );
@@ -212,7 +239,6 @@ in
             ".claude/skills".source = mkHmLink "skills";
             ".claude/agents".source = mkHmLink "agents";
             ".claude/commands".source = mkHmLink "commands";
-            ".claude/hooks".source = mkHmLink "hooks";
             ".claude/CLAUDE.md".source = mkHmLink "CLAUDE.md";
           };
         })
@@ -237,7 +263,7 @@ in
       ++ lib.optionals isNixOS [
         # ── Claude Code target — NixOS (systemd-tmpfiles) ──
         (lib.mkIf cfg.targets.claude.enable {
-          systemd.tmpfiles.rules = mkTmpfilesRules claudeLinks;
+          systemd.tmpfiles.rules = mkTmpfilesRules claudeLinks ++ mkTmpfilesRulesAbs claudeStoreLinks;
         })
         (lib.mkIf cfg.targets.codex.enable {
           systemd.tmpfiles.rules = mkTmpfilesRules codexLinks;
@@ -249,7 +275,8 @@ in
       ++ lib.optionals isNixDarwin [
         # ── Claude Code target — nix-darwin (postActivation script) ──
         (lib.mkIf cfg.targets.claude.enable {
-          system.activationScripts.postActivation.text = mkDarwinActivationLines claudeLinks;
+          system.activationScripts.postActivation.text =
+            mkDarwinActivationLines claudeLinks + "\n" + mkDarwinActivationLinesAbs claudeStoreLinks;
         })
         (lib.mkIf cfg.targets.codex.enable {
           system.activationScripts.postActivation.text = mkDarwinActivationLines codexLinks;

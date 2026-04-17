@@ -69,10 +69,6 @@ verify:
     fi
     echo "OK: all three produce $HASH_NIX_BUILD"
 
-# Regenerate settings.json from settings.nix
-generate-settings:
-    nix eval --impure --json --expr 'import ./settings.nix' | jq -S . > settings.json
-
 # Generate .mcp.json and .lsp.json from lib/servers.nix
 generate-servers:
     #!/usr/bin/env bash

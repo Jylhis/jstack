@@ -108,7 +108,7 @@ phase() { printf '\n%s %s\n' "$(cyan '==>')" "$*"; }
 preflight() {
   phase "preflight"
   [[ $EUID -ne 0 ]] || die "do not run as root"
-  [[ -f "$REPO_ROOT/settings.json" && -d "$REPO_ROOT/skills" ]] \
+  [[ -f "$REPO_ROOT/settings.nix" && -d "$REPO_ROOT/skills" ]] \
     || die "REPO_ROOT does not look like the jstack repo: $REPO_ROOT"
   for tool in git ln readlink awk jq nix; do
     command -v "$tool" >/dev/null 2>&1 || die "missing required tool: $tool"
@@ -225,14 +225,23 @@ generate_server_configs() {
 
 link_files() {
   phase "link files"
-  for name in settings.json CLAUDE.md; do
-    link_one_file "$REPO_ROOT/$name" "$CLAUDE_DIR/$name"
-  done
+
+  # settings.json is built from settings.nix into the nix store and
+  # symlinked from there — no tracked file in the repo.
+  local settings_store
+  settings_store="$(nix-build -E "
+    let pkgs = import <nixpkgs> {};
+    in (pkgs.formats.json {}).generate \"claude-settings.json\" (import $REPO_ROOT/settings.nix)
+  " --no-out-link 2>/dev/null)" \
+    || die "failed to build settings.json from settings.nix"
+  link_one_file "$settings_store" "$CLAUDE_DIR/settings.json"
+
+  link_one_file "$REPO_ROOT/CLAUDE.md" "$CLAUDE_DIR/CLAUDE.md"
 }
 
 link_dirs() {
   phase "link directories"
-  for name in skills agents commands hooks; do
+  for name in skills agents commands; do
     link_one_dir "$REPO_ROOT/$name" "$CLAUDE_DIR/$name"
   done
 }

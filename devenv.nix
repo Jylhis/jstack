@@ -1,6 +1,7 @@
 { pkgs, config, ... }:
 let
   settings = import ./settings.nix;
+  settingsFile = (pkgs.formats.json { }).generate "claude-settings.json" settings;
   runtimePkg = import ./runtime { };
   sources = import ./_sources.nix;
 in
@@ -35,9 +36,14 @@ in
     echo "skills: $(ls skills 2>/dev/null | wc -l)  agents: $(ls agents 2>/dev/null | wc -l)  commands: $(ls commands 2>/dev/null | wc -l)"
 
     # Symlink content dirs into .claude/ so Claude picks them up for this project.
-    for dir in agents commands hooks; do
+    for dir in agents commands; do
       ln -sfn "$DEVENV_ROOT/$dir" "$DEVENV_ROOT/.claude/$dir"
     done
+
+    # Replace the devenv-written settings.json with a symlink to the
+    # nix-store derivation built from settings.nix — same content, no
+    # tracked artifact, and Claude reads through the symlink.
+    ln -sfn "${settingsFile}" "$DEVENV_ROOT/.claude/settings.json"
 
     # Skills dir is a real directory so local and third-party skills coexist.
     mkdir -p "$DEVENV_ROOT/.claude/skills"
@@ -76,9 +82,9 @@ in
     };
   };
 
-  # Merge settings.nix into the devenv-generated .claude/settings.json.
-  # Must use the same key as the claude module (absolute path) so the
-  # module system merges the two attrsets instead of creating two entries.
+  # Merge settings.nix into devenv's claude.code-managed settings.json.
+  # devenv writes a regular file here; enterShell then replaces it with
+  # a symlink to the same content built into the nix store.
   files.${config.claude.code.settingsPath}.json = settings;
 
   # https://devenv.sh/integrations/treefmt/
@@ -97,13 +103,11 @@ in
         "scripts/**"
         "runtime/**"
         "evals/**"
-        "hooks/**"
         "agents/**"
         "commands/**"
         "skills/**"
         "*.md"
         "devenv.lock"
-        "settings.json"
         ".claude/**"
         ".mcp.json"
         ".lsp.json"
@@ -115,7 +119,7 @@ in
   scripts.lint.exec = ''
     treefmt --fail-on-change
     markdownlint-cli2 "skills/**/SKILL.md" "agents/*.md" "commands/*.md"
-    jq empty settings.json && echo "settings.json ok"
+    jq empty .claude/settings.json && echo ".claude/settings.json ok"
   '';
 
   scripts.install.exec = ''
@@ -147,10 +151,10 @@ in
     done
     pass "required tools available"
 
-    # 2. settings.json is valid JSON.
-    echo "-- test 2/15: settings.json parses as JSON"
-    jq empty settings.json || fail "settings.json invalid"
-    pass "settings.json valid"
+    # 2. .claude/settings.json is valid JSON (symlinked from nix store).
+    echo "-- test 2/15: .claude/settings.json parses as JSON"
+    jq empty .claude/settings.json || fail ".claude/settings.json invalid"
+    pass ".claude/settings.json valid"
 
     # 3. Project nix files exist and are non-empty.
     echo "-- test 3/15: project nix files present"
@@ -187,12 +191,18 @@ in
     fi
     pass "server config files valid"
 
-    # 8. settings.json matches settings.nix (canonical source).
-    echo "-- test 8/15: settings.json in sync with settings.nix"
+    # 8. .claude/settings.json is a symlink into the nix store built from settings.nix.
+    echo "-- test 8/15: .claude/settings.json links to nix store"
+    [ -L .claude/settings.json ] || fail ".claude/settings.json is not a symlink"
+    target=$(readlink -f .claude/settings.json)
+    case "$target" in
+      /nix/store/*) : ;;
+      *) fail ".claude/settings.json target $target is not under /nix/store" ;;
+    esac
     expected=$(nix eval --impure --json --expr 'import ./settings.nix' | jq -S .)
-    actual=$(jq -S . settings.json)
-    [ "$expected" = "$actual" ] || fail "settings.json out of sync with settings.nix — run: just generate-settings"
-    pass "settings.json in sync"
+    actual=$(jq -S . .claude/settings.json)
+    [ "$expected" = "$actual" ] || fail ".claude/settings.json content does not match settings.nix"
+    pass ".claude/settings.json -> $target"
 
     # 9. lib/discover.nix can discover skills from skills/.
     echo "-- test 9/15: lib/discover.nix discovers skills"
