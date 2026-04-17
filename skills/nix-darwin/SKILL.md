@@ -74,8 +74,11 @@ A typical flake.nix with nix-darwin and home-manager:
   # Allow Touch ID for sudo
   security.pam.services.sudo_local.touchIdAuth = true;
 
-  # Set primary user (required for some features)
-  users.primaryUser = "myuser";
+  # Set primary user (required for some features that need a user-scoped context).
+  # Note: `system.primaryUser` is a transitional shim — upstream plans to remove
+  # it as individual options gain proper per-user scoping. Expect this to be
+  # reorganized; follow the nix-darwin release notes when upgrading.
+  system.primaryUser = "myuser";
 }
 ```
 
@@ -298,21 +301,22 @@ After initial setup, the `darwin-rebuild` command is available system-wide.
 
 ## Hybrid Architecture Integration
 
-In the npins + devenv + flake pattern, nix-darwin is a **module flake** -- it consumes nixpkgs and produces system configuration. The typical integration:
+In the flake-compat + devenv pattern, nix-darwin is a **module flake** -- it consumes nixpkgs and produces system configuration. The typical integration:
 
-- **npins** pins nixpkgs and other inputs for non-flake evaluation
+- **flake.lock** is the single source of truth for all pinned inputs
 - **devenv** provides the development shell (orthogonal to system config)
 - **flake.nix** is the thin wrapper that wires nix-darwin, home-manager, and nixpkgs together
+- **default.nix** is a flake-compat shim for non-flake consumers
 
 The nix-darwin flake.nix is usually a separate repo from project devenv configs. It lives in a dedicated system-configuration repository.
 
-See the `nix-hybrid` skill for the full npins + devenv + flake architecture pattern.
+See the `nix-hybrid` skill for the full flake-compat + devenv architecture pattern.
 
 ## Cross-References
 
 - **home-manager** -- per-user dotfiles and program configuration (programs.*, home.file, xdg)
 - **nixos-modules** -- shared module patterns (mkOption, mkIf, mkMerge) that apply identically in nix-darwin
-- **nix-hybrid** -- the npins + devenv + flake architecture for combining multiple Nix tools
+- **nix-hybrid** -- the flake-compat + devenv architecture for combining multiple Nix tools
 - **flakes** -- flake.nix structure, inputs, outputs, follows
 
 ## MCP Tooling

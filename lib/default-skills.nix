@@ -33,7 +33,6 @@ rec {
     "nix-testing"
     "nixos-modules"
     "nixpkgs"
-    "npins"
   ];
 
   golang = mkSkills [

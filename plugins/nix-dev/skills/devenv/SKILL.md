@@ -336,9 +336,9 @@ inputs:
 
 After `devenv update`, `devenv.lock` will have `nodes.nixpkgs.locked.rev` pointing directly at `NixOS/nixpkgs` -- no indirection.
 
-**Do NOT use `cachix/devenv-nixpkgs/rolling`** as the nixpkgs input. It adds a `nixpkgs-src` indirection node in `devenv.lock`, which causes the locked revision to diverge from `cache.nixos.org` hashes. This breaks binary cache hits and makes pin synchronization with npins and flake.lock impossible.
+**Do NOT use `cachix/devenv-nixpkgs/rolling`** as the nixpkgs input. It adds a `nixpkgs-src` indirection node in `devenv.lock`, which causes the locked revision to diverge from `cache.nixos.org` hashes. This breaks binary cache hits and makes pin synchronization with flake.lock impossible.
 
-Use an exact `github:NixOS/nixpkgs/<commit>` URL to keep all three lock files in sync. See the **nix-hybrid** skill for the full sync recipe.
+Use an exact `github:NixOS/nixpkgs/<commit>` URL to keep both lock files in sync. See the **nix-hybrid** skill for the full sync recipe.
 
 ### Multiple Environments
 
@@ -404,7 +404,7 @@ inputs:
 
 Use conditional configuration for CI vs local by checking environment variables in `enterShell` or using `lib.mkIf`.
 
-Cross-reference the **nix-hybrid** skill for managing three-lock-file sync (devenv.lock, flake.lock, npins sources) in polyglot projects.
+Cross-reference the **nix-hybrid** skill for managing two-lock-file sync (devenv.lock, flake.lock) in polyglot projects.
 
 ## CLI Commands
 

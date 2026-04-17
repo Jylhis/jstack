@@ -43,10 +43,10 @@ arguments. Do NOT use multiple `--ignore` flags.
 
 ```bash
 # Correct — single --ignore with multiple globs
-statix check . --ignore 'npins/*' '.devenv/*' 'result/*'
+statix check . --ignore '.devenv/*' 'result/*'
 
 # WRONG — multiple --ignore flags (only the last one takes effect)
-statix check . --ignore 'npins/*' --ignore '.devenv/*'
+statix check . --ignore '.devenv/*' --ignore 'result/*'
 ```
 
 ### statix.toml Configuration
@@ -98,10 +98,10 @@ flag. Directories are names, not glob patterns.
 
 ```bash
 # Correct — single --exclude with multiple directories
-deadnix --exclude npins .devenv result .
+deadnix --exclude .devenv result .
 
 # WRONG — multiple --exclude flags
-deadnix --exclude npins --exclude .devenv .
+deadnix --exclude .devenv --exclude result .
 ```
 
 ### Options
@@ -262,8 +262,8 @@ Combine all linting tools in a single recipe:
 ```bash
 # Full lint pipeline
 nixfmt --check .
-statix check . --ignore 'npins/*' '.devenv/*' 'result/*'
-deadnix --fail --exclude npins .devenv result .
+statix check . --ignore '.devenv/*' 'result/*'
+deadnix --fail --exclude .devenv result .
 nix-instantiate --parse default.nix
 ```
 
@@ -278,8 +278,8 @@ nix flake check
 ```just
 lint:
     nixfmt --check .
-    statix check . --ignore 'npins/*' '.devenv/*' 'result/*'
-    deadnix --fail --exclude npins .devenv result .
+    statix check . --ignore '.devenv/*' 'result/*'
+    deadnix --fail --exclude .devenv result .
 
 lint-fix:
     statix fix .

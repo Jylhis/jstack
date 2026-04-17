@@ -1,17 +1,17 @@
 # nix-dev
 
-Nix development intelligence for jstack: 14 skills covering the Nix
-language, NixOS modules, flakes, npins, devenv, home-manager,
-nix-darwin, nix-debugging, nixpkgs, hybrid non-flake + flake
-architecture, linting, performance optimization, container image
-building, and NixOS integration testing — plus a `.mcp.json` that wires
-up the `mcp-nixos` MCP server for NixOS option and package lookups.
+Nix development intelligence for jstack: 13 skills covering the Nix
+language, NixOS modules, flakes, devenv, home-manager, nix-darwin,
+nix-debugging, nixpkgs, hybrid non-flake + flake architecture, linting,
+performance optimization, container image building, and NixOS
+integration testing — plus a `.mcp.json` that wires up the `mcp-nixos`
+MCP server for NixOS option and package lookups.
 
 ## Contents
 
 - `.claude-plugin/plugin.json` — plugin manifest
 - `.mcp.json` — `mcp-nixos` server (`nix run github:utensils/mcp-nixos`)
-- `skills/` — 14 skill directories with `SKILL.md` and optional `references/`
+- `skills/` — 13 skill directories with `SKILL.md` and optional `references/`
 
 This plugin is part of [jstack](../../) and is installed into
 `~/.claude/plugins/nix-dev/` automatically by `scripts/install.bash`.
@@ -21,7 +21,7 @@ There is no separate install step.
 
 `devenv`, `flakes`, `home-manager`, `nix-containers`, `nix-darwin`,
 `nix-debugging`, `nix-hybrid`, `nix-language`, `nix-linting`,
-`nix-performance`, `nix-testing`, `nixos-modules`, `nixpkgs`, `npins`
+`nix-performance`, `nix-testing`, `nixos-modules`, `nixpkgs`
 
 See [`docs/plugins/nix-dev.mdx`](../../docs/plugins/nix-dev.mdx) for the
 per-skill description table.

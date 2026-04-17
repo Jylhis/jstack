@@ -6,6 +6,17 @@ user-invocable: false
 
 # devenv
 
+## devenv 2.0 Migration Notes
+
+If the project pins devenv 1.x, be aware of breaking changes in 2.0 before upgrading:
+
+- A built-in Rust process manager replaces process-compose for `devenv up`. Most process definitions carry over, but `process-compose`-specific attrs (ordering, readiness probes) may need adjustment.
+- The `pre-commit` integration was renamed to `prek`. The option name moved from `pre-commit.hooks.*` to `git-hooks.hooks.*`. The legacy `git-hooks` alias for the option path was removed in 2.0.
+- `devenv build` now emits JSON; shell scripts that parsed old text output need updating.
+- Task exports landed in `$DEVENV_TASK_EXPORTS_FILE` (instead of being eval'd into the shell directly).
+
+See https://devenv.sh/guides/migrating-to-2.0/ for the full list.
+
 ## File Structure
 
 ```
@@ -325,9 +336,9 @@ inputs:
 
 After `devenv update`, `devenv.lock` will have `nodes.nixpkgs.locked.rev` pointing directly at `NixOS/nixpkgs` -- no indirection.
 
-**Do NOT use `cachix/devenv-nixpkgs/rolling`** as the nixpkgs input. It adds a `nixpkgs-src` indirection node in `devenv.lock`, which causes the locked revision to diverge from `cache.nixos.org` hashes. This breaks binary cache hits and makes pin synchronization with npins and flake.lock impossible.
+**Do NOT use `cachix/devenv-nixpkgs/rolling`** as the nixpkgs input. It adds a `nixpkgs-src` indirection node in `devenv.lock`, which causes the locked revision to diverge from `cache.nixos.org` hashes. This breaks binary cache hits and makes pin synchronization with flake.lock impossible.
 
-Use an exact `github:NixOS/nixpkgs/<commit>` URL to keep all three lock files in sync. See the **nix-hybrid** skill for the full sync recipe.
+Use an exact `github:NixOS/nixpkgs/<commit>` URL to keep both lock files in sync. See the **nix-hybrid** skill for the full sync recipe.
 
 ### Multiple Environments
 
@@ -393,7 +404,7 @@ inputs:
 
 Use conditional configuration for CI vs local by checking environment variables in `enterShell` or using `lib.mkIf`.
 
-Cross-reference the **nix-hybrid** skill for managing three-lock-file sync (devenv.lock, flake.lock, npins sources) in polyglot projects.
+Cross-reference the **nix-hybrid** skill for managing two-lock-file sync (devenv.lock, flake.lock) in polyglot projects.
 
 ## CLI Commands
 

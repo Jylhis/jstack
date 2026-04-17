@@ -10,6 +10,30 @@
     "WebFetch"
     "mcp__fetch__fetch"
   ];
+  hooks = {
+    PreToolUse = [
+      {
+        matcher = "Edit|Write";
+        hooks = [
+          {
+            type = "command";
+            command = ''"$CLAUDE_PROJECT_DIR"/hooks/protect-generated-files.sh'';
+          }
+        ];
+      }
+    ];
+    PostToolUse = [
+      {
+        matcher = "Edit|Write";
+        hooks = [
+          {
+            type = "command";
+            command = ''"$CLAUDE_PROJECT_DIR"/hooks/auto-format.sh'';
+          }
+        ];
+      }
+    ];
+  };
   model = "opus[1m]";
   statusLine = {
     type = "command";
