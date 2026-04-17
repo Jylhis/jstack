@@ -5,20 +5,11 @@ let
   pkgs = import flakeSources.nixpkgs { };
   discoverSkills = import ./discover.nix;
 
-  # Discover local plugin skills
-  pluginsDir = ../plugins;
-  entries = builtins.readDir pluginsDir;
-  pluginNames = builtins.filter (
-    n: entries.${n} == "directory" && builtins.pathExists (pluginsDir + "/${n}/plugin.nix")
-  ) (builtins.attrNames entries);
-
-  localCatalogs = map (
-    name:
-    discoverSkills {
-      path = pluginsDir + "/${name}/skills";
-      namespace = name;
-    }
-  ) pluginNames;
+  # Discover skills from flat skills/ directory
+  localCatalog = discoverSkills {
+    path = ../skills;
+    namespace = "jstack";
+  };
 
   # Discover third-party skills from flake inputs
   thirdPartySources = import ../sources.nix;
@@ -31,7 +22,7 @@ let
     }
   ) thirdPartySources;
 
-  allCatalogs = localCatalogs ++ thirdPartyCatalogs;
+  allCatalogs = [ localCatalog ] ++ thirdPartyCatalogs;
   merged = builtins.foldl' (a: b: a // b) { } allCatalogs;
 in
 builtins.mapAttrs (_: s: {

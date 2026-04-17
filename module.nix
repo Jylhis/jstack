@@ -41,32 +41,14 @@ let
   # ── Build artifacts (shared across all contexts) ────────────────────
   runtimePkg = import ./runtime { inherit pkgs; };
 
-  pluginsDir = ./plugins;
-  pluginBundles = lib.pipe (builtins.readDir pluginsDir) [
-    (lib.filterAttrs (_: type: type == "directory"))
-    (lib.filterAttrs (name: _: builtins.pathExists (pluginsDir + "/${name}/plugin.nix")))
-    (lib.mapAttrsToList (name: _: pluginsDir + "/${name}"))
-  ];
-
   # Discovery library
   discoverSkills = import ./lib/discover.nix;
 
-  # Discover local plugin skills
-  localPluginNames = lib.pipe (builtins.readDir pluginsDir) [
-    (lib.filterAttrs (_: type: type == "directory"))
-    (lib.filterAttrs (name: _: builtins.pathExists (pluginsDir + "/${name}/plugin.nix")))
-    builtins.attrNames
-  ];
-
-  localCatalogs = map (
-    name:
-    discoverSkills {
-      path = pluginsDir + "/${name}/skills";
-      namespace = name;
-    }
-  ) localPluginNames;
-
-  localCatalog = builtins.foldl' (a: b: a // b) { } localCatalogs;
+  # Discover skills from flat skills/ directory
+  localCatalog = discoverSkills {
+    path = ./skills;
+    namespace = "jstack";
+  };
 
   # Discover third-party skills from flake inputs
   thirdPartySources = import ./sources.nix;
@@ -102,7 +84,6 @@ let
     ".claude/agents" = "agents";
     ".claude/commands" = "commands";
     ".claude/hooks" = "hooks";
-    ".claude/plugins" = "plugins";
     ".claude/CLAUDE.md" = "CLAUDE.md";
     ".claude/settings.json" = "settings.json";
   };
@@ -163,7 +144,7 @@ in
         enable = lib.mkOption {
           type = lib.types.bool;
           default = true;
-          description = "Deploy skills and plugins to Claude Code (~/.claude/).";
+          description = "Deploy skills, agents, and hooks to Claude Code (~/.claude/).";
         };
       };
       codex = {
@@ -226,14 +207,12 @@ in
         # ── Claude Code target ──
         (lib.mkIf cfg.targets.claude.enable {
           programs.claude-code.settings = import ./settings.nix;
-          programs.claude-code.plugins = pluginBundles;
 
           home.file = {
             ".claude/skills".source = mkHmLink "skills";
             ".claude/agents".source = mkHmLink "agents";
             ".claude/commands".source = mkHmLink "commands";
             ".claude/hooks".source = mkHmLink "hooks";
-            ".claude/plugins".source = mkHmLink "plugins";
             ".claude/CLAUDE.md".source = mkHmLink "CLAUDE.md";
           };
         })

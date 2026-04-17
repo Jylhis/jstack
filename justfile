@@ -73,39 +73,23 @@ verify:
 generate-settings:
     nix eval --impure --json --expr 'import ./settings.nix' | jq -S . > settings.json
 
-# Generate all manifests (plugin.json, .mcp.json, .lsp.json) from plugin.nix
-generate-manifests:
-    @for dir in plugins/*/; do \
-      dir="${dir%/}"; \
-      name=$(basename "$dir"); \
-      [ -f "$dir/plugin.nix" ] || continue; \
-      echo "Generating manifests for $name..."; \
-      manifest=$( \
-        nix eval --impure --json --expr " \
-          let sources = import ./_sources.nix; pkgs = import sources.nixpkgs {}; p = import ./$dir/plugin.nix { inherit pkgs; }; \
-          in { inherit (p) name description; } \
-            // (if p ? version then { inherit (p) version; } else {}) \
-            // { author = p.author or {}; } \
-        " \
-      ); \
-      mkdir -p "$dir/.claude-plugin"; \
-      echo "$manifest" | jq -S . > "$dir/.claude-plugin/plugin.json"; \
-      mcp=$( \
-        nix eval --impure --json --expr " \
-          let sources = import ./_sources.nix; pkgs = import sources.nixpkgs {}; p = import ./$dir/plugin.nix { inherit pkgs; }; \
-          in if p ? mcpServers && p.mcpServers != {} then { mcpServers = p.mcpServers; } else null \
-        " \
-      ); \
-      [ "$mcp" != "null" ] && echo "$mcp" | jq -S . > "$dir/.mcp.json" || true; \
-      lsp=$( \
-        nix eval --impure --json --expr " \
-          let sources = import ./_sources.nix; pkgs = import sources.nixpkgs {}; p = import ./$dir/plugin.nix { inherit pkgs; }; \
-          in if p ? lspServers && p.lspServers != {} then p.lspServers else null \
-        " \
-      ); \
-      [ "$lsp" != "null" ] && echo "$lsp" | jq -S . > "$dir/.lsp.json" || true; \
-    done
-    @echo "Done."
+# Generate .mcp.json and .lsp.json from lib/servers.nix
+generate-servers:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    echo "Generating .mcp.json..."
+    nix eval --impure --json --expr '
+      let sources = import ./_sources.nix; pkgs = import sources.nixpkgs {};
+          s = import ./lib/servers.nix { inherit pkgs; };
+      in { mcpServers = s.mcpServers; }
+    ' | jq -S . > .mcp.json
+    echo "Generating .lsp.json..."
+    nix eval --impure --json --expr '
+      let sources = import ./_sources.nix; pkgs = import sources.nixpkgs {};
+          s = import ./lib/servers.nix { inherit pkgs; };
+      in s.lspServers
+    ' | jq -S . > .lsp.json
+    echo "Done."
 
 # List all discovered skills from local plugins and third-party sources
 list-skills:
@@ -142,9 +126,9 @@ eval-quality *args:
 eval-skill skill *args:
     bash scripts/eval.bash --skill {{skill}} {{args}}
 
-# Run evals for a specific plugin
-eval-plugin plugin *args:
-    bash scripts/eval.bash --plugin {{plugin}} {{args}}
+# Run evals for a skill group (legacy: was eval-plugin)
+eval-group group *args:
+    bash scripts/eval.bash --plugin {{group}} {{args}}
 
 # Compare routing results across Claude and GPT-4o
 eval-compare *args:

@@ -268,8 +268,8 @@ This is a single atomic migration — do it in one linear pass:
 5. **Create default.nix** — flake-compat shim
 6. **Set up devenv** — `devenv.nix` + `devenv.yaml` with exact nixpkgs commit
 7. **Sync pins** — run the sync recipe above
-9. **Git stage** — `git add` all new files before verification
-10. **Verify** — `just check`, `just build`, `just fmt`, `nix flake show`,
+8. **Git stage** — `git add` all new files before verification
+9. **Verify** — `just check`, `just build`, `just fmt`, `nix flake show`,
     `devenv shell`, `just verify`
 
 ## Hard Constraints

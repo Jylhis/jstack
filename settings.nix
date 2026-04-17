@@ -1,6 +1,5 @@
 {
   "$schema" = "https://json.schemastore.org/claude-code-settings.json";
-  env.CLAUDE_CODE_EFFORT_LEVEL = "high";
   includeCoAuthoredBy = false;
   permissions.allow = [
     "Read"

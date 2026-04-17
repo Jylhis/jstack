@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Is
 
-jstack is a Nix-managed multi-agent AI developer workflow configuration. It bundles skills, agents, commands, hooks, plugins, settings, and promptfoo evals into a system deployed via NixOS/nix-darwin/Home Manager modules or `scripts/install.bash`. The repo is cloned and symlinked into agent config dirs (~/.claude, ~/.codex, ~/.gemini) — it's referenced in-place, not installed as a package.
+jstack is a Nix-managed multi-agent AI developer workflow configuration. It bundles skills, agents, commands, hooks, settings, and promptfoo evals into a system deployed via NixOS/nix-darwin/Home Manager modules or `scripts/install.bash`. The repo is cloned and symlinked into agent config dirs (~/.claude, ~/.codex, ~/.gemini) — it's referenced in-place, not installed as a package.
 
 ## Commands
 
@@ -22,7 +22,7 @@ Key commands:
     just update         # Sync inputs: nix flake update → extract rev → update devenv.yaml → devenv update
     just verify         # Verify nixpkgs rev parity + build hash parity across nix-build/nix build/devenv
     just generate-settings    # Regenerate settings.json from settings.nix (canonical source)
-    just generate-manifests   # Regenerate plugin.json/.mcp.json/.lsp.json from plugin.nix files
+    just generate-servers     # Regenerate .mcp.json/.lsp.json from lib/servers.nix
     just list-skills          # Discover all skills (local + third-party)
 
 Eval commands (promptfoo):
@@ -30,7 +30,7 @@ Eval commands (promptfoo):
     just eval                 # Run full eval suite
     just eval-fast            # Fast subset
     just eval-skill <name>    # Single skill
-    just eval-plugin <name>   # Single plugin
+    just eval-group <name>    # Single skill group
 
 `devenv test` runs 15 smoke tests covering tools, JSON validity, nix evaluation, module contracts, and nixpkgs rev parity.
 
@@ -60,38 +60,21 @@ Single module serving three contexts — detected at eval time:
 
 Context detection: `isHomeManager = options ? home.homeDirectory`, `isDarwin = pkgs.stdenv.hostPlatform.isDarwin`.
 
-The module discovers skills from local plugins (`plugins/*/skills/`) and third-party sources (`sources.nix` keys mapped to flake inputs via `_sources.nix` / `flake-compat`) via `lib/discover.nix`. Pure eval: module resolves everything from relative paths, never from `cfg.repoPath` at eval time.
+The module discovers skills from `skills/` and third-party sources (`sources.nix` keys mapped to flake inputs via `_sources.nix` / `flake-compat`) via `lib/discover.nix`. Pure eval: module resolves everything from relative paths, never from `cfg.repoPath` at eval time.
 
 ### Runtime Package
 
-`overlay.nix` adds `jstack-runtime` to nixpkgs. `runtime/default.nix` scans `plugins/*/plugin.nix`, collects their `packages` lists, and builds a `pkgs.buildEnv` combining them with base packages (pyright, typescript-language-server).
+`overlay.nix` adds `jstack-runtime` to nixpkgs. `runtime/default.nix` imports `lib/servers.nix` and builds a `pkgs.buildEnv` from its `packages` list.
 
 ### Canonical Sources
 
 - `settings.nix` → `settings.json` (regenerate with `just generate-settings`)
-- `plugin.nix` → `.claude-plugin/plugin.json`, `.mcp.json`, `.lsp.json` (regenerate with `just generate-manifests`)
+- `lib/servers.nix` → `.mcp.json`, `.lsp.json` (regenerate with `just generate-servers`)
 - `sources.nix` → third-party skill source config (keys must match flake input names)
-
-## Plugin Structure
-
-Each plugin lives in `plugins/<name>/` with a `plugin.nix` as source of truth:
-
-```nix
-{ pkgs }:
-{
-  name = "my-plugin";
-  description = "...";
-  packages = [ pkgs.some-tool ];     # Added to jstack-runtime PATH
-  mcpServers = { ... };              # Optional: generates .mcp.json
-  lspServers = { ... };              # Optional: generates .lsp.json
-}
-```
-
-Skills live in `plugins/<name>/skills/<skill-name>/SKILL.md`. Discovery is recursive (up to maxDepth) — a directory containing SKILL.md is a skill; recursion stops there.
 
 ## Skill Structure
 
-Each skill is a directory with a `SKILL.md` file:
+Each skill is a directory under `skills/` with a `SKILL.md` file:
 
 ```markdown
 ---
@@ -101,7 +84,7 @@ description: "When to trigger this skill"
 # Content — reference material, examples, best practices
 ```
 
-Skill IDs are namespaced: `<plugin>:<skill>` (e.g., `nix-dev:flakes`).
+Skills are grouped logically in `lib/default-skills.nix` (nix, golang, rust, python, typescript, jvm, emacs, etc.) for module consumers.
 
 ## Adding Third-Party Sources
 
@@ -112,6 +95,6 @@ Skill IDs are namespaced: `<plugin>:<skill>` (e.g., `nix-dev:flakes`).
 ## Testing
 
 - `nix flake check` — pure flake evaluation + module-eval checks (22 assertions across HM/NixOS/nix-darwin)
-- `devenv test` — 15 smoke tests (tools, JSON, nix files, manifests, discovery, module eval, rev parity)
+- `devenv test` — 15 smoke tests (tools, JSON, nix files, servers, discovery, module eval, rev parity)
 - `tests/module-eval.nix` — synthetic eval driver testing all module contexts + negative cases + pure-eval regression
 - `just eval*` — promptfoo evaluation suite (routing, discovery, quality, adversarial)

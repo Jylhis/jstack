@@ -1,8 +1,0 @@
-{
-  "author": {
-    "name": "Markus Jylhänkangas"
-  },
-  "description": "Python development intelligence: Python 3.12+, uv, ruff, pytest, pyright, FastAPI, Pydantic v2, plus pyright LSP",
-  "name": "python-dev",
-  "version": "0.1.0"
-}

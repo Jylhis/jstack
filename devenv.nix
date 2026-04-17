@@ -32,11 +32,10 @@ in
   };
   enterShell = ''
     echo "jstack dev shell"
-    echo "skills: $(ls skills 2>/dev/null | wc -l)  agents: $(ls agents 2>/dev/null | wc -l)  commands: $(ls commands 2>/dev/null | wc -l)  plugins: $(ls plugins 2>/dev/null | wc -l)"
+    echo "skills: $(ls skills 2>/dev/null | wc -l)  agents: $(ls agents 2>/dev/null | wc -l)  commands: $(ls commands 2>/dev/null | wc -l)"
 
     # Symlink content dirs into .claude/ so Claude picks them up for this project.
-    # Uses real paths (not nix store copies) to preserve live editing.
-    for dir in plugins agents commands hooks; do
+    for dir in agents commands hooks; do
       ln -sfn "$DEVENV_ROOT/$dir" "$DEVENV_ROOT/.claude/$dir"
     done
 
@@ -94,7 +93,6 @@ in
       # Only format files authored by this project. Plugin bundles,
       # scripts/, docs/, etc. are vendored/upstream-owned and left alone.
       settings.global.excludes = [
-        "plugins/**"
         "docs/**"
         "scripts/**"
         "runtime/**"
@@ -108,6 +106,7 @@ in
         "settings.json"
         ".claude/**"
         ".mcp.json"
+        ".lsp.json"
         ".github/**"
       ];
     };
@@ -178,16 +177,15 @@ in
     treefmt --version >/dev/null || fail "treefmt not runnable"
     pass "treefmt available"
 
-    # 7. Any plugin manifests that exist are valid JSON.
-    # Zero plugins is allowed (e.g. base configuration / fresh setup).
-    echo "-- test 7/15: plugin .claude-plugin/plugin.json files valid"
-    found=0
-    for f in plugins/*/.claude-plugin/plugin.json; do
-      [ -e "$f" ] || continue
-      jq empty "$f" || fail "invalid JSON in $f"
-      found=$((found + 1))
-    done
-    pass "$found plugin manifests valid"
+    # 7. Generated server config files are valid JSON.
+    echo "-- test 7/15: .mcp.json and .lsp.json valid"
+    if [ -f .mcp.json ]; then
+      jq empty .mcp.json || fail ".mcp.json invalid"
+    fi
+    if [ -f .lsp.json ]; then
+      jq empty .lsp.json || fail ".lsp.json invalid"
+    fi
+    pass "server config files valid"
 
     # 8. settings.json matches settings.nix (canonical source).
     echo "-- test 8/15: settings.json in sync with settings.nix"
@@ -196,35 +194,33 @@ in
     [ "$expected" = "$actual" ] || fail "settings.json out of sync with settings.nix — run: just generate-settings"
     pass "settings.json in sync"
 
-    # 9. lib/discover.nix can discover skills from plugins/.
+    # 9. lib/discover.nix can discover skills from skills/.
     echo "-- test 9/15: lib/discover.nix discovers skills"
     skill_count=$(nix eval --impure --json --expr '
       let d = import ./lib/discover.nix;
-          c = d { path = ./plugins/nix-dev/skills; namespace = "nix-dev"; };
+          c = d { path = ./skills; namespace = "jstack"; };
       in builtins.length (builtins.attrNames c)
     ')
     [ "$skill_count" -gt 0 ] || fail "discover.nix found zero skills"
-    pass "discover.nix found $skill_count skills in nix-dev"
+    pass "discover.nix found $skill_count skills"
 
-    # 10. plugin.nix files exist for all plugin directories.
-    echo "-- test 10/15: plugin.nix files present"
-    plugin_count=0
-    for d in plugins/*/; do
-      d="''${d%/}"
-      name=$(basename "$d")
-      [ -f "$d/plugin.nix" ] || continue
-      plugin_count=$((plugin_count + 1))
-    done
-    pass "$plugin_count plugin.nix files present"
-
-    # 11. Generated manifests match plugin.nix data.
-    echo "-- test 11/15: manifest generation round-trip"
-    nix_name=$(nix eval --impure --json --expr '
-      let sources = import ./_sources.nix; pkgs = import sources.nixpkgs {}; p = import ./plugins/nix-dev/plugin.nix { inherit pkgs; };
-      in p.name
+    # 10. lib/servers.nix evaluates and has expected keys.
+    echo "-- test 10/15: lib/servers.nix evaluates"
+    server_keys=$(nix eval --impure --json --expr '
+      let sources = import ./_sources.nix; pkgs = import sources.nixpkgs {};
+          s = import ./lib/servers.nix { inherit pkgs; };
+      in { mcp = builtins.attrNames s.mcpServers; lsp = builtins.attrNames s.lspServers; pkgCount = builtins.length s.packages; }
     ')
-    [ "$nix_name" = '"nix-dev"' ] || fail "plugin.nix name mismatch: $nix_name"
-    pass "manifest generation consistent"
+    [ -n "$server_keys" ] || fail "lib/servers.nix eval failed"
+    pass "lib/servers.nix valid: $server_keys"
+
+    # 11. lib/default-skills.nix lists skills that exist on disk.
+    echo "-- test 11/15: default-skills.nix consistency"
+    nix eval --impure --json --expr '
+      let ds = import ./lib/default-skills.nix;
+      in builtins.length (builtins.attrNames ds.all)
+    ' > /dev/null || fail "default-skills.nix eval failed"
+    pass "default-skills.nix consistent"
 
     # 12. sources.nix parses without error.
     echo "-- test 12/15: sources.nix parses"

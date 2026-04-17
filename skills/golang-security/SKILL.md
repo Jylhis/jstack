@@ -86,6 +86,7 @@ For the full methodology with Go examples, DFD trust boundaries, DREAD scoring, 
 | Medium | Timing Attacks | Constant-time comparison avoids byte-by-byte leaks | `crypto/subtle.ConstantTimeCompare` |
 | High | Crypto Issues | Use vetted algorithms; never roll your own | `crypto/aes`, `crypto/rand` |
 | Medium | HTTP Security | TLS + security headers prevent downgrade attacks | `net/http`, configure TLSConfig |
+| Medium | CSRF | Fetch metadata-based cross-origin protection | `net/http.CrossOriginProtection` (Go 1.25+) |
 | Low | Missing Headers | HSTS, CSP, X-Frame-Options prevent browser attacks | Security headers middleware |
 | Medium | Rate Limiting | Rate limits prevent brute-force and resource exhaustion | `golang.org/x/time/rate`, server timeouts |
 | High | Race Conditions | Protect shared state to prevent data corruption | `sync.Mutex`, channels, avoid shared state |
@@ -166,6 +167,31 @@ go test -fuzz=Fuzz
 | Critical | Rolling your own crypto | Custom encryption hasn't been analyzed by cryptographers | Use `crypto/aes` GCM, `golang.org/x/crypto/argon2` |
 
 See **[Security Architecture](./references/architecture.md)** for detailed anti-patterns with Go code examples.
+
+## Go 1.25+ / 1.26+ Security Features
+
+### `net/http.CrossOriginProtection` (Go 1.25+)
+
+Built-in CSRF protection using Fetch metadata headers — no tokens or cookies required:
+
+```go
+mux := http.NewServeMux()
+mux.HandleFunc("POST /api/transfer", handleTransfer)
+
+// Wrap with CrossOriginProtection — rejects cross-origin state-changing requests
+protected := http.CrossOriginProtection(mux)
+http.ListenAndServe(":8080", protected)
+```
+
+Supports origin-based and pattern-based bypasses for legitimate cross-origin use cases.
+
+### `crypto/hpke` (Go 1.26+)
+
+Hybrid Public Key Encryption (RFC 9180) with post-quantum hybrid KEM support. Use for encrypting data to a recipient's public key without a pre-shared secret.
+
+### `runtime/secret` (Go 1.26+, experimental)
+
+Secure erasure of cryptographic temporaries (registers, stack, heap). Enable with `GOEXPERIMENT=runtimesecret`. Available on amd64 and arm64 Linux.
 
 ## Cross-References
 

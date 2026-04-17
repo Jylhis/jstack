@@ -1,8 +1,0 @@
-{ pkgs }:
-{
-  name = "productivity";
-  description = "General productivity and workflow skills for session management, logging, and daily workflows";
-  author.name = "Jylhis";
-
-  packages = [ ];
-}

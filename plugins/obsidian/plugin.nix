@@ -1,8 +1,0 @@
-{ pkgs }:
-{
-  name = "obsidian";
-  description = "Obsidian knowledge base skills -- markdown, canvas, bases, CLI, and web content extraction";
-  author.name = "kepano";
-
-  packages = [ ];
-}

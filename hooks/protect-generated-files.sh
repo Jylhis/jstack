@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 # PreToolUse hook: block edits to generated/lock files
+# shellcheck disable=SC2016
 
 set -euo pipefail
+
+command -v jq &>/dev/null || exit 0
 
 input=$(cat)
 file_path=$(printf '%s' "$input" | jq -r '.tool_input.file_path // empty')
@@ -15,27 +18,14 @@ rel_path="${file_path#"${CLAUDE_PROJECT_DIR}"/}"
 
 case "$rel_path" in
   settings.json)
-    # shellcheck disable=SC2016
     printf 'Blocked: settings.json is generated from settings.nix. Edit settings.nix and run `just generate-settings`.\n' >&2
     exit 2
     ;;
-  */.claude-plugin/plugin.json | */plugin.json)
-    # shellcheck disable=SC2016
-    printf 'Blocked: plugin.json is generated from plugin.nix. Edit plugin.nix and run `just generate-manifests`.\n' >&2
-    exit 2
-    ;;
-  */.mcp.json)
-    # shellcheck disable=SC2016
-    printf 'Blocked: .mcp.json is generated from plugin.nix. Edit plugin.nix and run `just generate-manifests`.\n' >&2
-    exit 2
-    ;;
-  */.lsp.json)
-    # shellcheck disable=SC2016
-    printf 'Blocked: .lsp.json is generated from plugin.nix. Edit plugin.nix and run `just generate-manifests`.\n' >&2
+  .mcp.json | .lsp.json)
+    printf 'Blocked: %s is generated from lib/servers.nix. Edit lib/servers.nix and run `just generate-servers`.\n' "$(basename "$rel_path")" >&2
     exit 2
     ;;
   flake.lock)
-    # shellcheck disable=SC2016
     printf 'Blocked: flake.lock is managed by Nix. Run `nix flake update` or `just update`.\n' >&2
     exit 2
     ;;

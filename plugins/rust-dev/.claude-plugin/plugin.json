@@ -1,8 +1,0 @@
-{
-  "author": {
-    "name": "Markus Jylhänkangas"
-  },
-  "description": "Rust development intelligence: 29 skills covering ownership, lifetimes, error handling, concurrency, domain patterns, and LSP tooling plus rust-analyzer integration",
-  "name": "rust-dev",
-  "version": "1.0.0"
-}

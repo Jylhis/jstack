@@ -86,6 +86,24 @@ Refer to library documentation for known patterns before inventing custom soluti
 | No GC tuning in containers | Set `GOMEMLIMIT` to 80-90% of container memory to prevent OOM kills |
 | `reflect.DeepEqual` in production | 50-200x slower than typed comparison; use `slices.Equal`, `maps.Equal`, `bytes.Equal` |
 
+## Go 1.25+ / 1.26+ Performance Features
+
+### Green Tea GC (Go 1.26+ default)
+
+The Green Tea garbage collector is **enabled by default** in Go 1.26, delivering **10-40% reduction in GC overhead** through improved marking/scanning of small objects with better locality and CPU scalability. On newer amd64 CPUs (Intel Ice Lake+, AMD Zen 4+), an additional ~10% improvement is achieved via vector instructions. Opt out with `GOEXPERIMENT=nogreenteagc` if issues arise.
+
+### Container-Aware GOMAXPROCS (Go 1.25+)
+
+Go 1.25 automatically detects Linux cgroup CPU bandwidth limits and sets `GOMAXPROCS` accordingly — no more need for `uber-go/automaxprocs`. The runtime periodically updates `GOMAXPROCS` if CPU availability changes. Disable with `GODEBUG=containermaxprocs=0`. Use `runtime.SetDefaultGOMAXPROCS()` to reset after manual overrides.
+
+### `io.ReadAll()` ~2x Faster (Go 1.26+)
+
+`io.ReadAll()` is approximately 2x faster with ~50% less memory allocation in Go 1.26. No code changes needed — existing code benefits automatically.
+
+### Faster cgo Calls (Go 1.26+)
+
+~30% reduction in baseline cgo call overhead. Relevant if your service makes frequent cgo calls.
+
 ## Deep Dives
 
 - [Memory Optimization](references/memory.md) — allocation patterns, backing array leaks, sync.Pool, struct alignment

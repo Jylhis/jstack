@@ -1,8 +1,0 @@
-{
-  "author": {
-    "name": "Markus Jylhänkangas"
-  },
-  "description": "TypeScript / JavaScript development intelligence: TS 5.9+ on Node 22 LTS, pnpm, vitest, ESLint 9 flat config, Prettier, plus typescript-language-server LSP",
-  "name": "typescript-dev",
-  "version": "0.1.0"
-}

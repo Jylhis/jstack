@@ -191,55 +191,34 @@ link_one_dir() {
 
 # ------------------------------------------------------------------ manifest generation --
 
-build_manifests() {
-  phase "generate manifests from plugin.nix"
-  for plugin_dir_raw in "$REPO_ROOT"/plugins/*/; do
-    local plugin_dir="${plugin_dir_raw%/}"
-    local name; name="$(basename "$plugin_dir")"
-    local plugin_nix="$plugin_dir/plugin.nix"
-    [ -f "$plugin_nix" ] || continue
+generate_server_configs() {
+  phase "generate server configs from lib/servers.nix"
 
-    # Generate .claude-plugin/plugin.json
-    local manifest_json
-    manifest_json=$(nix eval --impure --json --expr "
-      let sources = import $REPO_ROOT/_sources.nix;
-          pkgs = import sources.nixpkgs {};
-          p = import $plugin_nix { inherit pkgs; };
-      in { inherit (p) name description; }
-        // (if p ? version then { inherit (p) version; } else {})
-        // { author = p.author or {}; }
-    ")
-    if [[ $DRY_RUN -eq 0 ]]; then
-      mkdir -p "$plugin_dir/.claude-plugin"
-      echo "$manifest_json" | jq -S . > "$plugin_dir/.claude-plugin/plugin.json"
-    fi
+  # Generate .mcp.json
+  local mcp_json
+  mcp_json=$(nix eval --impure --json --expr "
+    let sources = import $REPO_ROOT/_sources.nix;
+        pkgs = import sources.nixpkgs {};
+        s = import $REPO_ROOT/lib/servers.nix { inherit pkgs; };
+    in { mcpServers = s.mcpServers; }
+  ")
+  if [[ $DRY_RUN -eq 0 ]]; then
+    echo "$mcp_json" | jq -S . > "$REPO_ROOT/.mcp.json"
+  fi
+  log_action GEN "$REPO_ROOT/.mcp.json" "from lib/servers.nix"
 
-    # Generate .mcp.json if mcpServers defined
-    local mcp_json
-    mcp_json=$(nix eval --impure --json --expr "
-      let sources = import $REPO_ROOT/_sources.nix;
-          pkgs = import sources.nixpkgs {};
-          p = import $plugin_nix { inherit pkgs; };
-      in if p ? mcpServers && p.mcpServers != {} then { mcpServers = p.mcpServers; } else null
-    ")
-    if [[ "$mcp_json" != "null" && $DRY_RUN -eq 0 ]]; then
-      echo "$mcp_json" | jq -S . > "$plugin_dir/.mcp.json"
-    fi
-
-    # Generate .lsp.json if lspServers defined
-    local lsp_json
-    lsp_json=$(nix eval --impure --json --expr "
-      let sources = import $REPO_ROOT/_sources.nix;
-          pkgs = import sources.nixpkgs {};
-          p = import $plugin_nix { inherit pkgs; };
-      in if p ? lspServers && p.lspServers != {} then p.lspServers else null
-    ")
-    if [[ "$lsp_json" != "null" && $DRY_RUN -eq 0 ]]; then
-      echo "$lsp_json" | jq -S . > "$plugin_dir/.lsp.json"
-    fi
-
-    log_action GEN "$plugin_dir" "manifests from plugin.nix"
-  done
+  # Generate .lsp.json
+  local lsp_json
+  lsp_json=$(nix eval --impure --json --expr "
+    let sources = import $REPO_ROOT/_sources.nix;
+        pkgs = import sources.nixpkgs {};
+        s = import $REPO_ROOT/lib/servers.nix { inherit pkgs; };
+    in s.lspServers
+  ")
+  if [[ $DRY_RUN -eq 0 ]]; then
+    echo "$lsp_json" | jq -S . > "$REPO_ROOT/.lsp.json"
+  fi
+  log_action GEN "$REPO_ROOT/.lsp.json" "from lib/servers.nix"
 }
 
 # ------------------------------------------------------------------ claude target --
@@ -256,36 +235,6 @@ link_dirs() {
   for name in skills agents commands hooks; do
     link_one_dir "$REPO_ROOT/$name" "$CLAUDE_DIR/$name"
   done
-}
-
-migrate_plugins() {
-  phase "migrate plugins"
-  local dst="$CLAUDE_DIR/plugins"
-  local src="$REPO_ROOT/plugins"
-
-  if [[ -L "$dst" ]]; then
-    local resolved
-    resolved="$(readlink -f "$dst" 2>/dev/null || true)"
-    if [[ "$resolved" == "$src" ]]; then
-      log_action skip "$dst" "already linked"
-      return 0
-    fi
-    ensure_backup_root
-    run mv "$dst" "$BACKUP_ROOT/plugins.symlink"
-  elif [[ -f "$dst/installed_plugins.json" ]]; then
-    warn "marketplace plugins/ detected — backing up wholesale"
-    ensure_backup_root
-    run mv "$dst" "$BACKUP_ROOT/plugins"
-    if [[ -f "$REPO_ROOT/templates/RESTORE.md" && $DRY_RUN -eq 0 ]]; then
-      cp "$REPO_ROOT/templates/RESTORE.md" "$BACKUP_ROOT/plugins/RESTORE.md"
-    fi
-  elif [[ -e "$dst" ]]; then
-    ensure_backup_root
-    run mv "$dst" "$BACKUP_ROOT/plugins"
-  fi
-
-  run ln -s "$src" "$dst"
-  log_action LINK "$dst" "-> $src"
 }
 
 build_runtime() {
@@ -358,10 +307,9 @@ update_shell_rc() {
 }
 
 deploy_claude() {
-  build_manifests
+  generate_server_configs
   link_files
   link_dirs
-  migrate_plugins
   build_runtime
   update_shell_rc
 }
@@ -374,25 +322,7 @@ deploy_codex() {
     mkdir -p "$CODEX_DIR"
   fi
 
-  # Link skills directory
   link_one_dir "$REPO_ROOT/skills" "$CODEX_DIR/skills"
-
-  # Link plugin skill directories as flat skill entries
-  for plugin_dir in "$REPO_ROOT"/plugins/*/skills; do
-    [ -d "$plugin_dir" ] || continue
-    local plugin_name; plugin_name="$(basename "$(dirname "$plugin_dir")")"
-    for skill_dir in "$plugin_dir"/*/; do
-      [ -d "$skill_dir" ] || continue
-      local skill_name; skill_name="$(basename "$skill_dir")"
-      local dst="$CODEX_DIR/skills/$skill_name"
-      if [[ ! -e "$dst" ]]; then
-        run ln -s "$skill_dir" "$dst"
-        log_action LINK "$dst" "-> $skill_dir"
-      else
-        log_action skip "$dst" "already exists"
-      fi
-    done
-  done
 
   log_action ok "codex" "deployed to $CODEX_DIR"
 }
@@ -405,24 +335,7 @@ deploy_gemini() {
     mkdir -p "$GEMINI_DIR"
   fi
 
-  # Link skills directory
   link_one_dir "$REPO_ROOT/skills" "$GEMINI_DIR/skills"
-
-  # Link plugin skill directories as flat skill entries
-  for plugin_dir in "$REPO_ROOT"/plugins/*/skills; do
-    [ -d "$plugin_dir" ] || continue
-    for skill_dir in "$plugin_dir"/*/; do
-      [ -d "$skill_dir" ] || continue
-      local skill_name; skill_name="$(basename "$skill_dir")"
-      local dst="$GEMINI_DIR/skills/$skill_name"
-      if [[ ! -e "$dst" ]]; then
-        run ln -s "$skill_dir" "$dst"
-        log_action LINK "$dst" "-> $skill_dir"
-      else
-        log_action skip "$dst" "already exists"
-      fi
-    done
-  done
 
   log_action ok "gemini" "deployed to $GEMINI_DIR"
 }

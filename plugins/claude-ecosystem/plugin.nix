@@ -1,8 +1,0 @@
-{ pkgs }:
-{
-  name = "claude-ecosystem";
-  description = "Claude API and MCP development: building apps with Claude API/Anthropic SDKs and creating MCP servers";
-  author.name = "Markus Jylhänkangas";
-
-  packages = [ ];
-}

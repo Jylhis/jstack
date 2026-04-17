@@ -183,6 +183,10 @@ rec {
     "zfs"
   ];
 
+  misc = mkSkills [
+    "offline-docs"
+  ];
+
   productivity = mkSkills [
     "session-log"
   ];
@@ -205,6 +209,7 @@ rec {
     // obsidian
     // gitlab
     // storage
+    // misc
     // productivity
     // skill-creator;
 }

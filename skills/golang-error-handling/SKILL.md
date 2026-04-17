@@ -34,7 +34,8 @@ allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(g
 3. **Error strings MUST be lowercase**, without trailing punctuation
 4. **Use `%w` internally, `%v` at system boundaries** to control error chain exposure
 5. **MUST use `errors.Is` and `errors.As`** instead of direct comparison or type assertion
-6. **SHOULD use `errors.Join`** (Go 1.20+) to combine independent errors
+6. **SHOULD use `errors.AsType[T]()`** (Go 1.26+) for type-safe error extraction — generic replacement for `errors.As`
+7. **SHOULD use `errors.Join`** (Go 1.20+) to combine independent errors
 7. **Errors MUST be either logged OR returned**, NEVER both (single handling rule)
 8. **Use sentinel errors** for expected conditions, custom types for carrying data
 9. **NEVER use `panic` for expected error conditions** — reserve for truly unrecoverable states
