@@ -5,7 +5,12 @@ SINCE="1 year ago"
 
 while [[ $# -gt 0 ]]; do
   case $1 in
-    --since) SINCE="$2"; shift 2 ;;
+    --since)
+      if [[ -z "${2:-}" ]]; then
+        echo "ERROR: --since requires an argument." >&2
+        exit 1
+      fi
+      SINCE="$2"; shift 2 ;;
     *) echo "Usage: git-recon.sh [--since \"<time>\"]" >&2; exit 1 ;;
   esac
 done
