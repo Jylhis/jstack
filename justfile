@@ -1,3 +1,5 @@
+export SECRETSPEC_PROVIDER := "env"
+
 default:
     @just --list --justfile {{justfile()}}
 
