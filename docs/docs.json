@@ -1,8 +1,8 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "jstack",
-  "description": "Personal Claude Code configuration: skills, agents, slash commands, hooks, and settings installed into ~/.claude via a symlink-based install script.",
+  "name": "skills",
+  "description": "Curated agent skill catalogue and multi-tool deployment module for Claude Code, Codex, Gemini and friends.",
   "colors": {
     "primary": "#7c3aed",
     "light": "#a78bfa",

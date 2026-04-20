@@ -4,7 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Is
 
-jstack is a Nix-managed multi-agent AI developer workflow configuration. It bundles skills, agents, commands, hooks, settings, and promptfoo evals into a system deployed via NixOS/nix-darwin/Home Manager modules or `scripts/install.bash`. The repo is cloned and symlinked into agent config dirs (~/.claude, ~/.codex, ~/.gemini) — it's referenced in-place, not installed as a package.
+**skills** (formerly `jstack`) is a Nix-managed curated catalogue of agent skills plus a multi-tool deployment module. It bundles skills, agents, commands, hooks, settings, and promptfoo evals into a system deployed via NixOS / nix-darwin / Home Manager modules or `scripts/install.bash`. Skills come from a dozen upstream repos (Anthropic, OpenAI, Microsoft, Cloudflare, HashiCorp, Trail of Bits, addyosmani, samber, MiniMax, Obsidian/kepano) plus a small locally maintained set.
+
+The module option namespace remains `programs.jstack` for stable public API — only the GitHub repo, branding, and docs URLs changed.
 
 ## Commands
 

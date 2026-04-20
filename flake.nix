@@ -1,5 +1,5 @@
 {
-  description = "jstack - multi-agent AI developer workflow configuration";
+  description = "skills - curated agent skill catalogue and multi-tool deployment module";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -27,6 +27,38 @@
       url = "github:anthropics/claude-plugins-official";
       flake = false;
     };
+    hashicorp-agent-skills = {
+      url = "github:hashicorp/agent-skills";
+      flake = false;
+    };
+    openai-skills = {
+      url = "github:openai/skills";
+      flake = false;
+    };
+    microsoft-skills = {
+      url = "github:microsoft/skills";
+      flake = false;
+    };
+    cloudflare-skills = {
+      url = "github:cloudflare/skills";
+      flake = false;
+    };
+    trailofbits-skills = {
+      url = "github:trailofbits/skills";
+      flake = false;
+    };
+    trailofbits-skills-curated = {
+      url = "github:trailofbits/skills-curated";
+      flake = false;
+    };
+    addyosmani-agent-skills = {
+      url = "github:addyosmani/agent-skills";
+      flake = false;
+    };
+    minimax-skills = {
+      url = "github:MiniMax-AI/skills";
+      flake = false;
+    };
   };
 
   outputs =
@@ -39,17 +71,11 @@
         "aarch64-darwin"
       ];
 
-      # Resolve bundled-sources.nix entries to concrete source paths by
-      # looking each key up in this flake's inputs. Passed to modules/
-      # via _module.args so the module evaluates purely without having
-      # to re-enter flake-compat.
-      bundledSources = nixpkgs.lib.mapAttrs (
-        name: cfg:
-        cfg
-        // {
-          src = inputs.${name};
-        }
-      ) (import ./bundled-sources.nix);
+      # Each bundled-sources.nix entry already has `src` wired to a
+      # concrete flake input (the file is a function of `inputs`).
+      # Pass the result to modules/ via _module.args so the module
+      # evaluates purely without having to re-enter flake-compat.
+      bundledSources = import ./bundled-sources.nix inputs;
 
       moduleWithBundled = {
         imports = [ ./modules ];

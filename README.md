@@ -1,12 +1,19 @@
-# jstack
+# skills
 
-Vibecoding setup. Fully managed with Nix. Bundles skills, agents, commands, hooks, settings, development environment, and promptfoo evals.
+A curated catalogue of agent skills plus a multi-tool deployment module.
+Fully managed with Nix. Bundles skills, agents, commands, hooks,
+settings, a devenv dev shell, and a promptfoo eval harness — imported
+from a dozen upstream sources and augmented with locally maintained
+skills. Superset of the [trailofbits/skills-curated](https://github.com/trailofbits/skills-curated)
+model.
 
-Currently only supports Claude Code, but Codex and Gemini support is in progress.
+Supports Claude Code, Codex, Gemini, Pi, Windsurf, Cursor, OpenCode,
+Cline, and Aider via a single `programs.jstack` option tree.
 
-Installation with home-manager module or `scripts/install.bash`.
+Installation with the home-manager / nix-darwin / NixOS module or
+`scripts/install.bash`.
 
-Docs: https://docs.jylhis.com/jstack
+Docs: https://docs.jylhis.com/skills
 
 ## Categories
 

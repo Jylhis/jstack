@@ -93,6 +93,13 @@ generate-servers:
 list-skills:
     nix eval --impure --json --expr 'import ./lib/list-catalog.nix' | jq .
 
+# Security-scan an imported bundled source (pass the source key from bundled-sources.nix)
+scan-source source:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    src=$(nix eval --impure --raw --expr "(import ./_sources.nix).{{source}}")
+    python3 scripts/scan_bundled_source.py "$src"
+
 # Bundle an upstream skill repo (add non-flake input, then lock)
 add-source owner repo:
     @echo "Add the following to flake.nix inputs:"

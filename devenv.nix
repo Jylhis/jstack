@@ -233,8 +233,10 @@ in
     pass "default-skills.nix consistent"
 
     # 12. bundled-sources.nix parses without error.
+    # (bundled-sources.nix is a function of flake inputs, so we apply it to the
+    # inputs attrset from _sources.nix before evaluating.)
     echo "-- test 12/15: bundled-sources.nix parses"
-    nix eval --impure --json --expr 'import ./bundled-sources.nix' > /dev/null \
+    nix eval --impure --json --expr 'builtins.attrNames ((import ./bundled-sources.nix) (import ./_sources.nix))' > /dev/null \
       || fail "bundled-sources.nix failed to parse"
     pass "bundled-sources.nix valid"
 

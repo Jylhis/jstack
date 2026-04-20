@@ -1,8 +1,10 @@
-# jstack module options
+# skills module options
 
-Reference for the `programs.jstack` option tree. The module is usable
-from Home Manager, NixOS, and nix-darwin — each context is detected at
-evaluation time and the appropriate deployment strategy is selected.
+Reference for the `programs.jstack` option tree (namespace kept stable
+for compatibility even though the repository is named `skills`). The
+module is usable from Home Manager, NixOS, and nix-darwin — each
+context is detected at evaluation time and the appropriate deployment
+strategy is selected.
 
 - **Skills** are declared either individually via
   `programs.jstack.skills.<name>` or in bulk via
@@ -16,7 +18,7 @@ evaluation time and the appropriate deployment strategy is selected.
   OpenCode, Cline, Aider). Each tool accepts `enable`, extra settings,
   permissions, and hooks.
 
-Source: <https://github.com/jylhis/jstack>.
+Source: <https://github.com/jylhis/skills>.
 
 ---
 

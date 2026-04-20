@@ -20,5 +20,13 @@ in
     obsidian-skills
     rust-skills
     claude-plugins-official
+    hashicorp-agent-skills
+    openai-skills
+    microsoft-skills
+    cloudflare-skills
+    trailofbits-skills
+    trailofbits-skills-curated
+    addyosmani-agent-skills
+    minimax-skills
     ;
 }

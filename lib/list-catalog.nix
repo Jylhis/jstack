@@ -13,20 +13,20 @@ let
   };
 
   # Discover bundled upstream skills from bundled-sources.nix. Each
-  # source can declare skills via either `subdir` (auto-discovery) or
-  # `paths` (explicit map of name -> relative path).
-  bundledSources = import ../bundled-sources.nix;
+  # entry has `src` (a resolved flake input path) and optionally a
+  # `skills` sub-attr declaring either `subdir` or `paths`.
+  bundledSources = import ../bundled-sources.nix flakeSources;
 
   bundledCatalogs = lib.flatten (
     lib.mapAttrsToList (
-      pinName: src:
+      sourceName: src:
       if !(src ? skills) then
         [ ]
       else
         let
           skillsCfg = src.skills;
-          root = flakeSources.${pinName};
-          namespace = skillsCfg.namespace or pinName;
+          root = src.src;
+          namespace = skillsCfg.namespace or sourceName;
         in
         if (skillsCfg.paths or { }) != { } then
           [
@@ -40,13 +40,23 @@ let
             ) skillsCfg.paths)
           ]
         else
-          [
-            (discoverSkills {
+          let
+            raw = discoverSkills {
               path = root + "/${skillsCfg.subdir or "."}";
               inherit namespace;
               maxDepth = skillsCfg.maxDepth or 5;
-            })
-          ]
+            };
+            include = skillsCfg.include or [ ];
+            exclude = skillsCfg.exclude or [ ];
+            filtered =
+              if include != [ ] then
+                lib.filterAttrs (_: s: builtins.elem s.name include) raw
+              else if exclude != [ ] then
+                lib.filterAttrs (_: s: !(builtins.elem s.name exclude)) raw
+              else
+                raw;
+          in
+          [ filtered ]
     ) bundledSources
   );
 

@@ -29,7 +29,7 @@ let
           rel = lib.removePrefix (prefix + "/") s;
         in
         {
-          url = "https://github.com/jylhis/jstack/blob/main/${rel}";
+          url = "https://github.com/jylhis/skills/blob/main/${rel}";
           name = rel;
         }
       ) opt.declarations;
@@ -41,7 +41,7 @@ let
     documentType = "none";
   };
 in
-pkgs.runCommand "jstack-options-doc"
+pkgs.runCommand "skills-options-doc"
   {
     nativeBuildInputs = [ pkgs.pandoc ];
     preamble = ./README.md;
@@ -57,7 +57,7 @@ pkgs.runCommand "jstack-options-doc"
     pandoc \
       --standalone \
       --toc --toc-depth=3 \
-      --metadata title="jstack module options" \
+      --metadata title="skills module options" \
       --from=commonmark \
       --to=html5 \
       --css=style.css \
