@@ -272,6 +272,21 @@ checkPhase
 installPhase
 ```
 
+## Building Nix From Source (RFC 132)
+
+Nix itself has moved from autotools to Meson (Nix 2.22+). To build from source for bisection or debugging:
+
+```bash
+meson setup build
+ninja -C build
+```
+
+Old `./configure && make` instructions are obsolete. Per RFC 134, `libnixstore` (the store layer) is separable from the evaluator — future Nix builds may ship layered packages.
+
+## ASCII Diagnostic Output (RFC 4)
+
+Nix CLI error output uses plain ASCII `'...'` and `"..."` quotes, not curly `‘ ’`. Parsers and tests matching on Nix output should assume ASCII.
+
 ## Store Path Internals
 
 Nix uses three store path naming strategies:

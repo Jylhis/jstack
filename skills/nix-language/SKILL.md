@@ -6,6 +6,18 @@ user-invocable: false
 
 # Nix Language
 
+## Terminology (RFC 134)
+
+Nix is layered. Use these terms precisely:
+
+- **Nix store** — the store daemon, `/nix/store` paths, substituters. Independent of the language.
+- **Nix expression language** — the `.nix` files you write. This skill.
+- **Nix CLI** — `nix-build`/`nix-shell` (classic) and `nix build`/`nix develop` (new, still experimental-features-gated per RFC 136).
+- **Nixpkgs** — the package collection; a corpus of Nix expressions, maintained separately from the Nix tool.
+- **NixOS** — a Linux distribution built on Nixpkgs + the NixOS module system.
+
+Confusing "Nix the language" with "Nix the store" is a common source of wrong answers.
+
 ## Core Data Types
 
 | Type | Example | Notes |
@@ -242,7 +254,31 @@ Always write packages as functions in separate files and use `callPackage` to in
 | `builtins.trace` | Debug print during evaluation |
 | `import` | Load and evaluate a `.nix` file |
 
-Read `references/advanced.md` for the full builtins and lib reference.
+Read `references/advanced.md` for the full builtins and lib reference. See `references/rfcs.md` for the authoritative RFC summary that governs Nix/Nixpkgs/NixOS conventions.
+
+## Doc Comments (RFC 145)
+
+Document Nix functions with `/** ... */` — **double** asterisk opening. Single-star `/* */` and `#` are implementation comments; only `/** */` is parsed as documentation by `nixdoc` and LSP tooling.
+
+```nix
+/**
+  Compute the sum of two numbers.
+
+  # Example
+  ```
+  add 1 2
+  => 3
+  ```
+
+  # Type
+  ```
+  add :: Number -> Number -> Number
+  ```
+*/
+add = a: b: a + b;
+```
+
+Body is CommonMark. Use fenced code blocks for examples and type signatures.
 
 ## nixpkgs `lib` Essentials
 
@@ -266,9 +302,11 @@ lib.const x                        # Always return x
 
 ## Anti-Patterns
 
-- **Always quote URLs** — `"https://..."` not bare `https://...` (RFC 45 deprecated unquoted URLs)
+- **Always quote URLs** — `"https://..."` not bare `https://...` (RFC 45 deprecated unquoted URL literals; statix `unquoted_uri` flags them)
+- **Use `nixfmt` for formatting** (RFC 166) — `pkgs.nixfmt` since nixpkgs 25.05 is the canonical formatter. `nixfmt-rfc-style` is a deprecated alias. Do not use `nixpkgs-fmt` or `alejandra` for new code.
+- **Use `/** ... */` for doc comments, not `#` or `/* */`** (RFC 145) — only `/**` is parsed as documentation
 - **Avoid `rec`** when `let-in` works — `rec` makes the whole attrset self-referential, risking infinite recursion on name shadowing
-- **Avoid `with pkgs;` in large scopes** — breaks static analysis, doesn't shadow let-bindings, makes name origins unclear. Prefer `inherit (pkgs) git curl;`
+- **Avoid `with pkgs;` in large scopes** — breaks static analysis, doesn't shadow let-bindings, makes name origins unclear. Prefer `inherit (pkgs) git curl;`. RFC 190 (open) proposes banning `with` in nixpkgs entirely.
 - **Don't use lookup paths** (`<nixpkgs>`) — depends on `$NIX_PATH` environment variable, breaks reproducibility. Pin nixpkgs explicitly.
 - **Set config and overlays explicitly** when importing nixpkgs:
   ```nix

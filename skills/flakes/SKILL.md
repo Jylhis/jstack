@@ -6,6 +6,12 @@ user-invocable: false
 
 # Nix Flakes
 
+## Experimental Status (RFC 136)
+
+Flakes and the `nix` CLI are under `experimental-features = nix-command flakes`. Per RFC 136, the new CLI stabilizes layer-by-layer separately from flakes themselves, so breaking changes still happen. Portable scripts that must not require experimental features should use classic `nix-build`/`nix-shell`. See `../nix-language/references/rfcs.md` for the RFC index.
+
+Per RFC 106, Nix (the tool) releases every 6 weeks — pin `nix.package` or a Nix version via flake inputs when determinism matters.
+
 ## Flake Structure
 
 A flake is a directory containing `flake.nix` with an attribute set containing `inputs` and `outputs`. The lock file `flake.lock` pins every input to an exact revision.

@@ -6,6 +6,16 @@ user-invocable: false
 
 # NixOS Module System
 
+## Modern Module Idioms
+
+Three RFCs define canonical patterns for any module you write today:
+
+- **RFC 42 — `settings` over `extraConfig`.** Generate config files from typed attrsets using `pkgs.formats.<format>.generate`, not stringly-typed `extraConfig` options.
+- **RFC 52 — Dynamic IDs.** New service modules use `isSystemUser = true` (auto-assigned persistent id) or `serviceConfig.DynamicUser = true` (ephemeral id). Do not add to `ids.nix`.
+- **RFC 72 — CommonMark descriptions.** Option `description` is Markdown, not DocBook. `lib.mdDoc` is historical — you can now pass plain strings directly.
+
+See `../nix-language/references/rfcs.md` for the authoritative RFC index.
+
 ## Module Structure
 
 Every NixOS module is a function returning an attrset with `options` and/or `config`:
@@ -141,6 +151,67 @@ services.foo.port = lib.mkOverride 50 9090; # Custom priority (lower = higher)
 ```
 
 Default priority is 100. `mkDefault` is 1000. `mkForce` is 50.
+
+## The `settings` Pattern (RFC 42)
+
+Canonical pattern for any module that generates a config file. Instead of a stringly-typed `extraConfig` option, expose a structured `settings` attrset and serialize it with `pkgs.formats.<format>`:
+
+```nix
+{ config, lib, pkgs, ... }:
+
+let
+  cfg = config.services.myservice;
+  settingsFormat = pkgs.formats.toml { };  # also .json, .yaml, .ini, .keyValue, .libconfig
+in {
+  options.services.myservice = {
+    enable = lib.mkEnableOption "myservice";
+
+    settings = lib.mkOption {
+      type = settingsFormat.type;
+      default = { };
+      description = ''
+        Configuration written to `myservice.toml`.
+        See <https://example.com/docs> for the full schema.
+      '';
+      example = lib.literalExpression ''
+        {
+          port = 8080;
+          log_level = "info";
+        }
+      '';
+    };
+  };
+
+  config = lib.mkIf cfg.enable {
+    environment.etc."myservice.toml".source =
+      settingsFormat.generate "myservice.toml" cfg.settings;
+
+    systemd.services.myservice.serviceConfig.ExecStart =
+      "${cfg.package}/bin/myservice --config /etc/myservice.toml";
+  };
+}
+```
+
+Users then write:
+
+```nix
+services.myservice = {
+  enable = true;
+  settings = {
+    port = 9090;
+    log_level = "debug";
+  };
+};
+```
+
+**Benefits over `extraConfig`:**
+
+- Structured, type-checked, introspectable via `nixos-option`
+- Properly merged across multiple modules via `//`-semantics
+- Declarative overrides with `lib.mkForce` / `lib.mkDefault`
+- Serialized once, no manual escaping
+
+**Don't shadow every upstream key with its own NixOS option.** Expose the full settings attrset, optionally with `freeformType` for typed subsets. Only add dedicated options for keys that need NixOS-specific handling (e.g., paths that should be substituted with `$RUNTIME_DIRECTORY`, or secrets that must be loaded at activation time).
 
 ## Common Configuration Patterns
 

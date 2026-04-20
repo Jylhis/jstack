@@ -14,6 +14,8 @@ nix search nixpkgs#<query>
 
 If the mcp-nixos MCP server is available, use it for richer search with version history and metadata.
 
+For the authoritative RFC index governing Nixpkgs contribution conventions (staging workflow, `pkgs/by-name`, `passthru.tests`, `meta.sourceProvenance`, platform tiers, breaking-change policy), see `../../nix-language/references/rfcs.md`.
+
 ## The `callPackage` Pattern
 
 `callPackage` is the core composition mechanism of nixpkgs. It takes a function (usually from a file) and auto-fills its arguments from the package set:
@@ -45,6 +47,22 @@ hello = callPackage ./package.nix {};
 - **Upstreamable:** Packages in `callPackage` form are directly submittable to nixpkgs
 
 Always write packages as functions in separate files and use `callPackage` to instantiate them.
+
+## File Layout: `pkgs/by-name` (RFC 140)
+
+New leaf packages in Nixpkgs go in `pkgs/by-name/<two-letter-shard>/<pname>/package.nix` with a plain `callPackage` signature. They are auto-wired into `all-packages.nix` by sharded discovery — do not edit `all-packages.nix` for new additions, and do not place new packages in ad-hoc category directories.
+
+```
+pkgs/by-name/
+├── he/
+│   └── hello/
+│       └── package.nix   # { lib, stdenv, fetchurl, ... }: stdenv.mkDerivation {...}
+└── ri/
+    └── ripgrep/
+        └── package.nix
+```
+
+Only packages that need non-default `callPackage` arguments (e.g., requiring a specific compiler or a language-specific builder) still live outside `by-name`. RFC 146 deprecates filesystem-path-based categorization — use `meta.categories = [ ... ]` instead of inferring category from directory.
 
 ## stdenv.mkDerivation
 
@@ -267,10 +285,77 @@ meta = with lib; {
   mainProgram = "mytool";              # which binary `nix run` executes
   broken = stdenv.isDarwin;            # mark as broken on specific platforms
   changelog = "https://example.com/changelog";
+
+  # RFC 89 — required when the package ships prebuilt binaries
+  sourceProvenance = with sourceTypes; [ fromSource ];
+  # Use [ binaryNativeCode ], [ binaryBytecode ], or [ binaryFirmware ]
+  # for non-source packages. Fully source packages can omit this field.
+
+  # RFC 146 — explicit categorization (preferred over directory path)
+  categories = [ "applications" "terminal-emulators" ];
 };
 ```
 
 `mainProgram` is important for `nix run` — without it, Nix guesses from `pname`.
+
+**`broken = true` auto-removes (RFC 180).** A package broken on all platforms is removed one NixOS release cycle after being marked (broken in 25.11 → removed after 26.05). Fix or remove, don't just unmark. The same applies to packages with empty `meta.maintainers` and no reverse dependents.
+
+**`meta.problems` is the future (RFC 127).** The current patchwork of `broken` / `insecure` / `knownVulnerabilities` / `allowUnfree` is being unified under `meta.problems` + configurable handlers. New packages should still set existing fields while the migration proceeds.
+
+## Tests: `passthru.tests` (RFC 119)
+
+Package tests live in two places with distinct purposes:
+
+| Mechanism | When it runs | Use for |
+|-----------|-------------|---------|
+| `doCheck = true` + `checkPhase` | During package build | Fast in-tree tests (unit tests, `cargo test`, `pytest`) |
+| `passthru.tests = { ... }` | Separate derivations, picked up by `nixpkgs-review` and CI | Slow / integration / VM / cross-package smoke tests |
+
+```nix
+stdenv.mkDerivation {
+  pname = "myapp";
+  # ...
+  doCheck = true;
+  checkPhase = ''
+    ./run-unit-tests
+  '';
+
+  passthru.tests = {
+    vm-smoke = nixosTests.myapp;               # NixOS VM integration test
+    cli-help = runCommand "myapp-cli-help" { } ''
+      ${placeholder "out"}/bin/myapp --help > $out
+    '';
+  };
+}
+```
+
+See the **nix-testing** skill for writing `nixosTests.*` entries.
+
+## Platform Tiers (RFC 46)
+
+Nixpkgs platforms are tiered. Only Tier 1 (x86_64-linux, aarch64-linux) has full CI and binary cache coverage. Don't assume substitutes exist for macOS/BSD/less-common architectures, and don't assume a package builds on non-Tier-1 platforms just because `platforms.all` is set. Use `meta.platforms` deliberately and `meta.broken = <predicate>` when a platform is known to break.
+
+## Contribution Workflow
+
+### Staging Branches (RFC 26)
+
+Three-branch Nixpkgs workflow based on rebuild count:
+
+| Base branch | Use for |
+|-------------|---------|
+| `master` | Small changes (package bumps that rebuild < ~500 packages) |
+| `staging-next` | Stabilization of staging changes before they hit master |
+| `staging` | Mass-rebuilds (stdenv, glibc, openssl, common libs) |
+
+Pick base branch based on rebuild blast radius. `nixpkgs-review` helps estimate this.
+
+### Breaking Changes (RFC 88)
+
+When changing a library with dependents: either fix all dependents in the same PR, or land on `staging` and give downstream maintainers a window. Never knowingly merge a change to `master` that would stall the channel.
+
+### Release Freeze (RFC 85)
+
+Around NixOS release branch-offs (YY.05 and YY.11 per RFC 80), changes to Release Critical Packages (kernel, systemd, glibc, desktop envs) are restricted during the "Zero Hydra Failures" push. Land risky work earlier in the cycle.
 
 ## Cross-Platform
 

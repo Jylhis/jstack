@@ -9,6 +9,18 @@ user-invocable: false
 ## Overview
 NixOS provides a VM-based integration testing framework. Tests run in isolated QEMU virtual machines with full NixOS systems. Tests are reproducible, hermetic, and can orchestrate multiple VMs.
 
+## Where Tests Live (RFC 119)
+
+Nixpkgs conventions split package tests by speed:
+
+| Mechanism | When it runs | Use for |
+|-----------|-------------|---------|
+| `doCheck = true` + `checkPhase` in a derivation | During the package build | Fast in-tree unit tests |
+| `passthru.tests = { ... }` on a package | Separate derivations, discovered by `nixpkgs-review` + Hydra | Slow / integration / VM / cross-package tests |
+| `nixos/tests/<name>.nix` + `nixosTests.<name>` | Separate VM invocation | Full-system integration tests |
+
+The NixOS VM test framework documented below produces the VM tests you reference from `passthru.tests` via `nixosTests.<name>`. See the nixpkgs skill for the `passthru.tests` attrset shape.
+
 ## Basic Test Structure
 ```nix
 # checks/my-test.nix

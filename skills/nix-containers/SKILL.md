@@ -7,6 +7,17 @@ user-invocable: false
 ### Overview
 Nix builds container images without Docker — images are reproducible derivations. No Dockerfile needed. Images are minimal by default: only the exact runtime closure is included.
 
+### "Container" Disambiguation
+
+The Nix ecosystem uses "container" for two unrelated things — don't conflate them:
+
+| Term | What it is | Covered in |
+|------|-----------|-----------|
+| **OCI image** (dockerTools, nix2container) | A tarball loadable by Docker / podman / Kubernetes runtimes | This skill |
+| **NixOS container** (`containers.<name>` option) | A local lightweight system container using `systemd-nspawn` | nixos-modules skill (RFC 108) |
+
+RFC 108 rewrites the NixOS `containers.<name>` subsystem on top of `systemd-nspawn` + `systemd-networkd`, fixing networking-during-boot bugs. That's orthogonal to `dockerTools` OCI image builders described below — the latter produce images consumed by external OCI runtimes, not local NixOS containers.
+
 ### dockerTools.buildImage
 Basic image builder. Produces a Docker-loadable tarball:
 ```nix
