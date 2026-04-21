@@ -76,9 +76,16 @@ let
       home.packages = looseList;
       home.sessionVariables = loose;
       home.file = loose;
-      # HM claude-code module stubs
+      # HM upstream AI-CLI module stubs. Our tool modules default their
+      # `tools.<name>.enable` to these when the upstream module is loaded,
+      # so they need to exist in the option tree for the default to fire.
+      programs.claude-code.enable = lib.mkEnableOption "upstream claude-code";
       programs.claude-code.settings = looseAny;
       programs.claude-code.plugins = looseList;
+      programs.codex.enable = lib.mkEnableOption "upstream codex";
+      programs.gemini-cli.enable = lib.mkEnableOption "upstream gemini-cli";
+      programs.aider-chat.enable = lib.mkEnableOption "upstream aider-chat";
+      programs.opencode.enable = lib.mkEnableOption "upstream opencode";
       lib = lib.mkOption {
         type = lib.types.unspecified;
         default = {
@@ -173,6 +180,32 @@ let
   nixosNoUserEval = evalCtx {
     contextModules = [ nixosStubModule ];
     pkgs' = linuxPkgs;
+  };
+
+  # HM upstream-wiring test: enabling `programs.<tool>.enable` on the
+  # upstream HM module should cause our matching `tools.<tool>.enable`
+  # to default to true without explicit configuration.
+  hmUpstreamWiredEval = lib.evalModules {
+    modules = [
+      hmStubModule
+      assertionsStub
+      jstackModule
+      { config._module.args.jstackBundledSources = { }; }
+      {
+        config = {
+          programs.jstack.enable = true;
+          # Upstream enable flags only — no explicit tools.*.enable.
+          programs.claude-code.enable = true;
+          programs.codex.enable = true;
+          programs.gemini-cli.enable = true;
+          programs.aider-chat.enable = true;
+          programs.opencode.enable = true;
+        };
+      }
+    ];
+    specialArgs = {
+      pkgs = linuxPkgs;
+    };
   };
 
   # livePath test: skills should use mkOutOfStoreSymlink
@@ -292,6 +325,21 @@ let
     # so mkOutOfStoreSymlink can't be applied to them directly.
     # livePath is effective for _generated files in NixOS/nix-darwin contexts.
     (check "hm.livePath.eval.succeeds" (assertionsPass hmLivePathEval))
+
+    # ── Upstream HM wiring: enable defaults follow programs.* ────
+    (check "hm.upstream.claude-code.defaults-true" hmUpstreamWiredEval.config.programs.jstack.tools.claude-code.enable)
+    (check "hm.upstream.codex.defaults-true" hmUpstreamWiredEval.config.programs.jstack.tools.codex.enable)
+    (check "hm.upstream.gemini.defaults-true" hmUpstreamWiredEval.config.programs.jstack.tools.gemini.enable)
+    (check "hm.upstream.aider.defaults-true" hmUpstreamWiredEval.config.programs.jstack.tools.aider.enable)
+    (check "hm.upstream.opencode.defaults-true" hmUpstreamWiredEval.config.programs.jstack.tools.opencode.enable)
+    # Tools without upstream HM modules stay at their explicit `false`
+    # default when the user did not opt-in.
+    (check "hm.upstream.cursor.stays-false" (
+      !hmUpstreamWiredEval.config.programs.jstack.tools.cursor.enable
+    ))
+    (check "hm.upstream.windsurf.stays-false" (
+      !hmUpstreamWiredEval.config.programs.jstack.tools.windsurf.enable
+    ))
 
     # ── Bundled-sources injection ────────────────────────────────
     (check "hm.bundled.skill.resolved" (

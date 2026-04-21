@@ -20,6 +20,8 @@ let
   isHomeManager = options ? home.homeDirectory;
   isSystem = !isHomeManager;
 
+  hasUpstream = lib.hasAttrByPath [ "programs" "claude-code" "enable" ] options;
+
   mcpFormat = import ../../lib/mcp-format.nix { inherit lib; };
   instructionGen = import ../../lib/instruction-gen.nix { inherit lib; };
   skillBundle = import ../../lib/skill-bundle.nix { inherit pkgs lib; };
@@ -108,7 +110,23 @@ let
 in
 {
   options.programs.jstack.tools.claude-code = {
-    enable = lib.mkEnableOption "Claude Code configuration";
+    enable = lib.mkOption {
+      type = lib.types.bool;
+      default = if hasUpstream then config.programs.claude-code.enable else false;
+      defaultText = lib.literalExpression ''
+        if the upstream Home Manager `programs.claude-code` module is loaded,
+        its `enable` value; otherwise `false`.
+      '';
+      example = true;
+      description = ''
+        Whether to enable Claude Code configuration.
+
+        In Home Manager context, this defaults to the upstream
+        `programs.claude-code.enable` value when the upstream module is
+        loaded, so enabling the HM module automatically activates this
+        tool. Set explicitly to override.
+      '';
+    };
 
     model = lib.mkOption {
       type = lib.types.nullOr lib.types.str;

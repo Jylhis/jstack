@@ -17,6 +17,9 @@ let
   isHomeManager = options ? home.homeDirectory;
   isSystem = !isHomeManager;
 
+  # Upstream Home Manager module is `programs.gemini-cli` (hyphenated).
+  hasUpstream = lib.hasAttrByPath [ "programs" "gemini-cli" "enable" ] options;
+
   mcpFormat = import ../../lib/mcp-format.nix { inherit lib; };
   instructionGen = import ../../lib/instruction-gen.nix { inherit lib; };
   skillBundle = import ../../lib/skill-bundle.nix { inherit pkgs lib; };
@@ -67,7 +70,21 @@ let
 in
 {
   options.programs.jstack.tools.gemini = {
-    enable = lib.mkEnableOption "Gemini CLI configuration";
+    enable = lib.mkOption {
+      type = lib.types.bool;
+      default = if hasUpstream then config.programs.gemini-cli.enable else false;
+      defaultText = lib.literalExpression ''
+        if the upstream Home Manager `programs.gemini-cli` module is loaded,
+        its `enable` value; otherwise `false`.
+      '';
+      example = true;
+      description = ''
+        Whether to enable Gemini CLI configuration.
+
+        In Home Manager context, this defaults to the upstream
+        `programs.gemini-cli.enable` value when the upstream module is loaded.
+      '';
+    };
 
     settings = lib.mkOption {
       type = lib.types.attrsOf lib.types.unspecified;
