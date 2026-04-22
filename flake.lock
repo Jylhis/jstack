@@ -96,6 +96,22 @@
         "type": "github"
       }
     },
+    "github-awesome-copilot": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1776661782,
+        "narHash": "sha256-ZCyhl2F6oBj6FYNfPKfS1jpf7RI/OVHJQi1C7kpxDjo=",
+        "owner": "github",
+        "repo": "awesome-copilot",
+        "rev": "63d08d51f792d53feec8c1c06897cee870e83c18",
+        "type": "github"
+      },
+      "original": {
+        "owner": "github",
+        "repo": "awesome-copilot",
+        "type": "github"
+      }
+    },
     "hashicorp-agent-skills": {
       "flake": false,
       "locked": {
@@ -217,6 +233,7 @@
         "claude-plugins-official": "claude-plugins-official",
         "cloudflare-skills": "cloudflare-skills",
         "flake-compat": "flake-compat",
+        "github-awesome-copilot": "github-awesome-copilot",
         "hashicorp-agent-skills": "hashicorp-agent-skills",
         "microsoft-skills": "microsoft-skills",
         "minimax-skills": "minimax-skills",

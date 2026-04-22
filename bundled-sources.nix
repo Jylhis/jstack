@@ -253,4 +253,20 @@ in
       subdir = ".";
     };
   };
+
+  # ── github/awesome-copilot — GitHub platform skills ──────────────
+  github-awesome-copilot = {
+    src = inputs.github-awesome-copilot;
+    skills = {
+      namespace = "github";
+      paths = {
+        github-actions-workflow-spec = "skills/create-github-action-workflow-specification";
+        dependabot = "skills/dependabot";
+        gh-cli = "skills/gh-cli";
+        secret-scanning = "skills/secret-scanning";
+        codeql = "skills/codeql";
+        automate-this = "skills/automate-this";
+      };
+    };
+  };
 }

@@ -67,6 +67,10 @@
       url = "github:Orchestra-Research/AI-Research-SKILLs";
       flake = false;
     };
+    github-awesome-copilot = {
+      url = "github:github/awesome-copilot";
+      flake = false;
+    };
   };
 
   outputs =
