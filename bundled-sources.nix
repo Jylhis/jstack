@@ -269,4 +269,17 @@ in
       };
     };
   };
+
+  # ── grafana/skills — Grafana stack observability skills ──────────
+  # Skills are nested as `skills/<plugin-group>/<skill>/SKILL.md`.
+  # The recursive discoverer walks down to find each SKILL.md, so a
+  # single subdir entry covers every plugin group (lgtm, plugins,
+  # app-sdk, k6, core, cloud).
+  grafana-skills = {
+    src = inputs.grafana-skills;
+    skills = {
+      namespace = "grafana";
+      subdir = "skills";
+    };
+  };
 }
