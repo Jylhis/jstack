@@ -30,5 +30,7 @@ in
     minimax-skills
     taste-skill
     ai-research-skills
+    github-awesome-copilot
+    grafana-skills
     ;
 }

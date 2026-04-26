@@ -71,6 +71,10 @@
       url = "github:github/awesome-copilot";
       flake = false;
     };
+    grafana-skills = {
+      url = "github:grafana/skills";
+      flake = false;
+    };
   };
 
   outputs =
