@@ -4,13 +4,18 @@
 #   programs.jstack.skills = jstack.lib.defaultSkills.all;
 #   # or selectively:
 #   programs.jstack.skills = jstack.lib.defaultSkills.nix
-#     // jstack.lib.defaultSkills.golang
+#     // jstack.lib.defaultSkills.python
 #     // jstack.lib.defaultSkills.typescript;
 #
 # Each group maps skill names to { src = <path>; } attrsets.
 # The `all` attribute merges all groups.
 #
-# These reference paths relative to this file's location (../skills/<name>).
+# These reference paths relative to this file's location (../skills/<name>),
+# so only skills that live IN THIS REPO under `skills/` belong here.
+# Skills bundled from upstream repositories (golang, rust, obsidian,
+# promptfoo, trailofbits, …) flow in through `bundled-sources.nix` /
+# `programs.jstack.skillSources` instead and must NOT be listed here,
+# since their source paths would be unresolvable relative to this file.
 let
   skillsDir = ../skills;
   mkSkill = name: {
@@ -35,75 +40,11 @@ rec {
     "nixpkgs"
   ];
 
+  # Only the locally-maintained Go skill lives here.
+  # The broader Go catalogue is bundled from `cc-skills-golang` via
+  # `bundled-sources.nix` (namespace `golang`).
   golang = mkSkills [
-    "golang-benchmark"
-    "golang-cli"
-    "golang-code-style"
-    "golang-concurrency"
-    "golang-context"
-    "golang-continuous-integration"
-    "golang-data-structures"
-    "golang-database"
-    "golang-dependency-injection"
-    "golang-dependency-management"
-    "golang-design-patterns"
-    "golang-documentation"
-    "golang-error-handling"
-    "golang-grpc"
-    "golang-linter"
     "golang-modern-syntax"
-    "golang-modernize"
-    "golang-naming"
-    "golang-observability"
-    "golang-performance"
-    "golang-popular-libraries"
-    "golang-project-layout"
-    "golang-safety"
-    "golang-samber-do"
-    "golang-samber-hot"
-    "golang-samber-lo"
-    "golang-samber-mo"
-    "golang-samber-oops"
-    "golang-samber-ro"
-    "golang-samber-slog"
-    "golang-security"
-    "golang-stay-updated"
-    "golang-stretchr-testify"
-    "golang-structs-interfaces"
-    "golang-testing"
-    "golang-troubleshooting"
-  ];
-
-  rust = mkSkills [
-    "coding-guidelines"
-    "domain-cli"
-    "domain-cloud-native"
-    "domain-embedded"
-    "domain-fintech"
-    "domain-iot"
-    "domain-ml"
-    "domain-web"
-    "m01-ownership"
-    "m02-resource"
-    "m03-mutability"
-    "m04-zero-cost"
-    "m05-type-driven"
-    "m06-error-handling"
-    "m07-concurrency"
-    "m09-domain"
-    "m10-performance"
-    "m11-ecosystem"
-    "m12-lifecycle"
-    "m13-domain-error"
-    "m14-mental-model"
-    "m15-anti-pattern"
-    "rust-call-graph"
-    "rust-code-navigator"
-    "rust-deps-visualizer"
-    "rust-refactor-helper"
-    "rust-symbol-analyzer"
-    "rust-trait-explorer"
-    "unsafe-checker"
   ];
 
   python = mkSkills [
@@ -120,7 +61,6 @@ rec {
   ];
 
   typescript = mkSkills [
-    "search-params"
     "typescript-async"
     "typescript-code-style"
     "typescript-error-handling"
@@ -160,16 +100,6 @@ rec {
   claude-ecosystem = mkSkills [
     "claude-api"
     "mcp-builder"
-    "promptfoo-evals"
-    "redteam-plugin-development"
-  ];
-
-  obsidian = mkSkills [
-    "defuddle"
-    "json-canvas"
-    "obsidian-bases"
-    "obsidian-cli"
-    "obsidian-markdown"
   ];
 
   gitlab = mkSkills [
@@ -185,6 +115,7 @@ rec {
 
   misc = mkSkills [
     "offline-docs"
+    "using-skills"
   ];
 
   productivity = mkSkills [
@@ -196,17 +127,15 @@ rec {
     "skill-creator-lang"
   ];
 
-  # All skills merged into a single attrset.
+  # All local skills merged into a single attrset.
   all =
     nix
     // golang
-    // rust
     // python
     // typescript
     // jvm
     // emacs
     // claude-ecosystem
-    // obsidian
     // gitlab
     // storage
     // misc

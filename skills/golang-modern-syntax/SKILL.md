@@ -1,6 +1,6 @@
 ---
-name: use-modern-go
-description: Apply modern Go syntax guidelines based on project's Go version. Use when user ask for modern Go code guidelines.
+name: golang-modern-syntax
+description: Apply modern Go syntax guidelines based on the project's Go version. Use when the user asks for modern Go code guidelines, mentions `go.mod`, or requests idiomatic/up-to-date Go (slices, maps, cmp, range-over-int, atomic.Bool, t.Context(), wg.Go, etc.). Triggers on phrases like "modern Go", "use modern Go", "idiomatic Go", "Go version", "Go 1.22/1.23/1.24/1.25/1.26 features".
 ---
 
 # Modern Go Guidelines
