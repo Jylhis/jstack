@@ -2,8 +2,7 @@
 
 A curated catalogue of agent skills plus a multi-tool deployment module.
 Fully managed with Nix. Bundles skills, agents, commands, hooks,
-settings, a devenv dev shell, and a promptfoo eval harness — imported
-from a dozen upstream sources and augmented with locally maintained
+settings, and a devenv dev shell — imported from a dozen upstream sources and augmented with locally maintained
 skills. Superset of the [trailofbits/skills-curated](https://github.com/trailofbits/skills-curated)
 model.
 
@@ -50,16 +49,12 @@ All things are generally categorised under following categories:
 │   └── list-catalog.nix       # convenience: list all discovered skills
 ├── runtime/default.nix        # pkgs.buildEnv with LSPs (auto-aggregates from plugin.nix)
 ├── modules/                   # multi-target module (NixOS / nix-darwin / Home Manager)
-├── evals/                     # promptfoo eval suite
-│   ├── promptfooconfig.yaml   # eval harness config
-│   └── cases/                 # per-plugin test cases
 ├── docs/                      # Mintlify documentation site
-├── flake.nix                  # source of truth for pinned inputs (nixpkgs, promptfoo, flake-compat)
+├── flake.nix                  # source of truth for pinned inputs (nixpkgs, flake-compat)
 ├── flake.lock                 # pinned input revisions (read by flake + flake-compat)
 ├── _sources.nix               # flake-compat shim that exposes flake inputs to non-flake consumers
 └── scripts/
-    ├── install.bash           # link the repo into agent config dirs, build runtime
-    └── eval.bash              # run promptfoo (--fast, --plugin)
+    └── install.bash           # link the repo into agent config dirs, build runtime
 ```
 
 ## Plugin definition

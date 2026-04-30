@@ -11,10 +11,6 @@ inputs:
       nixpkgs:
         follows: nixpkgs
 
-secretspec:
-  enable: true
-  provider: onepassword  #onepassword  # keyring, dotenv, env, 1password, lastpass
-  profile: development   # profile from secretspec.toml
 # https://devenv.sh/binary-caching/
 cachix:
   pull:

@@ -224,23 +224,6 @@
         "type": "github"
       }
     },
-    "promptfoo": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1774392755,
-        "narHash": "sha256-3ki3pDl8At6oX9x2X+z9S9zXINPu/aZfrUuonIiDRec=",
-        "owner": "promptfoo",
-        "repo": "promptfoo",
-        "rev": "4197b03c384adad2e26a369b5ee7aeb2013a71bc",
-        "type": "github"
-      },
-      "original": {
-        "owner": "promptfoo",
-        "ref": "0.121.3",
-        "repo": "promptfoo",
-        "type": "github"
-      }
-    },
     "root": {
       "inputs": {
         "addyosmani-agent-skills": "addyosmani-agent-skills",
@@ -257,7 +240,6 @@
         "nixpkgs": "nixpkgs",
         "obsidian-skills": "obsidian-skills",
         "openai-skills": "openai-skills",
-        "promptfoo": "promptfoo",
         "rust-skills": "rust-skills",
         "taste-skill": "taste-skill",
         "trailofbits-skills": "trailofbits-skills",

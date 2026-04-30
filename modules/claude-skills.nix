@@ -6,10 +6,10 @@
 #
 # Usage in devenv.nix:
 #   # _sources.nix re-exports flake inputs via flake-compat.
-#   claude.code.skills.promptfoo = {
-#     source = (import ./_sources.nix).promptfoo;
+#   claude.code.skills.example = {
+#     source = (import ./_sources.nix).some-skill-source;
 #     skillsRoot = ".claude/skills";
-#     namespace = "promptfoo";
+#     namespace = "example";
 #   };
 {
   config,
@@ -54,7 +54,7 @@ in
           };
           namespace = lib.mkOption {
             type = lib.types.str;
-            description = "Namespace prefix for discovered skills (e.g. 'promptfoo').";
+            description = "Namespace prefix for discovered skills (e.g. 'example').";
           };
           maxDepth = lib.mkOption {
             type = lib.types.int;

@@ -35,7 +35,6 @@ and what domain it addresses.
 | Namespace | Scope | Source |
 |---|---|---|
 | `jstack` | Local — personal skills maintained in this repo (including the merged `skill-creator` and this meta-skill) | repo root |
-| `promptfoo` | promptfoo eval harness patterns | `promptfoo/promptfoo` |
 | `golang` | Go language, stdlib, samber/* ecosystem | `samber/cc-skills-golang` |
 | `rust` | Rust language, LSP-based navigation, ownership/lifetime mental models | `actionbook/rust-skills` |
 | `obsidian` | Obsidian vault automation | `kepano/obsidian-skills` |
@@ -160,7 +159,7 @@ just list-skills | jq 'group_by(.namespace) | map({namespace: .[0].namespace, co
 just list-skills | jq '.[] | select(.name | test("review|security"))'
 
 # Open a specific skill
-just list-skills | jq -r '.[] | select(.name == "promptfoo-evals") | .relativePath'
+just list-skills | jq -r '.[] | select(.name == "using-skills") | .relativePath'
 ```
 
 Upstream provenance is tracked in `bundled-sources.nix`. To add a new

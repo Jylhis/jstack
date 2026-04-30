@@ -7,10 +7,6 @@
       url = "github:edolstra/flake-compat";
       flake = false;
     };
-    promptfoo = {
-      url = "github:promptfoo/promptfoo/0.121.3";
-      flake = false;
-    };
     cc-skills-golang = {
       url = "github:samber/cc-skills-golang";
       flake = false;

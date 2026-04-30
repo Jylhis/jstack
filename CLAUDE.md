@@ -4,16 +4,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Is
 
-**skills** (formerly `jstack`) is a Nix-managed curated catalogue of agent skills plus a multi-tool deployment module. It bundles skills, agents, commands, hooks, settings, and promptfoo evals into a system deployed via NixOS / nix-darwin / Home Manager modules or `scripts/install.bash`. Skills come from a dozen upstream repos (Anthropic, OpenAI, Microsoft, Cloudflare, HashiCorp, Trail of Bits, addyosmani, samber, MiniMax, Obsidian/kepano) plus a small locally maintained set.
+**skills** (formerly `jstack`) is a Nix-managed curated catalogue of agent skills plus a multi-tool deployment module. It bundles skills, agents, commands, hooks, and settings into a system deployed via NixOS / nix-darwin / Home Manager modules or `scripts/install.bash`. Skills come from a dozen upstream repos (Anthropic, OpenAI, Microsoft, Cloudflare, HashiCorp, Trail of Bits, addyosmani, samber, MiniMax, Obsidian/kepano) plus a small locally maintained set.
 
 The module option namespace remains `programs.jstack` for stable public API — only the GitHub repo, branding, and docs URLs changed.
 
 ## Commands
 
-All development happens inside devenv (`devenv shell` or direnv). To skip 1Password authentication (as done in CI), prefix commands with `SECRETSPEC_PROVIDER=env`:
-
-    SECRETSPEC_PROVIDER=env devenv shell -- <command>
-    SECRETSPEC_PROVIDER=env just lint
+All development happens inside devenv (`devenv shell` or direnv).
 
 Key commands:
 
@@ -27,14 +24,7 @@ Key commands:
     just generate-servers     # Regenerate .mcp.json/.lsp.json from lib/servers.nix
     just list-skills          # Discover all skills (local + third-party)
 
-Eval commands (promptfoo):
-
-    just eval                 # Run full eval suite
-    just eval-fast            # Fast subset
-    just eval-skill <name>    # Single skill
-    just eval-group <name>    # Single skill group
-
-`devenv test` runs 15 smoke tests covering tools, JSON validity, nix evaluation, module contracts, and nixpkgs rev parity.
+`devenv test` runs 14 smoke tests covering tools, JSON validity, nix evaluation, module contracts, and nixpkgs rev parity.
 
 When devenv.nix doesn't exist and a command/tool is missing, create ad-hoc environment:
 
@@ -46,11 +36,11 @@ See https://devenv.sh/ad-hoc-developer-environments/
 
 ### Input Resolution
 
-`flake.nix` is the source of truth for pinned inputs (nixpkgs, promptfoo, flake-compat). Non-flake consumers re-enter the flake through `flake-compat`: `default.nix` is a thin shim that returns `flake.defaultNix`, and `_sources.nix` re-exports the input attrset for in-tree helpers that need raw source paths. Both paths produce identical store paths.
+`flake.nix` is the source of truth for pinned inputs (nixpkgs, flake-compat, and bundled skill sources). Non-flake consumers re-enter the flake through `flake-compat`: `default.nix` is a thin shim that returns `flake.defaultNix`, and `_sources.nix` re-exports the input attrset for in-tree helpers that need raw source paths. Both paths produce identical store paths.
 
 - `flake.nix` → deployment (NixOS/nix-darwin/HM module consumption, `nix build`, `nix flake check`)
 - `default.nix` → non-flake entry point (`nix-build -A packages.default`) — a `flake-compat` shim
-- `_sources.nix` → `{ nixpkgs, promptfoo }` sourced from the same `flake-compat` evaluation; used by in-tree helpers (`runtime/`, `tests/`, `lib/list-catalog.nix`)
+- `_sources.nix` → selected flake inputs sourced from the same `flake-compat` evaluation; used by in-tree helpers (`runtime/`, `tests/`, `lib/list-catalog.nix`)
 - `devenv.yaml` → devenv inputs (nixpkgs pinned to same rev as flake.lock, synced via `just update`)
 
 ### Module System (modules/)
@@ -104,6 +94,5 @@ Update with `nix flake update my-source` (or `just update` for everything).
 ## Testing
 
 - `nix flake check` — pure flake evaluation + module-eval checks across HM/NixOS/nix-darwin
-- `devenv test` — 15 smoke tests (tools, JSON, nix files, servers, discovery, module eval, rev parity)
+- `devenv test` — 14 smoke tests (tools, JSON, nix files, servers, discovery, module eval, rev parity)
 - `tests/module-eval.nix` — synthetic eval driver testing all module contexts + negative cases + pure-eval regression
-- `just eval*` — promptfoo evaluation suite (routing, discovery, quality, adversarial)

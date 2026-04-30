@@ -19,8 +19,7 @@ a runtime built with Nix, and a set of plugin bundles.
 | Hooks | `hooks/` | Hook scripts referenced from `settings.json` |
 | Plugins | `plugins/<name>/` | One directory per plugin bundle |
 | Runtime | `runtime/default.nix` | `pkgs.buildEnv` with MCP servers and LSPs |
-| Evals | `evals/` | promptfoo eval suite |
-| Scripts | `scripts/install.bash`, `scripts/eval.bash` | Install + eval entry points |
+| Scripts | `scripts/install.bash` | Install entry point |
 
 ## Plugin bundles
 
@@ -44,7 +43,7 @@ directory.
     Run `scripts/install.bash` to link everything into `~/.claude/`.
   </Card>
   <Card title="Develop" icon="code" href="/develop">
-    Use the devenv shell, lint, and run the eval suite.
+    Use the devenv shell, lint, and run repository checks.
   </Card>
   <Card title="Architecture" icon="diagram-project" href="/architecture">
     How the symlink layout, runtime, and plugins fit together.

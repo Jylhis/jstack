@@ -15,7 +15,6 @@ in
 {
   inherit (inputs)
     nixpkgs
-    promptfoo
     cc-skills-golang
     obsidian-skills
     rust-skills

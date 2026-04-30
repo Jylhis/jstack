@@ -147,4 +147,4 @@ versions:
 
 **Adopt from llm-agents.nix:** Use as package source (rigup.nix already does this).
 
-**jstack unique advantages:** Only project with NixOS + nix-darwin + HM in single module. Only project with flake + non-flake entry points. Only project with full eval suite (promptfoo + devenv test + module-eval).
+**jstack unique advantages:** Only project with NixOS + nix-darwin + HM in single module. Only project with flake + non-flake entry points and module evaluation across supported targets.

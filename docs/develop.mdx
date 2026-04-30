@@ -1,6 +1,6 @@
 ---
 title: "Develop"
-description: "devenv shell, lint, and the promptfoo eval suite."
+description: "devenv shell, lint, and repository checks."
 ---
 
 ## Enter the dev shell
@@ -27,8 +27,7 @@ Inside the dev shell, the following scripts are exposed:
 |---|---|
 | `install` | Alias for `bash scripts/install.bash` |
 | `lint` | Run `markdownlint-cli2` over `skills/**/SKILL.md`, `agents/*.md`, `commands/*.md`, then `jq empty settings.json` |
-| `eval` | Run the full promptfoo suite via `bash scripts/eval.bash` |
-| `eval-fast` | Run only the routing tests via `bash scripts/eval.bash --fast` |
+| `check` | Run Nix evaluation, flake checks, devenv tests, `statix`, and `deadnix` |
 
 ## Lint
 
@@ -45,17 +44,14 @@ The plugin bundles under `plugins/` are intentionally excluded from
 `lint`'s globs because they carry upstream-authored content and should not
 be reformatted casually.
 
-## Eval
+## Check
 
 ```bash
-eval        # full suite
-eval-fast   # routing only
+just check
 ```
 
-The eval harness lives under `evals/` and uses
-[promptfoo](https://www.promptfoo.dev/) (installed via npm in the dev
-shell). `eval-fast` skips end-to-end tests and is the right loop for
-working on skill descriptions and routing triggers.
+Use `just check` before opening a pull request. For faster feedback on
+module wiring, run `just check-modules`.
 
 ## Editing skills
 
@@ -71,8 +67,9 @@ working on skill descriptions and routing triggers.
     Run `install` (idempotent). New skills become visible to `~/.claude` on
     the next session.
   </Step>
-  <Step title="Verify routing">
-    Run `eval-fast` to check that triggering still does what you expect.
+  <Step title="Verify">
+    Run `just check-modules` for module changes or `just check` before a pull
+    request.
   </Step>
 </Steps>
 

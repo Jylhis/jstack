@@ -1,9 +1,7 @@
-export SECRETSPEC_PROVIDER := "env"
-
 default:
     @just --list --justfile {{justfile()}}
 
-# Run all checks (lint + typecheck + eval)
+# Run all checks (lint + typecheck)
 check:
     nix-instantiate --eval default.nix > /dev/null
     nix flake check --no-build
@@ -116,33 +114,6 @@ install *args:
 # Install for a specific target (claude, codex, gemini, all)
 install-target target *args:
     bash scripts/install.bash --target {{target}} {{args}}
-
-eval *args:
-    bash scripts/eval.bash {{args}}
-
-eval-fast *args:
-    bash scripts/eval.bash --fast {{args}}
-
-# Run quality evals only (llm-rubric assertions)
-eval-quality *args:
-    bash scripts/eval.bash --quality {{args}}
-
-# Run evals for a specific skill (matches test description)
-eval-skill skill *args:
-    bash scripts/eval.bash --skill {{skill}} {{args}}
-
-# Run evals for a skill group (legacy: was eval-plugin)
-eval-group group *args:
-    bash scripts/eval.bash --plugin {{group}} {{args}}
-
-# Compare routing results across Claude and GPT-4o
-eval-compare *args:
-    bash scripts/eval.bash --compare {{args}}
-
-# Run adversarial/redteam tests
-eval-redteam *args:
-    bash scripts/eval.bash --redteam {{args}}
-
 
 research:
     cat research/PROMPT.md | claude --effort max --name jstack-research --print --verbose --allowedTools "Read Write Edit Bash Glob Grep Agent WebFetch WebSearch mcp__devenv__search_options mcp__claude_ai_Context7__resolve-library-id mcp__claude_ai_Context7__query-docs"

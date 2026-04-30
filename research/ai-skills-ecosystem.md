@@ -194,6 +194,6 @@
 
 5. **ClawHub's malicious skills incident** (Feb 2026) validates the curated+Nix-pinned approach over direct registry pulls.
 
-6. **No tool manages the full stack** (skills + agents + commands + hooks + settings + MCP servers + eval suite) — this repo's main differentiator.
+6. **No tool manages the full stack** (skills + agents + commands + hooks + settings + MCP servers) — this repo's main differentiator.
 
 7. **Not yet bundled here but worth considering**: `huggingface/skills`, `mukul975/Anthropic-Cybersecurity-Skills` (754 skills, Apache 2.0), `anthropics/skills` (separate repo from `claude-plugins-official`).

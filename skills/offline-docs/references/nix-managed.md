@@ -147,8 +147,6 @@ If devenv is available:
 devenv search <query>
 ```
 
-Note: may require `SECRETSPEC_PROVIDER=env` prefix if 1Password integration is configured but not authenticated.
-
 ### MCP Tools
 
 If MCP servers are available, these provide richer search:

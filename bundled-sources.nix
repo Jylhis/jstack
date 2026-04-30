@@ -42,14 +42,6 @@ let
 in
 {
   # ── Anthropic / OpenAI / etc — single-namespace sources ────────────
-  promptfoo = {
-    src = inputs.promptfoo;
-    skills = {
-      namespace = "promptfoo";
-      subdir = ".claude/skills";
-    };
-  };
-
   cc-skills-golang = {
     src = inputs.cc-skills-golang;
     skills = {

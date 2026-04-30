@@ -160,7 +160,6 @@ rec {
   claude-ecosystem = mkSkills [
     "claude-api"
     "mcp-builder"
-    "promptfoo-evals"
     "redteam-plugin-development"
   ];
 

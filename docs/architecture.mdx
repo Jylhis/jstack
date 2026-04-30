@@ -20,10 +20,8 @@ exist in the repo), **install** (how they reach `~/.claude/`), and
 ├── hooks/                     # hook scripts referenced from settings.json
 ├── plugins/                   # one directory per plugin bundle
 ├── runtime/default.nix        # pkgs.buildEnv with MCP servers, LSPs
-├── evals/                     # promptfoo eval suite
 └── scripts/
-    ├── install.bash           # link the repo into ~/.claude, build runtime
-    └── eval.bash              # run promptfoo (--fast for routing only)
+    └── install.bash           # link the repo into ~/.claude, build runtime
 ```
 
 ## Install model
@@ -69,4 +67,3 @@ After install, `~/.claude/plugins/` is a symlink into this repo. If you
 install a plugin via Claude Code's marketplace UI (`/plugin install foo`),
 it writes a new directory under `plugins/` and shows up in `git status`.
 Either commit the new plugin to the repo or revert it.
-
