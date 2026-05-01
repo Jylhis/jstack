@@ -291,6 +291,18 @@ let
     };
   };
 
+  hmCodexInvalidSkillEval = evalCtx {
+    contextModules = [ hmStubModule ];
+    pkgs' = linuxPkgs;
+    extraConfig = {
+      programs.jstack.skills.invalid-codex-skill.src =
+        jstackRepo + "/tests/fixtures/invalid-codex-skill";
+    };
+  };
+
+  hmCodexInvalidSkillBundle =
+    builtins.attrNames (builtins.readDir hmCodexInvalidSkillEval.config.programs.codex.skills);
+
   devenvCodexEval = lib.evalModules {
     modules = [
       devenvStubModule
@@ -391,6 +403,10 @@ let
       lib.hasInfix "Test instructions" hmEval.config.programs.codex."custom-instructions"
     ))
     (check "hm.codex.skills.delegated" (hmEval.config.programs.codex.skills != { }))
+    (check "hm.codex.invalid-skill.filtered" (
+      !(builtins.elem "invalid-codex-skill" hmCodexInvalidSkillBundle)
+      && builtins.elem "test-skill" hmCodexInvalidSkillBundle
+    ))
 
     # Codex: direct fallback writes files when upstream is absent
     (check "hm.codex.fallback.skills.linked" (hmCodexDirectEval.config.home.file ? ".agents/skills"))

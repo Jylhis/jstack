@@ -66,12 +66,45 @@ let
     && hasFrontmatterDescription skill
   ) cfg._resolvedSkills;
 
-  skills =
+  rawSkills =
     if toolSkills != { } then
       skillBundle.mkSkillBundle {
         skills = toolSkills;
         toolName = "codex";
       }
+    else
+      null;
+
+  skills =
+    if rawSkills != null then
+      pkgs.runCommand "jstack-skills-codex-filtered" { } ''
+        cp -r "${rawSkills}/." "$out"
+        chmod -R u+w "$out"
+
+        # Defense in depth: re-check the rendered bundle because some upstream
+        # internal skills intentionally omit `description` and Codex refuses
+        # to load them.
+        find "$out" -mindepth 1 -maxdepth 1 -type d | while read -r skillDir; do
+          skillFile="$skillDir/SKILL.md"
+
+          if [ ! -f "$skillFile" ]; then
+            rm -rf "$skillDir"
+            continue
+          fi
+
+          frontmatter="$(
+            awk '
+              NR == 1 && $0 == "---" { in_frontmatter = 1; next }
+              in_frontmatter && $0 == "---" { exit }
+              in_frontmatter { print }
+            ' "$skillFile"
+          )"
+
+          if ! printf '%s\n' "$frontmatter" | grep -Eq '^[[:space:]]*description[[:space:]]*:'; then
+            rm -rf "$skillDir"
+          fi
+        done
+      ''
     else
       null;
 
