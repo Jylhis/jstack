@@ -104,8 +104,9 @@
       # Lib exports for consumers
       lib = {
         defaultSkills = import ./lib/default-skills.nix;
-        toolDefs = import ./lib/tool-defs.nix;
+        toolDefs = import ./lib/tool-defs.nix { inherit lib; };
         toolMappings = import ./lib/tool-mappings.nix;
+        compatibility = import ./lib/compatibility-matrix.nix { inherit lib; };
       };
 
       packages = forAllSystems (
@@ -119,6 +120,7 @@
             inherit pkgs;
             inherit (pkgs) lib;
           };
+          compatibility-matrix = (import ./lib/compatibility-matrix.nix { inherit (pkgs) lib; inherit pkgs; }).exportJson;
         }
       );
 

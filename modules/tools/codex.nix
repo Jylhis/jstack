@@ -28,6 +28,8 @@ let
   upstreamHasSkills = lib.hasAttrByPath [ "programs" "codex" "skills" ] options;
 
   mcpFormat = import ../../lib/mcp-format.nix { inherit lib; };
+  compatibility = import ../../lib/compatibility-matrix.nix { inherit lib; };
+  toolCaps = compatibility.matrix.codex;
   instructionGen = import ../../lib/instruction-gen.nix { inherit lib; };
   skillBundle = import ../../lib/skill-bundle.nix { inherit pkgs lib; };
 
@@ -143,12 +145,12 @@ let
     else
       null;
 
-  skillsPath = if toolCfg.skillsTarget == "agents" then ".agents/skills" else ".codex/skills";
+  skillsPath = if toolCfg.skillsTarget == "agents" then toolCaps.paths.skillsAgents else toolCaps.paths.skillsPrimary;
 
   generatedFiles =
     { }
     // lib.optionalAttrs (instructionFile != null) {
-      ".codex/AGENTS.md" = instructionFile;
+      "${toolCaps.paths.instructions}" = instructionFile;
     }
     // lib.optionalAttrs (configToml != null) {
       ".codex/config.toml" = configToml;

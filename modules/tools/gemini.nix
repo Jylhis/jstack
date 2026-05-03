@@ -21,6 +21,8 @@ let
   hasUpstream = lib.hasAttrByPath [ "programs" "gemini-cli" "enable" ] options;
 
   mcpFormat = import ../../lib/mcp-format.nix { inherit lib; };
+  compatibility = import ../../lib/compatibility-matrix.nix { inherit lib; };
+  toolCaps = compatibility.matrix.gemini;
   instructionGen = import ../../lib/instruction-gen.nix { inherit lib; };
   skillBundle = import ../../lib/skill-bundle.nix { inherit pkgs lib; };
 
@@ -62,10 +64,10 @@ let
   generatedFiles =
     { }
     // lib.optionalAttrs (instructionFile != null) {
-      ".gemini/GEMINI.md" = instructionFile;
+      "${toolCaps.paths.instructions}" = instructionFile;
     }
     // lib.optionalAttrs (settingsFile != null) {
-      ".gemini/settings.json" = settingsFile;
+      "${toolCaps.capabilities.mcp.file}" = settingsFile;
     };
 in
 {
@@ -106,7 +108,7 @@ in
           home.file = lib.mapAttrs (_: source: { inherit source; }) generatedFiles;
         }
         (lib.mkIf (skills != null) {
-          home.file.".gemini/skills".source = skills;
+          home.file."${toolCaps.paths.skills}".source = skills;
         })
       ]
       ++ lib.optionals isSystem [
@@ -115,7 +117,7 @@ in
         }
         (lib.mkIf (skills != null) {
           programs.jstack._generated.gemini.dirs = {
-            ".gemini/skills" = skills;
+            "${toolCaps.paths.skills}" = skills;
           };
         })
       ]
