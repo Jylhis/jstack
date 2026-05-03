@@ -15,6 +15,13 @@
 let
   cfg = config.programs.jstack;
 
+  compatibility = import ../lib/compatibility-matrix.nix { inherit lib; };
+  matrix = compatibility.matrix;
+
+  toolModuleKeys = builtins.attrNames cfg.tools;
+  knownTools = builtins.attrNames matrix;
+  unknownTools = lib.filter (t: !(builtins.elem t knownTools)) toolModuleKeys;
+
   # ── Context detection ────────────────────────────────────────────────
   isHomeManager = options ? home.homeDirectory;
   inherit (pkgs.stdenv.hostPlatform) isDarwin;
@@ -212,7 +219,11 @@ in
       [
         # ── Assertions ──
         {
-          assertions = [
+          assertions = compatibility.validateMatrix matrix ++ [
+            {
+              assertion = unknownTools == [ ];
+              message = "programs.jstack: unknown tools in programs.jstack.tools: ${lib.concatStringsSep ", " unknownTools}";
+            }
             {
               assertion = isHomeManager || effectiveUser != null;
               message =

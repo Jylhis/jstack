@@ -58,7 +58,7 @@ in
       target ? "claude",
     }:
     let
-      targets = import ./targets.nix;
+      targets = import ./targets.nix { inherit lib; };
       t = targets.${target};
       manifest = import ./manifest.nix { inherit pkgs; };
 

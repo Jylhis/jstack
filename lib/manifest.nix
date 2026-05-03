@@ -46,7 +46,7 @@ in
       target ? "claude",
     }:
     let
-      targets = import ./targets.nix;
+      targets = import ./targets.nix { inherit (pkgs) lib; };
       t = targets.${target};
       self = pkgs.lib.getAttrs [ "mkClaudeManifest" "mkGeminiManifest" "mkMcpConfig" "mkLspConfig" ] (
         import ./manifest.nix { inherit pkgs; }

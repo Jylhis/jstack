@@ -23,6 +23,8 @@ let
   hasUpstream = lib.hasAttrByPath [ "programs" "claude-code" "enable" ] options;
 
   mcpFormat = import ../../lib/mcp-format.nix { inherit lib; };
+  compatibility = import ../../lib/compatibility-matrix.nix { inherit lib; };
+  toolCaps = compatibility.matrix."claude-code";
   instructionGen = import ../../lib/instruction-gen.nix { inherit lib; };
   skillBundle = import ../../lib/skill-bundle.nix { inherit pkgs lib; };
   fileBundle = import ../../lib/file-bundle.nix { inherit pkgs lib; };
@@ -182,19 +184,19 @@ in
         }
 
         (lib.mkIf (instructionFile != null) {
-          home.file.".claude/CLAUDE.md".source = instructionFile;
+          home.file."${toolCaps.paths.instructions}".source = instructionFile;
         })
 
         (lib.mkIf (skills != null) {
-          home.file.".claude/skills".source = skills;
+          home.file."${toolCaps.paths.skills}".source = skills;
         })
 
         (lib.mkIf (agentsDir != null) {
-          home.file.".claude/agents".source = agentsDir;
+          home.file."${toolCaps.paths.agents}".source = agentsDir;
         })
 
         (lib.mkIf (commandsDir != null) {
-          home.file.".claude/commands".source = commandsDir;
+          home.file."${toolCaps.paths.commands}".source = commandsDir;
         })
 
         (lib.mkIf (mcpJson != null) {
@@ -215,8 +217,8 @@ in
           // lib.optionalAttrs (instructionFile != null) {
             ".claude/CLAUDE.md" = instructionFile;
           }
-          // lib.optionalAttrs (mcpJson != null) { ".mcp.json" = mcpJson; }
-          // lib.optionalAttrs (lspJson != null) { ".lsp.json" = lspJson; };
+          // lib.optionalAttrs (mcpJson != null) { "${toolCaps.capabilities.mcp.file}" = mcpJson; }
+          // lib.optionalAttrs (lspJson != null) { "${toolCaps.capabilities.lsp.file}" = lspJson; };
         }
 
         (lib.mkIf (skills != null) {
