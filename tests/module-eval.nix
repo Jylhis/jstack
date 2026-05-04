@@ -295,13 +295,13 @@ let
     contextModules = [ hmStubModule ];
     pkgs' = linuxPkgs;
     extraConfig = {
-      programs.jstack.skills.invalid-codex-skill.src =
-        jstackRepo + "/tests/fixtures/invalid-codex-skill";
+      programs.jstack.skills.invalid-codex-skill.src = jstackRepo + "/tests/fixtures/invalid-codex-skill";
     };
   };
 
-  hmCodexInvalidSkillBundle =
-    builtins.attrNames (builtins.readDir hmCodexInvalidSkillEval.config.programs.codex.skills);
+  hmCodexInvalidSkillBundle = builtins.attrNames (
+    builtins.readDir hmCodexInvalidSkillEval.config.programs.codex.skills
+  );
 
   devenvCodexEval = lib.evalModules {
     modules = [
