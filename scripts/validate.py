@@ -228,6 +228,10 @@ def _parse_field(body: str) -> tuple[str, str]:
     return k.strip(), v.strip().strip('"\'')
 
 
+def _is_skippable_line(stripped: str, line: str) -> bool:
+    return not stripped or stripped.startswith("#") or line == "sources:"
+
+
 def _read_manifest_ids() -> tuple[set[str], dict[str, str]]:
     """Return ({source-ids}, {id: reviewed-rev}) from upstream/sources.yaml.
 
@@ -236,34 +240,38 @@ def _read_manifest_ids() -> tuple[set[str], dict[str, str]]:
     """
     ids: set[str] = set()
     reviewed: dict[str, str] = {}
-    current_id: str | None = None
-    in_skills = False
+    state = {"current_id": None, "in_skills": False}
 
     for raw in UPSTREAM_MANIFEST.read_text().splitlines():
         line = raw.rstrip()
         stripped = line.strip()
-        if not stripped or stripped.startswith("#") or line == "sources:":
+        if _is_skippable_line(stripped, line):
             continue
         ind = len(line) - len(line.lstrip(" "))
-
-        if ind == 2 and stripped.startswith("- "):
-            current_id = _start_new_source(stripped)
-            if current_id:
-                ids.add(current_id)
-            in_skills = False
-            continue
-        if current_id is None or in_skills:
-            if ind == 4 and stripped == "skills:":
-                in_skills = True
-            continue
-        if ind == 4 and stripped == "skills:":
-            in_skills = True
-            continue
-        if ind == 4 and ":" in stripped:
-            key, value = _parse_field(stripped)
-            if key == "reviewed-rev":
-                reviewed[current_id] = value
+        _feed_manifest_line(ind, stripped, state, ids, reviewed)
     return ids, reviewed
+
+
+def _feed_manifest_line(ind: int, stripped: str, state: dict,
+                        ids: set[str], reviewed: dict[str, str]) -> None:
+    if ind == 2 and stripped.startswith("- "):
+        new_id = _start_new_source(stripped)
+        state["current_id"] = new_id
+        state["in_skills"] = False
+        if new_id:
+            ids.add(new_id)
+        return
+    if state["current_id"] is None:
+        return
+    if ind == 4 and stripped == "skills:":
+        state["in_skills"] = True
+        return
+    if state["in_skills"]:
+        return
+    if ind == 4 and ":" in stripped:
+        key, value = _parse_field(stripped)
+        if key == "reviewed-rev":
+            reviewed[state["current_id"]] = value
 
 
 def _extract_metadata(fm: dict) -> dict:
