@@ -53,7 +53,7 @@ if $TEST_COMMAND; then
     echo "📝 Adding test-result comment..."
     glab mr note "$MR_ID" -m "✅ Local tests passed. Manual code review and approval are still required."
 
-    echo "⚠️  Tests complete - MR was NOT auto-approved"
+    echo "✨ Tests complete - MR was NOT auto-approved"
 else
     echo "❌ Tests failed!"
 
