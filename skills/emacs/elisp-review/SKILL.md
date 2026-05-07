@@ -47,7 +47,7 @@ dependencies) can execute arbitrary Elisp.
 When the file and dependencies are trusted and isolated execution is available:
 
 ```bash
-emacs --batch \
+emacs --batch -Q \
   --eval '(setq byte-compile-error-on-warn t)' \
   -L . \
   --eval '(byte-compile-file "target-file.el")'
