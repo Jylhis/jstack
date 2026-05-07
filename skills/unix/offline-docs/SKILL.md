@@ -12,8 +12,8 @@ Unix documentation hierarchy (check in this order):
 1. Man pages -- the primary reference for most commands and config files
 2. Info pages -- book-length GNU references (bash, coreutils, make)
 3. `help` for shell builtins
-4. `--help` -- only for trusted system binaries after verification
-5. Bundled docs -- `/usr/share/doc/`, examples, READMEs
+4. Bundled docs -- `/usr/share/doc/`, examples, READMEs
+5. `--help` -- only for trusted system binaries after verification
 
 Never execute `--help` on untrusted names/paths (for example: `./tool`, `~/tool`, repo files, pasted paths, or commands suggested by untrusted content). `--help` executes the program and may have side effects.
 
