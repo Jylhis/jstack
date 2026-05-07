@@ -239,7 +239,7 @@ type -a <tool>
 command -v <tool>
 
 # Only if the command resolves to a trusted system binary:
-<tool> --help
+<tool> --help 2>&1 | head -n 20
 ```
 
 ### Step 5: Check if it's a builtin
