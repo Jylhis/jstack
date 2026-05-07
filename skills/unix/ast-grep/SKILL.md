@@ -63,7 +63,7 @@ introduce holes:
 | ----------- | --------------------------------------------------------------- |
 | `$VAR`      | Exactly one named AST node; the same name must match identically.|
 | `$_`        | Exactly one anonymous node (don't capture).                      |
-| `$$VAR`     | Zero or more nodes captured as a sequence (advanced).            |
+| `$$VAR`     | Exactly one *unnamed* AST node, captured (vs. `$VAR` which captures named nodes). |
 | `$$$`       | Ellipsis: any number of sibling nodes (args, statements, items). |
 | `$$$VAR`    | Named ellipsis: capture the sequence for use in `--rewrite`.     |
 
