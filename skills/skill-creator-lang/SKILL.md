@@ -109,10 +109,10 @@ This is a meta skill. It does not write application code. It produces other skil
 
 9. **Write the files.** Create the skill directory with:
    - `SKILL.md` — the prompt document, structured like other jstack skills
-   - `reference.md` — longer-form notes: links to official docs, the rationale for
+   - `references/reference.md` — longer-form notes: links to official docs, the rationale for
      each opinionated pick, and any topic that did not fit cleanly in `SKILL.md`
-   - Additional reference files only if a topic genuinely needs its own document
-     (e.g. `testing.md`, `tooling.md`). Do not split for the sake of splitting.
+   - Additional reference files in `references/` only if a topic genuinely needs its own document
+     (e.g. `references/testing.md`, `references/tooling.md`). Do not split for the sake of splitting.
 
    If an existing skill was found in step 5, overwrite the same files in place
    rather than creating a parallel directory.
@@ -207,7 +207,7 @@ description: <one sentence: what this skill teaches Claude>
 
 ## References
 
-<links to reference.md and official docs>
+<links to references/reference.md and official docs>
 ```
 
 ## Output
