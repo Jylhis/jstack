@@ -10,8 +10,8 @@ from pathlib import Path
 
 TOOL_TOKEN_RE = re.compile(r"^[A-Za-z][A-Za-z0-9_-]{0,63}$")
 BANNED_PATTERNS: list[tuple[str, re.Pattern[str], str]] = [
-    ("remote-execution", re.compile(r"(?:curl|wget)\s+[^\n|]+\|\s*(?:bash|sh|zsh)"), "Avoid pipe-to-shell; download and inspect before executing."),
-    ("obfuscated-exec", re.compile(r"(?:base64\s+-d|python\s+-c).*\|\s*(?:bash|sh)\b"), "Remove obfuscated execution chains and provide transparent commands."),
+    ("remote-execution", re.compile(r"(?:curl|wget).*\|\s*(?:sudo\s+)?(?:bash|sh|zsh)\b"), "Avoid pipe-to-shell; download and inspect before executing."),
+    ("obfuscated-exec", re.compile(r"(?:base64\s+-d|python\s+-c).*\|\s*(?:sudo\s+)?(?:bash|sh)\b"), "Remove obfuscated execution chains and provide transparent commands."),
     ("prompt-exfiltration", re.compile(r"ignore (?:all|previous) instructions", re.IGNORECASE), "Do not include instruction-override or exfiltration language in skills."),
 ]
 
@@ -42,7 +42,7 @@ def parse_frontmatter(text: str) -> dict[str, str] | None:
             raise ValueError(f"Unparseable frontmatter line: {line}")
         k, v = line.split(":", 1)
         current_key = k.strip()
-        data[current_key] = v.strip().strip('"')
+        data[current_key] = v.strip().strip("'\"")
     return data
 
 
@@ -50,7 +50,7 @@ def validate_tool_syntax(path: Path, text: str, findings: list[Finding]) -> None
     for i, line in enumerate(text.splitlines(), start=1):
         if "allowedTools" not in line:
             continue
-        m = re.search(r"allowedTools\s*[=:]\s*[\"']([^\"']+)[\"']", line)
+        m = re.search(r"allowedTools\s*[=:]\s*[\"']?([^\"'\n#]+)[\"']?", line)
         if not m:
             findings.append(Finding(path, f"{path}:{i}: malformed allowedTools declaration"))
             continue
@@ -67,10 +67,16 @@ def validate_skill_dir(skill_dir: Path, findings: list[Finding]) -> None:
         return
 
     text = skill_file.read_text(encoding="utf-8")
-    fm = parse_frontmatter(text)
-    if fm is None:
+    fm_error = False
+    try:
+        fm = parse_frontmatter(text)
+    except ValueError as exc:
+        findings.append(Finding(skill_file, f"{skill_file}: malformed frontmatter: {exc}"))
+        fm = None
+        fm_error = True
+    if fm is None and not fm_error:
         findings.append(Finding(skill_file, f"{skill_file}: missing or unclosed YAML frontmatter"))
-    else:
+    elif fm is not None:
         for key in ("name", "description"):
             if key not in fm or not fm[key].strip():
                 findings.append(Finding(skill_file, f"{skill_file}: frontmatter missing required field '{key}'"))
