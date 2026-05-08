@@ -137,8 +137,8 @@ in
       || fail "shellcheck reported errors"
     pass "shellcheck clean"
 
-    # 6. treefmt is wired up and can resolve its generated config.
-    echo "-- test 6/13: treefmt loads config"
+    # 6. treefmt is available.
+    echo "-- test 6/13: treefmt available"
     treefmt --version >/dev/null || fail "treefmt not runnable"
     pass "treefmt available"
 
