@@ -1,0 +1,20 @@
+{
+  "name": "jylhis-skills",
+  "interface": {
+    "displayName": "Jylhis Skills"
+  },
+  "plugins": [
+    {
+      "name": "jylhis-skills",
+      "source": {
+        "source": "local",
+        "path": "./"
+      },
+      "policy": {
+        "installation": "INSTALLED_BY_DEFAULT",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Coding"
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Symlink this repo (the jylhis-skills plugin) into each tool's plugin directory.
+# Install this repo (the jylhis-skills plugin) into supported agent tools.
 # Also links AGENTS.md and CLAUDE.md directly for Claude Code project context.
 # Idempotent. Backs up any existing files it would overwrite.
 #
@@ -30,6 +30,78 @@ link() {
   fi
   run ln -s "$src" "$dst"
   echo "link $dst -> $src"
+}
+
+enable_codex_plugin() {
+  local config="$1"
+  local plugin_id="jylhis-skills@jylhis-skills"
+  local section="[plugins.\"$plugin_id\"]"
+  local tmp
+
+  if [[ $DRY_RUN -eq 1 ]]; then
+    echo "DRY: enable Codex plugin $plugin_id in $config"
+    return
+  fi
+
+  mkdir -p "$(dirname "$config")"
+  touch "$config"
+
+  if grep -qF "$section" "$config"; then
+    tmp="$(mktemp "${config}.XXXXXX")"
+    awk -v section="$section" '
+      /^\[/ {
+        if (in_section && !saw_enabled) {
+          print "enabled = true"
+        }
+        in_section = ($0 == section)
+        if (in_section) {
+          saw_enabled = 0
+        }
+      }
+      in_section && /^enabled[[:space:]]*=/ {
+        print "enabled = true"
+        saw_enabled = 1
+        next
+      }
+      { print }
+      END {
+        if (in_section && !saw_enabled) {
+          print "enabled = true"
+        }
+      }
+    ' "$config" > "$tmp"
+    mv "$tmp" "$config"
+  else
+    printf '\n[plugins."%s"]\nenabled = true\n' "$plugin_id" >> "$config"
+  fi
+
+  echo "enable Codex plugin $plugin_id in $config"
+}
+
+sync_codex_plugin_cache() {
+  local cache_dir="$1/plugins/cache/jylhis-skills/jylhis-skills"
+  local cache_root="$cache_dir/local"
+
+  run mkdir -p "$cache_dir"
+  if [[ -L "$cache_root" || ( -e "$cache_root" && ! -d "$cache_root" ) ]]; then
+    run mkdir -p "$BACKUP_ROOT"
+    run mv "$cache_root" "$BACKUP_ROOT/$(basename "$cache_root")"
+  fi
+  run mkdir -p "$cache_root"
+  run rsync -a --delete --delete-excluded \
+    --exclude .git \
+    --exclude .devenv \
+    --exclude .direnv \
+    --exclude .cache \
+    --exclude .claude \
+    --exclude .codex \
+    --exclude .gemini \
+    --exclude result \
+    --exclude 'result-*' \
+    --exclude __pycache__ \
+    --exclude '*.pyc' \
+    "$REPO_ROOT/" "$cache_root/"
+  echo "sync $cache_root <- $REPO_ROOT"
 }
 
 # ── Claude Code ──────────────────────────────────────────────────────────────
@@ -96,7 +168,32 @@ link "$REPO_ROOT" "$GEMINI_DIR/extensions/jylhis-skills"
 # ── Codex ─────────────────────────────────────────────────────────────────────
 CODEX_DIR="$HOME/.codex"
 run mkdir -p "$CODEX_DIR/plugins"
-link "$REPO_ROOT" "$CODEX_DIR/plugins/jylhis-skills"
+
+# Migrate older installs: a raw symlink under ~/.codex/plugins is not a
+# Codex marketplace install and can make Codex try to parse Claude metadata.
+CODEX_LEGACY_LINK="$CODEX_DIR/plugins/jylhis-skills"
+if [[ -e "$CODEX_LEGACY_LINK" || -L "$CODEX_LEGACY_LINK" ]]; then
+  run mkdir -p "$BACKUP_ROOT"
+  run mv "$CODEX_LEGACY_LINK" "$BACKUP_ROOT/$(basename "$CODEX_LEGACY_LINK")"
+  echo "moved legacy Codex plugin path $CODEX_LEGACY_LINK -> $BACKUP_ROOT/"
+fi
+
+if command -v codex >/dev/null 2>&1; then
+  run codex plugin marketplace add "$REPO_ROOT"
+  sync_codex_plugin_cache "$CODEX_DIR"
+  enable_codex_plugin "$CODEX_DIR/config.toml"
+else
+  cat <<EOF
+codex CLI not found on PATH. To finish the Codex install, run:
+  codex plugin marketplace add $REPO_ROOT
+  mkdir -p ~/.codex/plugins/cache/jylhis-skills/jylhis-skills
+  rsync -a --delete $REPO_ROOT/ ~/.codex/plugins/cache/jylhis-skills/jylhis-skills/local/
+
+Then enable this plugin in ~/.codex/config.toml:
+  [plugins."jylhis-skills@jylhis-skills"]
+  enabled = true
+EOF
+fi
 
 if [[ -d "$BACKUP_ROOT" ]]; then
   echo

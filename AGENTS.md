@@ -21,8 +21,10 @@ A curated [Agent Skills](https://agentskills.io) catalogue packaged as the
 - `upstream/decisions/<id>.log` — per-source append-only review log
   (one row per upstream commit decided via `upstream-tracker`).
 - `.claude-plugin/plugin.json` — Claude Code plugin manifest; lists every skill path explicitly.
+- `.codex-plugin/plugin.json` — Codex plugin manifest; loads `skills/` recursively.
+- `.agents/plugins/marketplace.json` — Codex local marketplace entry for this plugin.
 - `gemini-extension.json` — Gemini CLI extension manifest.
-- `scripts/install.sh` — symlinks the repo root into each tool's plugin directory.
+- `scripts/install.sh` — registers local marketplaces for Claude Code and Codex, and symlinks Gemini.
 - `scripts/validate.py` — portable skill frontmatter lint (two-level paths);
   also runs an advisory `--strict-upstream` pass when `upstream/sources.yaml`
   exists.
@@ -75,10 +77,11 @@ devenv -O packages:pkgs "ripgrep fd" shell -- rg pattern
 
 ## Repo conventions
 
-- The repo root is the plugin. All three tool manifests (`.claude-plugin/plugin.json`,
-  `gemini-extension.json`) live at the root.
+- The repo root is the plugin. Tool manifests (`.claude-plugin/plugin.json`,
+  `.codex-plugin/plugin.json`, `gemini-extension.json`) live at the root.
 - Skills are two levels deep: `skills/<category>/<name>/SKILL.md`.
 - When promoting a skill, add its path to `.claude-plugin/plugin.json`'s `skills` array.
+  Codex discovers skills recursively from `skills/`.
 - Skill runtime dependencies use `nix run` shebangs in `scripts/` or MCP/LSP
   config — not in `devenv.nix`.
 - No bundled upstream skill repos. To re-import, vendor selected

@@ -17,7 +17,7 @@ Idempotent; backs up anything it would overwrite. Pass `--dry-run` to preview.
 |---|---|---|
 | Claude Code | local marketplace + `plugin install` | `~/.claude/plugins/known_marketplaces.json` + `installed_plugins.json` |
 | Gemini CLI | symlink | `~/.gemini/extensions/jylhis-skills` → repo root |
-| Codex | symlink | `~/.codex/plugins/jylhis-skills` → repo root |
+| Codex | local marketplace + enabled plugin | `~/.codex/config.toml` |
 
 For Claude Code, the script registers this repo as a local marketplace
 and then installs the `jylhis-skills` plugin from it, so it appears in
@@ -48,6 +48,17 @@ Claude Code also gets direct context links:
 ~/.claude/CLAUDE.md  →  CLAUDE.md
 ```
 
+For Codex, the script registers this repo as a local marketplace using
+`.agents/plugins/marketplace.json`, then enables
+`jylhis-skills@jylhis-skills` in `~/.codex/config.toml`. Older raw
+symlinks at `~/.codex/plugins/jylhis-skills` are moved aside because
+Codex does not load this repo correctly from that path. The local
+marketplace marks this plugin as installed by default so new sessions
+can load its skills without a separate Codex install command. The script
+also syncs the repo into Codex's plugin cache at
+`~/.codex/plugins/cache/jylhis-skills/jylhis-skills/local`, which is the
+path current Codex builds use for installed local plugins.
+
 ## Development
 
 Load the plugin without installing:
@@ -58,6 +69,9 @@ claude --plugin-dir ./
 
 # Gemini CLI
 gemini extensions link .
+
+# Codex
+codex plugin marketplace add ./
 ```
 
 All dev tools come from devenv:
@@ -76,6 +90,9 @@ Add a skill:
 1. Create `skills/<category>/<name>/SKILL.md` with YAML frontmatter.
 2. Add `"./skills/<category>/<name>"` to `.claude-plugin/plugin.json`'s `skills` array.
 3. Run `just validate`.
+
+Codex loads skills recursively from `.codex-plugin/plugin.json`'s
+`"skills": "./skills/"`, so no per-skill Codex manifest entry is needed.
 
 See `docs/skill-authoring-guide.md` for the portability profile and rejected fields.
 
