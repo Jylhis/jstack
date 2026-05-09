@@ -108,6 +108,53 @@ def parse_frontmatter(text: str) -> tuple[dict, str] | None:
     return _parse_yaml_lines(fm_text), body
 
 
+def _quoted_scalar_end(value: str, quote: str) -> int | None:
+    """Return the closing quote offset for a simple YAML quoted scalar."""
+    i = 1
+    while i < len(value):
+        ch = value[i]
+        if quote == '"' and ch == "\\":
+            i += 2
+            continue
+        if ch == quote:
+            if quote == "'" and i + 1 < len(value) and value[i + 1] == "'":
+                i += 2
+                continue
+            return i
+        i += 1
+    return None
+
+
+def _check_frontmatter_syntax(rel: Path, fm_text: str) -> list[str]:
+    """Catch YAML syntax this repo's lightweight parser would otherwise mask."""
+    errors: list[str] = []
+
+    for lineno, line in enumerate(fm_text.splitlines(), start=2):
+        if not _is_top_level_key(line):
+            continue
+
+        key, _, val = line.partition(":")
+        val = val.strip()
+        if not val or val in BLOCK_SCALAR_INDICATORS:
+            continue
+        if val[0] not in ("'", '"'):
+            continue
+
+        end = _quoted_scalar_end(val, val[0])
+        if end is None:
+            errors.append(f"{rel}:{lineno}: unterminated quoted frontmatter value for `{key}`")
+            continue
+
+        trailing = val[end + 1:].strip()
+        if trailing and not trailing.startswith("#"):
+            errors.append(
+                f"{rel}:{lineno}: invalid trailing content after quoted "
+                f"frontmatter value for `{key}`"
+            )
+
+    return errors
+
+
 # ── Per-skill checks ───────────────────────────────────────────────────
 
 
@@ -170,13 +217,15 @@ def validate_skill(skill_md: Path) -> list[str]:
     if text is None:
         return encoding_errors
 
-    parsed = parse_frontmatter(text)
-    if parsed is None:
+    split = _split_frontmatter(text)
+    if split is None:
         return encoding_errors + [f"{rel}: missing or malformed YAML frontmatter (must start with `---`)"]
-    fm, body = parsed
+    fm_text, body = split
+    fm = _parse_yaml_lines(fm_text)
 
     return [
         *encoding_errors,
+        *_check_frontmatter_syntax(rel, fm_text),
         *_check_name(rel, fm.get("name", ""), skill_md.parent.name),
         *_check_description(rel, fm.get("description", "")),
         *_check_frontmatter_keys(rel, set(fm.keys())),
