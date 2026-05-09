@@ -12,7 +12,14 @@ A curated [Agent Skills](https://agentskills.io) catalogue packaged as the
 
 ## Layout
 
-- `skills/` — curated skills (`skills/<category>/<name>/SKILL.md`).
+- `skills/` — published catalogue. One **umbrella** skill per category
+  (`skills/<category>/<category>/SKILL.md`) with sub-topic guidance
+  under that umbrella's `references/` directory. Standalone tool
+  skills (e.g. `unix/ast-grep`, `unix/offline-docs`) live at
+  `skills/<category>/<name>/SKILL.md`.
+- `dev-skills/` — repo-only meta skills (`skill-creator-lang`,
+  `upstream-tracker`, `using-skills`). **Not** shipped via the plugin;
+  exposed project-locally through `.claude/skills/<name>` symlinks.
 - `staging/` — legacy content awaiting per-skill review. Do not edit
   unless promoting an item out of staging or removing it.
 - `upstream/sources.yaml` — manifest of tracked upstream skill repos
@@ -36,7 +43,7 @@ A curated [Agent Skills](https://agentskills.io) catalogue packaged as the
 - `evals/` — eval scaffolding (currently empty; see `evals/README.md`).
 
 For the workflow that operates on `upstream/`, see the
-`meta/upstream-tracker` skill.
+`upstream-tracker` skill in `dev-skills/` (project-local).
 
 ## Skill format
 
@@ -80,8 +87,15 @@ devenv -O packages:pkgs "ripgrep fd" shell -- rg pattern
 - The repo root is the plugin. Tool manifests (`.claude-plugin/plugin.json`,
   `.codex-plugin/plugin.json`, `gemini-extension.json`) live at the root.
 - Skills are two levels deep: `skills/<category>/<name>/SKILL.md`.
+- The published catalogue uses an **umbrella per category**:
+  `skills/<category>/<category>/SKILL.md` is the entry point, deeper
+  guidance lives under `references/<topic>.md` (and nested
+  `references/<topic>/...md` for multi-file topics).
 - When promoting a skill, add its path to `.claude-plugin/plugin.json`'s `skills` array.
   Codex discovers skills recursively from `skills/`.
+- Meta / repo-maintenance skills go in `dev-skills/` (not under
+  `skills/`), so they ship neither via the Claude plugin manifest nor
+  the Codex recursive scan.
 - Skill runtime dependencies use `nix run` shebangs in `scripts/` or MCP/LSP
   config — not in `devenv.nix`.
 - No bundled upstream skill repos. To re-import, vendor selected
