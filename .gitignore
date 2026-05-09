@@ -11,3 +11,10 @@ devenv.local.yaml
 # Python bytecode (helper scripts)
 __pycache__/
 *.pyc
+
+# Per-machine tool install/runtime state — install scripts regenerate these.
+# (.agents/plugins/marketplace.json stays tracked.)
+.agents/skills/
+.claude/
+.codex/
+.gemini/
