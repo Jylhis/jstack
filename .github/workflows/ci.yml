@@ -43,3 +43,12 @@ jobs:
 
       - name: Run devenv tests
         run: devenv test
+
+      - name: Upload eval results (if any)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-results-${{ matrix.os }}
+          path: evals/results/
+          if-no-files-found: ignore
+          retention-days: 14

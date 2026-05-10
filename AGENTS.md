@@ -43,7 +43,11 @@ A curated [Agent Skills](https://agentskills.io) catalogue packaged as the
 - `docs/skills-spec-v3.md` — target architecture spec we are growing toward.
 - `docs/upstream-sources.md` — list of upstream skill repos parked for later re-import.
 - `docs/history/` — archived design docs.
-- `evals/` — eval scaffolding (currently empty; see `evals/README.md`).
+- `evals/` — offline eval harness (no API keys). `cases.yaml` per
+  suite under `evals/suites/<suite>/`, deterministic-first assertions
+  driven through `promptfoo` `exec:` providers, cross-vendor
+  LLM-as-a-judge layer, hash-keyed VCR cassettes for CI replay. See
+  `evals/README.md` for recipes and the spec-v3 §10 mapping.
 
 For the workflow that operates on `upstream/`, see the
 `upstream-tracker` skill in `dev-skills/` (project-local).

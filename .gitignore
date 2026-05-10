@@ -18,3 +18,11 @@ __pycache__/
 .claude/
 .codex/
 .gemini/
+
+# Eval harness runtime artefacts. Cassettes and authored cases.yaml are
+# tracked; results, expander output, and Pi sentinel marks are not.
+evals/results/
+!evals/results/.gitkeep
+evals/.generated/
+evals/.skill_marks
+evals/scripts/__pycache__/

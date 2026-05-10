@@ -5,7 +5,9 @@
     just
     jq
     shellcheck
-    python3
+    (python3.withPackages (ps: with ps; [ pyyaml jsonschema ]))
+    nodejs_22
+    promptfoo
   ];
 
   enterShell = ''
@@ -21,6 +23,8 @@
   enterTest = ''
     set -e
     shellcheck scripts/install.sh
+    shellcheck evals/providers/*.sh evals/judges/*.sh
     python3 scripts/validate.py
+    just eval-smoke
   '';
 }
