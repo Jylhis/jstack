@@ -42,8 +42,7 @@ pi login
 
 The harness itself (promptfoo, jq, python, pyyaml, jsonschema) is
 provided by `devenv.nix`. Enter the dev shell with `direnv allow` or
-`devenv shell`. If `nodePackages.promptfoo` is unavailable in your
-nixpkgs pin, fall back to `npm i -g promptfoo`.
+`devenv shell`.
 
 ## Eval levels
 

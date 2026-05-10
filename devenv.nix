@@ -7,13 +7,11 @@
     shellcheck
     (python3.withPackages (ps: with ps; [ pyyaml jsonschema ]))
     nodejs_22
+    promptfoo
   ];
 
   enterShell = ''
     echo "skills dev shell — see 'just' for available recipes"
-    if ! command -v promptfoo >/dev/null 2>&1; then
-      echo "note: promptfoo not on PATH. Install via 'npm i -g promptfoo' for live evals."
-    fi
   '';
 
   languages = {
