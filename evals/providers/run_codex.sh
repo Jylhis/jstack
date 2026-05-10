@@ -10,7 +10,8 @@ emit_family_if_requested openai "${1:-}"
 require_cmd jq python3 codex
 
 PROMPT="${1:?prompt required as argv[1]}"
-WORKDIR="${2:-$(mktemp -d -t eval-codex-XXXXXX)}"
+# argv[2+] is reserved for promptfoo's options JSON; ignore it.
+WORKDIR="${EVAL_WORKDIR:-$(mktemp -d -t eval-codex-XXXXXX)}"
 mkdir -p "$WORKDIR"
 
 CLI_VERSION="$(codex --version 2>/dev/null | head -n1 || echo unknown)"
@@ -49,7 +50,7 @@ TRIGGERED_RAW="$(jq -r '
   select(.type == "item" and .item.kind == "command_execution")
   | .item.command // empty
   | tostring
-  | capture("[/\\\\]skills[/\\\\][^/\\\\]+[/\\\\](?<n>[^/\\\\]+)[/\\\\]SKILL\\.md")? .n
+  | capture("[/\\\\]skills[/\\\\][^/\\\\]+[/\\\\](?<n>[^/\\\\]+)[/\\\\]SKILL\\.md")? | .n
 ' "$TRACE_FILE" | head -n1)"
 
 if [[ -n "$TRIGGERED_RAW" ]]; then

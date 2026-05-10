@@ -15,7 +15,8 @@ emit_family_if_requested anthropic "${1:-}"
 require_cmd jq claude
 
 PROMPT="${1:?prompt required as argv[1]}"
-WORKDIR="${2:-$(mktemp -d -t judge-claude-XXXXXX)}"
+# argv[2+] is reserved for promptfoo's options JSON; ignore it.
+WORKDIR="${EVAL_WORKDIR:-$(mktemp -d -t judge-claude-XXXXXX)}"
 mkdir -p "$WORKDIR"
 
 CLI_VERSION="$(claude --version 2>/dev/null | head -n1 || echo unknown)"

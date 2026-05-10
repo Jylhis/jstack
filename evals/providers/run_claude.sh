@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # Claude Code provider for promptfoo's `exec:` lane.
 #
-# Usage (called by promptfoo, but also by humans for debugging):
-#   run_claude.sh "<prompt>" [workdir]
-#
-# The prompt is on argv[1]. argv[2] is an optional workdir (defaults to
-# a fresh mktemp dir) — the CLI runs with this as CWD so the host's
-# real skills/CLAUDE.md/AGENTS.md cannot leak into the session.
+# Wrapper contract (see evals/providers/lib.sh): argv[1] is the rendered
+# prompt. argv[2+] is RESERVED for promptfoo (it passes provider options
+# JSON there) and is ignored. The workdir override is via the
+# `EVAL_WORKDIR` env var; otherwise a fresh mktemp dir is used. The CLI
+# runs with the workdir as CWD so the host's real skills/CLAUDE.md/
+# AGENTS.md cannot leak into the session.
 #
 # Stdout: the assistant's final text. Stderr: a single line of JSON
 # trace consumed by promptfoo + invariants.py.
@@ -20,7 +20,7 @@ emit_family_if_requested anthropic "${1:-}"
 require_cmd jq python3 claude
 
 PROMPT="${1:?prompt required as argv[1]}"
-WORKDIR="${2:-$(mktemp -d -t eval-claude-XXXXXX)}"
+WORKDIR="${EVAL_WORKDIR:-$(mktemp -d -t eval-claude-XXXXXX)}"
 mkdir -p "$WORKDIR"
 
 CLI_VERSION="$(claude --version 2>/dev/null | head -n1 || echo unknown)"

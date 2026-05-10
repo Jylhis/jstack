@@ -14,7 +14,8 @@ emit_family_if_requested stub "${1:-}"
 require_cmd python3 jq
 
 PROMPT="${1:?prompt required as argv[1]}"
-WORKDIR="${2:-$(mktemp -d -t judge-stub-XXXXXX)}"
+# argv[2+] is reserved for promptfoo's options JSON; ignore it.
+WORKDIR="${EVAL_WORKDIR:-$(mktemp -d -t judge-stub-XXXXXX)}"
 mkdir -p "$WORKDIR"
 
 EVAL_SUITE="${EVAL_SUITE:?EVAL_SUITE env var required}"

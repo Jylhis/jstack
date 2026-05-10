@@ -24,8 +24,15 @@ eval-stub suite="ast-grep":
     python3 evals/scripts/invariants.py --provider stub --judge stub --suite {{suite}}
     promptfoo eval --config evals/.generated/{{suite}}.yaml --no-cache --output evals/results/{{suite}}-stub.json
 
-# Live four-CLI matrix; requires each CLI to be logged in (no API keys in harness)
-eval suite="ast-grep" provider="claude" judge="gemini":
+# Live four-CLI matrix; requires each CLI to be logged in (no API keys in harness).
+# Runs all four providers — the labelled "four-CLI matrix".
+eval suite="ast-grep" judge="gemini":
+    python3 evals/scripts/expand.py {{suite}} --judge {{judge}}
+    python3 evals/scripts/invariants.py --provider claude --judge {{judge}} --suite {{suite}}
+    promptfoo eval --config evals/.generated/{{suite}}.yaml --no-cache --output evals/results/{{suite}}.json
+
+# Single-provider live run; useful for triaging one CLI in isolation.
+eval-one suite="ast-grep" provider="claude" judge="gemini":
     python3 evals/scripts/expand.py {{suite}} --judge {{judge}}
     python3 evals/scripts/invariants.py --provider {{provider}} --judge {{judge}} --suite {{suite}}
     promptfoo eval --config evals/.generated/{{suite}}.yaml --filter-providers {{provider}} --no-cache --output evals/results/{{suite}}-{{provider}}.json

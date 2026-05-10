@@ -62,22 +62,33 @@ def judge_id(name: str) -> str:
     return f"exec:./evals/judges/judge_{name}.sh"
 
 
-def stub_provider_for(name: str, suite: str) -> dict:
+def stub_provider_for(name: str, suite: str,
+                       fixtures_subdir: str | None = None) -> dict:
     """Promptfoo provider entry that calls run_stub.sh on behalf of `name`.
 
-    Each cassette is keyed by recorded-provider, so we need a distinct
-    provider entry per substituted target with EVAL_PROVIDER set in env.
+    Each cassette is keyed by (provider, prompt, model, fixtures-digest),
+    so any case with `fixtures_subdir` needs `EVAL_FIXTURES_DIR` propagated
+    into the provider's subprocess env — otherwise replay computes a
+    no-fixtures key while record computed a with-fixtures key, and the
+    cassette is reported as "stale or missing". The label embeds the
+    fixtures dir so the de-dup in expand_suite() keeps a distinct entry
+    per (target, fixtures) tuple.
     """
+    env = {
+        "EVAL_PROVIDER": name,
+        "EVAL_SUITE": suite,
+        "EVAL_MODEL_SNAPSHOT": "default",
+    }
+    label = f"stub:{name}"
+    if fixtures_subdir:
+        env["EVAL_FIXTURES_DIR"] = (
+            f"./evals/suites/{suite}/fixtures/{fixtures_subdir}"
+        )
+        label = f"stub:{name}:{fixtures_subdir}"
     return {
         "id": "exec:./evals/providers/run_stub.sh",
-        "label": f"stub:{name}",
-        "config": {
-            "env": {
-                "EVAL_PROVIDER": name,
-                "EVAL_SUITE": suite,
-                "EVAL_MODEL_SNAPSHOT": "default",
-            },
-        },
+        "label": label,
+        "config": {"env": env},
     }
 
 
@@ -189,12 +200,13 @@ def expand_suite(suite: str, judge: str = "gemini",
         provs = default_providers(case)
         threshold = case_threshold(case)
         kind = case.get("kind", "output_quality")
+        fixtures_sub = case.get("fixtures_subdir")
         for p in provs:
             test_assert = build_assertions(case, suite, judge,
                                             stub_judge_flag=stub_judge_flag,
                                             no_rubric=no_rubric)
             if stub_sut:
-                provider_entry = stub_provider_for(p, suite)
+                provider_entry = stub_provider_for(p, suite, fixtures_sub)
             else:
                 provider_entry = provider_id(p)
             tests.append({
@@ -216,12 +228,15 @@ def expand_suite(suite: str, judge: str = "gemini",
             })
 
     if stub_sut:
-        # de-dup stub provider entries by label
+        # de-dup stub provider entries by label; the label includes the
+        # fixtures subdir so each unique (target, fixtures) tuple gets
+        # its own entry with the right EVAL_FIXTURES_DIR in env.
         seen_labels: set[str] = set()
         prov_list: list = []
         for case in cases:
+            sub = case.get("fixtures_subdir")
             for p in default_providers(case):
-                entry = stub_provider_for(p, suite)
+                entry = stub_provider_for(p, suite, sub)
                 if entry["label"] in seen_labels:
                     continue
                 seen_labels.add(entry["label"])

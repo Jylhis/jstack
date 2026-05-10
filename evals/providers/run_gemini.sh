@@ -10,7 +10,8 @@ emit_family_if_requested google "${1:-}"
 require_cmd jq python3 gemini
 
 PROMPT="${1:?prompt required as argv[1]}"
-WORKDIR="${2:-$(mktemp -d -t eval-gemini-XXXXXX)}"
+# argv[2+] is reserved for promptfoo's options JSON; ignore it.
+WORKDIR="${EVAL_WORKDIR:-$(mktemp -d -t eval-gemini-XXXXXX)}"
 mkdir -p "$WORKDIR"
 
 CLI_VERSION="$(gemini --version 2>/dev/null | head -n1 || echo unknown)"

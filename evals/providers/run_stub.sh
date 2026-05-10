@@ -13,7 +13,8 @@ emit_family_if_requested stub "${1:-}"
 require_cmd python3 jq
 
 PROMPT="${1:?prompt required as argv[1]}"
-WORKDIR="${2:-$(mktemp -d -t eval-stub-XXXXXX)}"
+# argv[2+] is reserved for promptfoo's options JSON; ignore it.
+WORKDIR="${EVAL_WORKDIR:-$(mktemp -d -t eval-stub-XXXXXX)}"
 mkdir -p "$WORKDIR"
 
 # These are populated by the harness (run.py / justfile recipes) when
