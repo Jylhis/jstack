@@ -157,9 +157,9 @@ if [[ -z "$SCOPE" ]]; then
 fi
 
 # Read the recorded marketplace source. An older install may point at a
-# stale GitHub mirror (e.g. `Jylhis/jstack`) instead of this repo, which
-# causes Claude to keep serving the pre-merge skill list. Returns empty if
-# the entry is missing or unreadable.
+# stale GitHub mirror instead of this repo (`Jylhis/skills`), which causes
+# Claude to keep serving an outdated skill list. Returns empty if the entry
+# is missing or unreadable.
 claude_marketplace_source() {
   python3 - "$KNOWN" <<'PY' 2>/dev/null || true
 import json, sys
