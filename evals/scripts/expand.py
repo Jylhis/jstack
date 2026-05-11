@@ -47,19 +47,23 @@ ALL_PROVIDERS = ["claude", "codex", "gemini", "pi"]
 
 
 def default_providers(case: dict) -> list[str]:
-    if case.get("providers"):
-        return list(case["providers"])
-    if case.get("kind", "").startswith("trigger_"):
-        return ["claude"]
+    """Return the provider list for a case.
+
+    The cases.yaml field ``providers`` is purely a recording hint (which
+    CLIs to *record* against); it does not restrict which providers
+    appear in the promptfoo matrix.  We always expand to all four
+    providers so that promptfoo's top-level × test cross-product has a
+    cassette for every cell.
+    """
     return list(ALL_PROVIDERS)
 
 
 def provider_id(name: str) -> str:
-    return f"exec:./evals/providers/run_{name}.sh"
+    return f"exec:../providers/run_{name}.sh"
 
 
 def judge_id(name: str) -> str:
-    return f"exec:./evals/judges/judge_{name}.sh"
+    return f"exec:../judges/judge_{name}.sh"
 
 
 def stub_provider_for(name: str, suite: str,
@@ -86,7 +90,7 @@ def stub_provider_for(name: str, suite: str,
         )
         label = f"stub:{name}:{fixtures_subdir}"
     return {
-        "id": "exec:./evals/providers/run_stub.sh",
+        "id": "exec:../providers/run_stub.sh",
         "label": label,
         "config": {"env": env},
     }
@@ -94,7 +98,7 @@ def stub_provider_for(name: str, suite: str,
 
 def stub_judge(name: str, suite: str) -> dict:
     return {
-        "id": "exec:./evals/judges/judge_stub.sh",
+        "id": "exec:../judges/judge_stub.sh",
         "label": f"judge-stub:{name}",
         "config": {
             "env": {
@@ -205,17 +209,27 @@ def _provider_entry(name: str, suite: str, fixtures_sub: str | None,
     return provider_id(name)
 
 
+def _provider_label(name: str, stub_sut: bool,
+                     fixtures_subdir: str | None = None) -> str:
+    """Return the label that matches the top-level provider entry."""
+    if stub_sut:
+        label = f"stub:{name}"
+        if fixtures_subdir:
+            label = f"stub:{name}:{fixtures_subdir}"
+        return label
+    return provider_id(name)
+
+
 def _make_test(case: dict, provider: str, suite: str, judge: str,
                 stub_sut: bool, stub_judge_flag: bool, no_rubric: bool) -> dict:
     test_assert = build_assertions(case, suite, judge,
                                     stub_judge_flag=stub_judge_flag,
                                     no_rubric=no_rubric)
-    entry = _provider_entry(provider, suite,
-                             case.get("fixtures_subdir"), stub_sut)
+    label = _provider_label(provider, stub_sut, case.get("fixtures_subdir"))
     test = {
         "description": f"{case['id']} :: {provider}",
         "vars": {"prompt": case["prompt"], "case_id": case["id"]},
-        "providers": [entry],
+        "providers": [label],
         "metadata": {
             "case_id": case["id"],
             "kind": case.get("kind", "output_quality"),

@@ -107,11 +107,10 @@ def seed(suite: str) -> int:
             continue
         triggered = SYNTHETIC_TRIGGERED.get(cid)
 
-        providers = case.get("providers")
-        if not providers:
-            kind = case.get("kind", "output_quality")
-            providers = ["claude"] if kind.startswith("trigger_") else \
-                        ["claude", "codex", "gemini", "pi"]
+        # Always seed all four providers so the promptfoo matrix has a
+        # cassette for every cell.  The cases.yaml ``providers`` field is
+        # a recording hint, not a matrix restriction.
+        providers = ["claude", "codex", "gemini", "pi"]
 
         for p in providers:
             key = compute_key(p, prompt, "default", None)

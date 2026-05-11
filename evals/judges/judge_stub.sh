@@ -13,8 +13,10 @@ emit_family_if_requested stub "${1:-}"
 
 require_cmd python3 jq
 
+# Import config.env from promptfoo's options JSON (argv[2]).
+import_promptfoo_env "${2:-}"
+
 PROMPT="${1:?prompt required as argv[1]}"
-# argv[2+] is reserved for promptfoo's options JSON; ignore it.
 WORKDIR="${EVAL_WORKDIR:-$(mktemp -d -t judge-stub-XXXXXX)}"
 mkdir -p "$WORKDIR"
 

@@ -73,3 +73,26 @@ require_cmd() {
     fi
   done
 }
+
+# Extract config.env from the promptfoo options JSON (argv[2]) and
+# export them into the current shell environment. promptfoo exec:
+# providers receive the config as a JSON string on argv[2] but do not
+# set config.env entries as actual environment variables.
+import_promptfoo_env() {
+  local config_json="${1:-}"
+  if [[ -z "$config_json" ]]; then
+    return 0
+  fi
+  # Parse config.env keys and export them, but only if they are not
+  # already set — explicit environment takes precedence.
+  local keys
+  keys="$(printf '%s' "$config_json" | jq -r '.config.env // {} | keys[]' 2>/dev/null)" || return 0
+  local key val
+  while IFS= read -r key; do
+    [[ -z "$key" ]] && continue
+    if [[ -z "${!key+x}" ]]; then
+      val="$(printf '%s' "$config_json" | jq -r --arg k "$key" '.config.env[$k]')"
+      export "$key=$val"
+    fi
+  done <<< "$keys"
+}
