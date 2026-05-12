@@ -1,7 +1,7 @@
 ---
 description: Append a correction note to the improvement-memory JSONL.
 argument-hint: <short note describing the correction>
-allowed-tools: Bash(python3:*), Bash(date:*), Read
+allowed-tools: Bash(go:*), Bash(date:*), Read
 ---
 
 Record a user correction as one schema-v1 entry in the
@@ -31,19 +31,19 @@ Steps:
    - `proposed_skill_change`: `null` unless an obvious one-line edit
      is suggested by the correction.
 
-3. Pipe the object to `python3 scripts/append-correction.py --json -`
+3. Pipe the object to `go run scripts/append-correction.go --json -`
    via stdin. Pass the JSON through a heredoc or `printf '%s'` from a
    shell variable; do NOT inline the JSON inside the command string
    (quoting hazards).
 
 4. On exit 0, print one acknowledgement line showing the resolved file
-   path (the helper echoes it on stderr; surface that to the user). On
-   non-zero exit, surface the helper's stderr verbatim — do not retry.
+   path (the helper prints it on stdout). On non-zero exit, surface
+   the helper's stderr verbatim — do not retry.
 
 Example invocation:
 
 ```bash
-python3 scripts/append-correction.py --json - <<'JSON'
+go run scripts/append-correction.go --json - <<'JSON'
 {
   "schema_version": 1,
   "timestamp": "2026-05-11T14:23:00Z",

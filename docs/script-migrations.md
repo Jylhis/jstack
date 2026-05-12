@@ -24,7 +24,7 @@ scope for migration.
 |------|---------|--------|----------|-----------|
 | `scripts/install.sh` (321 lines) | bash | Go | medium | Real installer with multiple registration paths; would benefit from typed config + tests. |
 | `scripts/validate.py` (533 lines) | typed Python (advisory-clean) | Go | low | Bootstrap concern — the validator can't validate itself if rewritten in Go yet. Already typed; keep as the typed-Python exemplar until Go is in `devenv.nix`. |
-| `scripts/append-correction.py` (new) | typed Python | Go | high | Small (~80 lines), called from a slash command. Easy first Go target once `devenv.nix` ships a Go toolchain. |
+| `scripts/append-correction.go` | Go | — | done | Ported from Python. Byte-identical JSONL output. The reference Go port. |
 | `evals/scripts/cassette.py` | Python | typed Python (exemption) | defer | Heavy YAML + jsonschema reliance; rewriting in Go is high-effort, low-value. Keep but ensure `mypy --strict` clean. |
 | `evals/scripts/expand.py` | Python | typed Python (exemption) | defer | Same — PyYAML-driven case expansion. |
 | `evals/scripts/invariants.py` | Python | typed Python (exemption) | defer | Same — jsonschema-driven invariants. |
@@ -33,18 +33,21 @@ scope for migration.
 | `meta/upstream-tracker/scripts/fetch.py` | typed Python | Go | low | git fetch wrapper; trivial Go rewrite. |
 | `meta/upstream-tracker/scripts/import.py` | typed Python | Go | low | Tree walk + frontmatter inject; doable in Go. |
 | `meta/upstream-tracker/scripts/review.py` | typed Python | Go | low | Append-only decision log; trivial Go rewrite. |
-| `skills/gitlab/gitlab/scripts/ci-debug.sh` | bash | Go | medium | GitLab API call + JSON manipulation — Go is the right shape (`net/http` + `encoding/json`). |
-| `skills/gitlab/gitlab/scripts/sync-fork.sh` | bash | Go | medium | Same. |
+| `skills/services/gitlab/scripts/ci-debug.sh` | bash | Go | medium | GitLab API call + JSON manipulation — Go is the right shape (`net/http` + `encoding/json`). |
+| `skills/services/gitlab/scripts/sync-fork.sh` | bash | Go | medium | Same. |
 
 ## Order of operations
 
-1. Add a Go toolchain to `devenv.nix` (separate PR).
-2. Port the smallest helper first: `scripts/append-correction.py`. Use
-   it as the reference implementation for the rest.
+1. ~~Add a Go toolchain to `devenv.nix`.~~ Done (`devenv.nix` now ships
+   Go + Bun + TypeScript via `languages.*` options).
+2. ~~Port the smallest helper first: `scripts/append-correction.py`.~~
+   Done — see `scripts/append-correction.go`. The slash command at
+   `plugins/jylhis-skills-core/commands/remember-correction.md`
+   invokes it via `go run`.
 3. Port `meta/upstream-tracker/scripts/` next — small, internal,
    no end-user impact.
-4. Port `skills/gitlab/gitlab/scripts/` as a group; one PR per script
-   or a single PR if the diff stays reviewable.
+4. Port `skills/services/gitlab/scripts/` as a group; one PR per
+   script or a single PR if the diff stays reviewable.
 5. Port `scripts/install.sh` once a Go port of `validate.py` exists
    (so `just check` can shell out to one Go binary instead of two).
 6. Port `scripts/validate.py` last; rewriting it in Go closes the
@@ -52,8 +55,6 @@ scope for migration.
 
 ## Out of scope here
 
-- Adding Bun to `devenv.nix` — only needed when a TypeScript candidate
-  appears.
 - Rewriting eval scripts; the `mypy --strict` exemption is permanent
   until the ecosystem ergonomics in Go catch up to PyYAML/jsonschema.
 - Backfilling tests for the existing Bash scripts — port them, then
