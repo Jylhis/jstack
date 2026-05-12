@@ -372,8 +372,14 @@ def ensure_clone(src: dict[str, Any]) -> Path:
 
 def fetch_origin(src: dict[str, Any]) -> Path:
     cache = ensure_clone(src)
-    print(f"  fetching origin/{src['branch']}")
-    git("fetch", "--quiet", "origin", src["branch"], cwd=cache)
+    branch = src["branch"]
+    print(f"  fetching origin/{branch}")
+    # Bare clones don't populate refs/remotes/origin/* by default.
+    # The explicit refspec form `<branch>:refs/remotes/origin/<branch>`
+    # maintains the remote-tracking ref so resolve_ref("origin/<branch>")
+    # works the same way it does in a regular working clone.
+    git("fetch", "--quiet", "origin",
+        f"+{branch}:refs/remotes/origin/{branch}", cwd=cache)
     return cache
 
 

@@ -28,7 +28,10 @@ MARKETPLACE_JSON = REPO_ROOT / ".claude-plugin" / "marketplace.json"
 UPSTREAM_MANIFEST = REPO_ROOT / "upstream" / "sources.yaml"
 
 CORE_PLUGIN_NAME = "jylhis-skills-core"
-CORE_PLUGIN_SKILLS = {"security", "ast-grep", "offline-docs"}
+# The core plugin must always declare these baseline cross-cutting
+# skills. Additional skills may be present (e.g. imported via
+# meta/upstream-tracker); the check is a subset, not equality.
+CORE_PLUGIN_REQUIRED_SKILLS = {"security", "ast-grep", "offline-docs"}
 
 NAME_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 DESC_MIN = 50
@@ -255,11 +258,12 @@ def check_plugin_manifests(skill_files: list[Path]) -> list[str]:
                 f"{rel}: referenced by multiple plugins {sorted(owners)} — must belong to exactly one"
             )
 
-    # The default plugin must cover exactly the cross-cutting set.
-    if core_seen != CORE_PLUGIN_SKILLS:
+    # The default plugin must cover at least the required cross-cutting set.
+    missing_required = CORE_PLUGIN_REQUIRED_SKILLS - core_seen
+    if missing_required:
         errors.append(
-            f"plugins/{CORE_PLUGIN_NAME}/.claude-plugin/plugin.json: core skills "
-            f"{sorted(core_seen)} do not match expected {sorted(CORE_PLUGIN_SKILLS)}"
+            f"plugins/{CORE_PLUGIN_NAME}/.claude-plugin/plugin.json: missing "
+            f"required core skills {sorted(missing_required)}"
         )
 
     errors.extend(_check_marketplace_manifest(plugin_manifests))
