@@ -6,7 +6,6 @@
     jq
     shellcheck
     (python3.withPackages (ps: with ps; [ pyyaml jsonschema ]))
-    nodejs_22
     promptfoo
   ];
 
@@ -18,6 +17,12 @@
     nix.enable = true;
     shell.enable = true;
     python.enable = true;
+    go.enable = true;
+    typescript.enable = true;
+    javascript = {
+      enable = true;
+      bun.enable = true;
+    };
   };
 
   enterTest = ''
