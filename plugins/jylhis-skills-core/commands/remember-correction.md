@@ -32,9 +32,10 @@ Steps:
      is suggested by the correction.
 
 3. Pipe the object to `go run "${CLAUDE_PLUGIN_ROOT}/scripts/append-correction.go" --json -`
-   via stdin. Pass the JSON through a heredoc or `printf '%s'` from a
-   shell variable; do NOT inline the JSON inside the command string
-   (quoting hazards).
+   via stdin. This path is plugin-root anchored; never use a workspace-relative
+   `scripts/append-correction.go`. Pass the JSON through a heredoc or
+   `printf '%s'` from a shell variable; do NOT inline the JSON inside the
+   command string (quoting hazards).
 
 4. On exit 0, print one acknowledgement line showing the resolved file
    path (the helper prints it on stdout). On non-zero exit, surface
