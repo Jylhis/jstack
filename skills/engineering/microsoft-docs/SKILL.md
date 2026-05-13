@@ -1,7 +1,7 @@
 ---
 name: microsoft-docs
 description: Understand Microsoft technologies by querying official documentation. Use whenever the user asks how something works, wants tutorials, needs configuration options, limits, quotas, or best practices for any Microsoft technology (Azure, .NET, M365, Windows, Power Platform, etc.)—even if they don't mention "docs." If the question is about understanding a concept rather than writing code, this is the right skill.
-compatibility: "Primarily uses the Microsoft Learn MCP Server (https://learn.microsoft.com/api/mcp); if that is unavailable, fall back to the mslearn CLI (`npx @microsoft/learn-cli`)."
+compatibility: "Primarily uses the Microsoft Learn MCP Server (https://learn.microsoft.com/api/mcp); if that is unavailable, fall back to the mslearn CLI (`npx @microsoft/learn-cli@0.1.0`)."
 metadata:
   upstream-id: microsoft-docs
   upstream-rev: b71de35cb5a1acc458e1f518cbb9acc830f6d7c6
@@ -66,10 +66,10 @@ If the Learn MCP server is not available, use the `mslearn` CLI from the command
 
 ```sh
 # Run directly (no install needed)
-npx @microsoft/learn-cli search "azure functions timeout"
+npx @microsoft/learn-cli@0.1.0 search "azure functions timeout"
 
 # Or install globally, then run
-npm install -g @microsoft/learn-cli
+npm install -g @microsoft/learn-cli@0.1.0
 mslearn search "azure functions timeout"
 ```
 
