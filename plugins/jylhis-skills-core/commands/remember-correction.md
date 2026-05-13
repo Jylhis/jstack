@@ -31,7 +31,7 @@ Steps:
    - `proposed_skill_change`: `null` unless an obvious one-line edit
      is suggested by the correction.
 
-3. Pipe the object to `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/append-correction.py --json -`
+3. Pipe the object to python3 "${CLAUDE_PLUGIN_ROOT}/scripts/append-correction.py" --json -
    via stdin. Pass the JSON through a heredoc or `printf '%s'` from a
    shell variable; do NOT inline the JSON inside the command string
    (quoting hazards).
