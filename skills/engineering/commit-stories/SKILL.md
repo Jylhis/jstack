@@ -60,7 +60,7 @@ A body that just restates the diff is noise. If you can't write a sentence the d
 
 ## Step 4 — One commit = one decision
 
-The 250–1000-line range is a **rhythm**, not a rule. The real test:
+The 50–500-line range is a common rhythm, not a rule. The real test:
 
 > Can you write a single honest subject for everything in this commit?
 
