@@ -71,6 +71,11 @@ by default.
 | `jylhis-nix` | Nix skill + `nixd` LSP |
 | `jylhis-filesystems` | DuckDB / filesystem tooling skill |
 | `jylhis-gitlab` | GitLab push + MR-create skill |
+| `jylhis-terraform` | Terraform skill |
+| `jylhis-azure` | Azure cloud skill |
+| `jylhis-obsidian` | Obsidian note-taking and knowledge management skill |
+| `jylhis-grafana` | Grafana observability skill |
+| `jylhis-taste` | UI/UX design taste and critique skill |
 
 Install one in each tool (example: `jylhis-python`):
 

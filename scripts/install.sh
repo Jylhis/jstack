@@ -66,18 +66,31 @@ PY
 list_enabled_codex_plugins() {
   local config="$1"
   [[ -f "$config" ]] || return 0
-  awk '
-    /^\[plugins\."[^"]+@jylhis-skills"\]/ {
-      match($0, /"([^"]+)"/, m)
-      current = m[1]
-      next
-    }
-    /^\[/ { current = "" }
-    current && /^enabled[[:space:]]*=[[:space:]]*true/ {
-      print current
-      current = ""
-    }
-  ' "$config"
+  python3 - "$config" <<'PY'
+import re
+import sys
+
+section_re = re.compile(r'^\[plugins\."([^"]+@jylhis-skills)"\]\s*$')
+enabled_re = re.compile(r"^enabled\s*=\s*true\s*$")
+
+current = ""
+try:
+    with open(sys.argv[1], encoding="utf-8") as f:
+        for raw_line in f:
+            line = raw_line.strip()
+            match = section_re.match(line)
+            if match:
+                current = match.group(1)
+                continue
+            if line.startswith("["):
+                current = ""
+                continue
+            if current and enabled_re.match(line):
+                print(current)
+                current = ""
+except OSError:
+    pass
+PY
 }
 
 link() {
@@ -140,6 +153,53 @@ enable_codex_plugin() {
   fi
 
   echo "enable Codex plugin $plugin_id in $config"
+}
+
+remove_codex_plugin_config_section() {
+  local config="$1"
+  local plugin_id="$2"
+  local section="[plugins.\"$plugin_id\"]"
+
+  [[ -f "$config" ]] || return 0
+  grep -qF "$section" "$config" || return 0
+
+  if [[ $DRY_RUN -eq 1 ]]; then
+    echo "DRY: remove legacy Codex plugin section $plugin_id from $config"
+    return
+  fi
+
+  python3 - "$config" "$section" <<'PY'
+import sys
+
+path, section = sys.argv[1], sys.argv[2]
+
+try:
+    with open(path, encoding="utf-8") as f:
+        lines = f.readlines()
+except OSError:
+    sys.exit(0)
+
+out = []
+skipping = False
+changed = False
+
+for line in lines:
+    stripped = line.strip()
+    if stripped == section:
+        skipping = True
+        changed = True
+        continue
+    if skipping and stripped.startswith("["):
+        skipping = False
+    if not skipping:
+        out.append(line)
+
+if changed:
+    with open(path, "w", encoding="utf-8") as f:
+        f.writelines(out)
+PY
+
+  echo "removed legacy Codex plugin section $plugin_id from $config"
 }
 
 sync_codex_plugin_cache() {
@@ -318,6 +378,8 @@ if [[ -d "$CODEX_LEGACY_CACHE" ]]; then
   run mv "$CODEX_LEGACY_CACHE" "$BACKUP_ROOT/codex-cache-$(basename "$CODEX_LEGACY_CACHE")"
   echo "moved legacy Codex cache $CODEX_LEGACY_CACHE -> $BACKUP_ROOT/"
 fi
+
+remove_codex_plugin_config_section "$CODEX_DIR/config.toml" "${LEGACY_PLUGIN}@jylhis-skills"
 
 # Read the `source = "..."` line under `[marketplaces.jylhis-skills]` in
 # Codex config.toml. Same intent as claude_marketplace_source: detect when
