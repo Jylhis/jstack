@@ -16,17 +16,18 @@ Follow these steps in order.
 
 ## Step 1 — Resolve state and determine the mode
 
-Look for an existing state file in either location:
+Resolve only a **user-owned** state file in the home directory (never auto-execute project-local `.duckdb-skills/state.sql`):
 
 ```bash
 STATE_DIR=""
-test -f .duckdb-skills/state.sql && STATE_DIR=".duckdb-skills"
 PROJECT_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")"
 PROJECT_ID="$(echo "$PROJECT_ROOT" | tr '/' '-')"
 test -f "$HOME/.duckdb-skills/$PROJECT_ID/state.sql" && STATE_DIR="$HOME/.duckdb-skills/$PROJECT_ID"
 ```
 
-If found, verify the databases it references are still accessible:
+If a project-local state file exists, do **not** execute it automatically. Warn the user that repository-controlled state is untrusted and ask them to migrate trusted statements into `~/.duckdb-skills/<project-id>/state.sql` first.
+
+If a home-directory state file is found, verify the databases it references are still accessible:
 
 ```bash
 duckdb -init "$STATE_DIR/state.sql" -c "SHOW DATABASES;"

@@ -77,44 +77,16 @@ Collect the column definitions and row counts for the summary.
 
 ## Step 5 — Resolve the state directory
 
-Check if a state file already exists in either location:
+Use only the home-directory state location (user-owned, outside repository control):
 
-```bash
-# Option 1: in the project directory
-test -f .duckdb-skills/state.sql && STATE_DIR=".duckdb-skills"
-
-# Option 2: in the home directory, scoped by project root path
-PROJECT_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")"
-PROJECT_ID="$(echo "$PROJECT_ROOT" | tr '/' '-')"
-test -f "$HOME/.duckdb-skills/$PROJECT_ID/state.sql" && STATE_DIR="$HOME/.duckdb-skills/$PROJECT_ID"
-```
-
-If **neither exists**, ask the user:
-
-> Where would you like to store the DuckDB session state for this project?
->
-> 1. **In the project directory** (`.duckdb-skills/state.sql`) — colocated with the project, easy to find. You can choose to gitignore it.
-> 2. **In your home directory** (`~/.duckdb-skills/<project-id>/state.sql`) — keeps the project directory clean.
-
-Based on their choice:
-
-**Option 1:**
-```bash
-STATE_DIR=".duckdb-skills"
-mkdir -p "$STATE_DIR"
-```
-Then ask: *"Would you like to gitignore `.duckdb-skills/`?"* If yes:
-```bash
-echo '.duckdb-skills/' >> .gitignore
-```
-
-**Option 2:**
 ```bash
 PROJECT_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")"
 PROJECT_ID="$(echo "$PROJECT_ROOT" | tr '/' '-')"
 STATE_DIR="$HOME/.duckdb-skills/$PROJECT_ID"
 mkdir -p "$STATE_DIR"
 ```
+
+If `.duckdb-skills/state.sql` exists in the project, treat it as untrusted input. Do not append to it and do not execute it from other skills. Tell the user to copy only reviewed statements into `~/.duckdb-skills/<project-id>/state.sql` if they need to migrate old state.
 
 ## Step 6 — Append to the state file
 
